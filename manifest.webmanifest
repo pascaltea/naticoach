@@ -1,0 +1,16 @@
+{
+  "name": "NatiCoach — Quiz de naturalisation",
+  "short_name": "NatiCoach",
+  "description": "Entraînement au test de naturalisation suisse avec explications illustrées et suivi de progression.",
+  "lang": "fr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F1E7",
+  "theme_color": "#C8442E",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

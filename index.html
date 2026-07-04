@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#C8442E" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="NatiCoach" />
+  <title>NatiCoach — Quiz de naturalisation</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="styles.css?v=44" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ============ ÉCRAN : CONFIGURATION / CHOIX DE COMMUNE ============ -->
+    <section class="screen active" id="screen-setup">
+      <button class="icon-btn setup-back" id="setupBack" hidden aria-label="Fermer">✕</button>
+      <div class="setup-hero">
+        <img class="brand-mark" src="logo-app-icon.svg" alt="" width="60" height="60" />
+        <h1 id="setupTitle">Bienvenue</h1>
+        <p class="sub" id="setupSub">Choisis ta commune pour personnaliser ton entraînement.</p>
+      </div>
+      <div class="search-wrap">
+        <span class="search-ico">🔍</span>
+        <input id="communeSearch" class="search-input" type="search" inputmode="search"
+               placeholder="Rechercher ma commune…" autocomplete="off" />
+      </div>
+      <div id="communeResults" class="commune-results"></div>
+    </section>
+
+    <!-- ============ ÉCRAN : ACCUEIL ============ -->
+    <section class="screen" id="screen-home">
+      <img class="hero-deco" src="logo-edelweiss-red.svg" alt="" aria-hidden="true" />
+      <header class="home-hero">
+        <img class="brand-mark" src="logo-app-icon.svg" alt="" width="48" height="48" />
+        <div class="home-hero-txt">
+          <h1 class="wordmark"><span class="wm-nati">Nati</span><span class="wm-coach">Coach</span></h1>
+          <button class="commune-pill" id="btnChangeCommune">
+            <span id="homeCommune">—</span> <span class="chev">▾</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="card readiness-card">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 120 120" class="ring">
+            <circle class="ring-bg" cx="60" cy="60" r="52"/>
+            <circle class="ring-fg" cx="60" cy="60" r="52" id="readinessRing"/>
+          </svg>
+          <div class="ring-center"><span id="readinessPct">0%</span><small>préparation</small></div>
+        </div>
+        <div class="readiness-meta">
+          <div><strong id="statBest">0%</strong><span>Meilleur score</span></div>
+          <div><strong id="statSessions">0</strong><span>Sessions</span></div>
+          <div><strong id="statStreak">0</strong><span>Série (jours)</span></div>
+        </div>
+      </div>
+
+      <div class="modes">
+        <button class="mode-btn primary" id="btnExam">
+          <span class="mode-ico">📝</span>
+          <span class="mode-txt"><b>Simuler l'examen</b><small>48 questions · 60 min · réussite 70 %</small></span>
+          <span class="chev">›</span>
+        </button>
+        <button class="mode-btn" id="btnStudy">
+          <span class="mode-ico">📖</span>
+          <span class="mode-txt"><b>Réviser les réponses</b><small>Toutes les questions · découverte ou quiz</small></span>
+          <span class="chev">›</span>
+        </button>
+        <button class="mode-btn" id="btnMistakes" hidden>
+          <span class="mode-ico">🔁</span>
+          <span class="mode-txt"><b>Réviser mes erreurs</b><small><span id="mistakesCount">0</span> question(s) à retravailler</small></span>
+          <span class="chev">›</span>
+        </button>
+        <button class="mode-btn" id="btnExplore">
+          <span class="mode-ico">🗺️</span>
+          <span class="mode-txt"><b>Explorer la Suisse</b><small>Carte interactive des 26 cantons</small></span>
+          <span class="chev">›</span>
+        </button>
+        <button class="mode-btn" id="btnTimeline">
+          <span class="mode-ico">🕰️</span>
+          <span class="mode-txt"><b>Frise chronologique</b><small>Les grandes dates suisses et vaudoises</small></span>
+          <span class="chev">›</span>
+        </button>
+        <button class="mode-btn" id="btnStats">
+          <span class="mode-ico">📊</span>
+          <span class="mode-txt"><b>Mes statistiques</b><small>Réussite par thème et par niveau</small></span>
+          <span class="chev">›</span>
+        </button>
+        <button class="mode-btn" id="btnBadges">
+          <span class="mode-ico">🏆</span>
+          <span class="mode-txt"><b>Mes succès</b><small><span id="badgeCount">0</span> badge(s) débloqué(s)</small></span>
+          <span class="chev">›</span>
+        </button>
+      </div>
+
+      <div class="card progress-card">
+        <div class="card-title-row"><h2>Ta progression</h2><span class="muted" id="trendLabel"></span></div>
+        <svg viewBox="0 0 300 90" class="spark" id="sparkline" preserveAspectRatio="none"></svg>
+        <p class="muted tiny" id="emptyHistory">Fais ta première session pour voir ta courbe évoluer.</p>
+      </div>
+
+      <p class="footer-note"><img class="footer-flower" src="logo-edelweiss-red.svg" alt="" width="14" height="14" /> Questions officielles du Canton de Vaud · progression enregistrée sur cet appareil · hors-ligne</p>
+    </section>
+
+    <!-- ============ ÉCRAN : RÉVISION (réponses affichées) ============ -->
+    <section class="screen" id="screen-study">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitStudy" aria-label="Retour">←</button>
+        <div class="seg" id="studyScopes"></div>
+        <span class="quiz-count" id="studyCount">1/1</span>
+      </div>
+      <div class="study-modebar"><div class="seg mini" id="studyMode"></div></div>
+      <div class="quiz-body">
+        <span class="chip" id="studyChip"></span>
+        <h2 class="question" id="studyQuestion"></h2>
+        <div class="options" id="studyOptions"></div>
+        <div class="explain" id="studyExplain">
+          <div class="explain-illus" id="studyIllus"></div>
+          <div class="explain-text">
+            <div class="explain-head ok" id="studyExplainHead">💡 Le savais-tu ?</div>
+            <p id="studyExplainText"></p>
+          </div>
+        </div>
+      </div>
+      <div class="quiz-foot study-foot">
+        <button class="btn btn-ghost half" id="btnPrev">‹ Précédent</button>
+        <button class="btn btn-primary half" id="btnNextStudy">Suivant ›</button>
+      </div>
+    </section>
+
+    <!-- ============ ÉCRAN : QUIZ (entraînement + examen) ============ -->
+    <section class="screen" id="screen-quiz">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitQuiz" aria-label="Quitter">✕</button>
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+        <span class="timer" id="examTimer" hidden>60:00</span>
+        <span class="quiz-count" id="quizCount">1/10</span>
+      </div>
+      <div class="quiz-body">
+        <span class="chip" id="quizCat"></span>
+        <h2 class="question" id="questionText"></h2>
+        <div class="options" id="optionsList"></div>
+        <div class="explain" id="explainBox" hidden>
+          <div class="explain-illus" id="explainIllus"></div>
+          <div class="explain-text">
+            <div class="explain-head" id="explainHead"></div>
+            <p id="explainText"></p>
+          </div>
+        </div>
+      </div>
+      <div class="quiz-foot">
+        <button class="btn btn-primary big" id="btnNext" hidden>Continuer</button>
+      </div>
+    </section>
+
+    <!-- ============ ÉCRAN : RÉSULTATS ============ -->
+    <section class="screen" id="screen-result">
+      <div class="result-inner">
+        <img class="result-mark" src="logo-edelweiss-red.svg" alt="" width="40" height="40" />
+        <div class="ring-wrap big">
+          <svg viewBox="0 0 120 120" class="ring">
+            <circle class="ring-bg" cx="60" cy="60" r="52"/>
+            <circle class="ring-fg" cx="60" cy="60" r="52" id="resultRing"/>
+          </svg>
+          <div class="ring-center"><span id="resultPct">0%</span><small id="resultFrac">0/0</small></div>
+        </div>
+        <div id="resultBadge" class="result-badge" hidden></div>
+        <h2 id="resultTitle"></h2>
+        <p class="muted" id="resultMsg"></p>
+        <div class="result-actions">
+          <button class="btn btn-primary big" id="btnReview" hidden>🔎 Revoir mes réponses</button>
+          <button class="btn btn-share" id="btnShare">📲 Partager mon score</button>
+          <button class="btn btn-ghost" id="btnRetry">Recommencer</button>
+          <button class="btn btn-ghost" id="btnHome">Accueil</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ÉCRAN : EXPLORER LA SUISSE ============ -->
+    <section class="screen" id="screen-explore">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitExplore" aria-label="Retour">←</button>
+        <h2 class="explore-title">Explorer la Suisse</h2>
+        <span></span>
+      </div>
+      <p class="muted tiny explore-sub">Touche un canton pour découvrir ses informations.</p>
+      <div class="map-frame">
+        <svg viewBox="0 0 100 72" class="canton-map" id="cantonMap" role="group" aria-label="Carte des cantons suisses"></svg>
+        <div class="map-zoom">
+          <button id="zoomIn" aria-label="Zoomer">＋</button>
+          <button id="zoomOut" aria-label="Dézoomer">－</button>
+          <button id="zoomReset" aria-label="Réinitialiser">⤢</button>
+        </div>
+      </div>
+      <div class="map-legend" id="mapLegend"></div>
+      <div class="canton-detail" id="cantonDetail"></div>
+    </section>
+
+    <!-- ============ ÉCRAN : SUCCÈS ============ -->
+    <section class="screen" id="screen-badges">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitBadges" aria-label="Retour">←</button>
+        <h2 class="explore-title">Mes succès</h2>
+        <span></span>
+      </div>
+      <p class="badge-progress" id="badgeProgress"></p>
+      <div class="badge-grid" id="badgeGrid"></div>
+    </section>
+
+    <!-- ============ ÉCRAN : STATISTIQUES ============ -->
+    <section class="screen" id="screen-stats">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitStats" aria-label="Retour">←</button>
+        <h2 class="explore-title">Mes statistiques</h2>
+        <span></span>
+      </div>
+      <div id="statsBody"></div>
+    </section>
+
+    <!-- ============ ÉCRAN : FRISE CHRONOLOGIQUE ============ -->
+    <section class="screen" id="screen-timeline">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitTimeline" aria-label="Retour">←</button>
+        <h2 class="explore-title">Frise chronologique</h2>
+        <span></span>
+      </div>
+      <div class="map-legend" id="timelineLegend"></div>
+      <div class="timeline" id="timelineList"></div>
+    </section>
+
+    <!-- ============ ÉCRAN : CORRECTION ============ -->
+    <section class="screen" id="screen-review">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitReview" aria-label="Retour">←</button>
+        <div class="seg" id="reviewFilter"></div>
+        <span class="quiz-count" id="reviewCount"></span>
+      </div>
+      <div id="reviewList" class="review-list"></div>
+    </section>
+
+    <!-- Lightbox illustrations -->
+    <div id="lightbox" class="lightbox" hidden><div class="lightbox-inner" id="lightboxInner"></div></div>
+    <!-- Notification succès -->
+    <div id="toast" class="toast" aria-live="polite"></div>
+  </div>
+
+  <script src="questions.js"></script>
+  <script src="illustrations.js"></script>
+  <script src="explanations.js"></script>
+  <script src="commune_explanations.js"></script>
+  <script src="commune_rules.js"></script>
+  <script src="cantons.js"></script>
+  <script src="swissmap.js"></script>
+  <script src="timeline.js"></script>
+  <script src="vd_official.js"></script>
+  <script src="app.js?v=42"></script>
+</body>
+</html>

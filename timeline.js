@@ -1,0 +1,51 @@
+/* =========================================================================
+ * Frise chronologique — repères de l'histoire suisse (ch) et vaudoise (vd).
+ * Alignée sur les faits du quiz de naturalisation, pour « visualiser » l'Histoire.
+ * ========================================================================= */
+
+const TIMELINE = [
+  { year: "~15 av. J.-C.", scope: "vd", icon: "🏛️", title: "Époque romaine",
+    desc: "Rome fonde Aventicum (Avenches), capitale de l'Helvétie, ainsi que Lousonna (Lausanne) et Noviodunum (Nyon)." },
+  { year: "1291", scope: "ch", icon: "🤝", title: "Pacte fédéral",
+    desc: "Uri, Schwytz et Unterwald s'allient : acte fondateur de la Confédération, fêté chaque 1er août." },
+  { year: "1315", scope: "ch", icon: "⚔️", title: "Bataille de Morgarten",
+    desc: "Les Confédérés remportent une première grande victoire face aux Habsbourg." },
+  { year: "1476", scope: "ch", icon: "🛡️", title: "Guerres de Bourgogne",
+    desc: "Victoires confédérées à Grandson et Morat (sur sol vaudois) contre Charles le Téméraire." },
+  { year: "1536", scope: "vd", icon: "⛪", title: "Berne conquiert Vaud",
+    desc: "Berne s'empare du Pays de Vaud et y impose la Réforme protestante. Vaud restera bernois jusqu'en 1798." },
+  { year: "1723", scope: "vd", icon: "🗡️", title: "Révolte du Major Davel",
+    desc: "Le patriote vaudois tente de libérer Vaud de la tutelle bernoise ; il est décapité." },
+  { year: "1798", scope: "vd", icon: "🎉", title: "Indépendance vaudoise",
+    desc: "Le 24 janvier, le Pays de Vaud proclame son indépendance (République lémanique), avec l'appui de la France." },
+  { year: "1803", scope: "vd", icon: "🇨🇭", title: "Vaud rejoint la Confédération",
+    desc: "L'Acte de Médiation de Napoléon fait de Vaud un canton suisse à part entière (14 avril)." },
+  { year: "1815", scope: "ch", icon: "🕊️", title: "Congrès de Vienne",
+    desc: "La neutralité suisse est reconnue ; Genève, le Valais et Neuchâtel rejoignent la Confédération (23 cantons)." },
+  { year: "1848", scope: "ch", icon: "📜", title: "Constitution fédérale",
+    desc: "Après la guerre du Sonderbund (1847), la Suisse devient un État fédéral moderne (Conseil fédéral, Parlement)." },
+  { year: "1863", scope: "ch", icon: "➕", title: "Fondation de la Croix-Rouge",
+    desc: "Henri Dunant fonde la Croix-Rouge à Genève ; il recevra le tout premier prix Nobel de la paix." },
+  { year: "1939–1945", scope: "vd", icon: "🎖️", title: "Seconde Guerre mondiale",
+    desc: "La Suisse reste neutre ; le Vaudois Henri Guisan est le général de l'armée." },
+  { year: "1959", scope: "vd", icon: "🗳️", title: "Vaud, pionnier du vote des femmes",
+    desc: "Vaud est le premier canton à accorder le droit de vote aux femmes au niveau cantonal." },
+  { year: "1964", scope: "vd", icon: "🎡", title: "Expo 64 à Lausanne",
+    desc: "L'Exposition nationale suisse se tient à Vidy, à Lausanne." },
+  { year: "1971", scope: "ch", icon: "♀️", title: "Vote des femmes (fédéral)",
+    desc: "Les Suissesses obtiennent le droit de vote et d'éligibilité au niveau fédéral." },
+  { year: "1979", scope: "ch", icon: "🆕", title: "Naissance du canton du Jura",
+    desc: "Le Jura devient le 26e canton, en se séparant du canton de Berne." },
+  { year: "2002", scope: "ch", icon: "🌍", title: "La Suisse entre à l'ONU",
+    desc: "Par votation populaire, la Suisse adhère à l'Organisation des Nations Unies." },
+  { year: "2003", scope: "vd", icon: "📖", title: "Constitution vaudoise actuelle",
+    desc: "Le canton de Vaud se dote de sa Constitution en vigueur aujourd'hui." },
+  { year: "2007", scope: "vd", icon: "🍇", title: "Lavaux au patrimoine de l'UNESCO",
+    desc: "Les terrasses viticoles de Lavaux, entre Lausanne et Montreux, sont classées à l'UNESCO." },
+  { year: "2008", scope: "ch", icon: "🛂", title: "Espace Schengen",
+    desc: "La Suisse rejoint l'espace Schengen (libre circulation), sans adhérer à l'Union européenne." },
+  { year: "2019", scope: "vd", icon: "🍷", title: "Fête des Vignerons",
+    desc: "La Fête des Vignerons de Vevey (patrimoine immatériel de l'UNESCO) rassemble des centaines de milliers de visiteurs." },
+];
+
+if (typeof module !== "undefined") { module.exports = { TIMELINE }; }
