@@ -194,16 +194,30 @@
     .map(([id, c]) => ({ id, name: c.name, district: c.district, key: norm(c.name) }))
     .sort((a, b) => a.name.localeCompare(b.name, "fr"));
 
+  let pendingCommune = null;
+
   function openSetup(isChange) {
     $("setupBack").hidden = !isChange;
-    $("setupTitle").textContent = isChange ? "Changer de commune" : "Bienvenue";
+    $("setupTitle").textContent = isChange ? "Changer de commune" : "Où habites-tu ?";
     $("setupSub").textContent = isChange
-      ? "Sélectionne ta nouvelle commune."
-      : "Choisis ta commune pour personnaliser ton entraînement.";
+      ? "Sélectionne ta nouvelle commune. Tu pourras la changer à tout moment."
+      : "Ta commune personnalise les questions locales. Tu pourras la changer à tout moment.";
     $("communeSearch").value = "";
+    pendingCommune = state.commune || null;
     renderCommuneResults("");
+    updateSetupCta();
     showScreen("screen-setup");
     setTimeout(() => $("communeSearch").focus(), 100);
+  }
+
+  function updateSetupCta() {
+    const cta = $("setupCta");
+    if (pendingCommune && VD_DATA.communes[pendingCommune]) {
+      $("btnSetupConfirm").textContent = "C'est parti avec " + VD_DATA.communes[pendingCommune].name;
+      cta.hidden = false;
+    } else {
+      cta.hidden = true;
+    }
   }
 
   function renderCommuneResults(q) {
@@ -211,14 +225,37 @@
     const nq = norm(q.trim());
     const list = nq ? communeIndex.filter((c) => c.key.includes(nq)) : communeIndex;
     if (!list.length) { box.innerHTML = `<p class="results-empty">Aucune commune trouvée.</p>`; return; }
-    box.innerHTML = list.slice(0, 60).map((c) =>
-      `<button class="commune-row${c.id === state.commune ? " selected" : ""}" data-id="${c.id}">
-         <span><b>${c.name}</b><small>District de ${c.district}</small></span>
-         <span class="pin">📍</span>
-       </button>`).join("") +
+    const shown = list.slice(0, 60);
+
+    // Regroupe par district (ordre alphabétique), en préservant le tri des communes.
+    const groups = [];
+    const byDist = {};
+    shown.forEach((c) => {
+      if (!byDist[c.district]) { byDist[c.district] = []; groups.push(c.district); }
+      byDist[c.district].push(c);
+    });
+    groups.sort((a, b) => a.localeCompare(b, "fr"));
+
+    box.innerHTML = groups.map((dist) => {
+      const items = byDist[dist];
+      const rows = items.map((c) => {
+        const sel = c.id === pendingCommune;
+        return `<button class="commune-row${sel ? " selected" : ""}" data-id="${c.id}">
+             <span><b>${c.name}</b></span>
+             ${sel ? `<span class="commune-check">✓</span>` : `<span class="commune-chev">›</span>`}
+           </button>`;
+      }).join("");
+      return `<div class="dist-label">District de ${dist} · ${items.length} commune${items.length > 1 ? "s" : ""}</div>
+              <div class="dist-group">${rows}</div>`;
+    }).join("") +
       (list.length > 60 ? `<p class="results-empty">Affine ta recherche (${list.length} résultats)…</p>` : "");
+
     box.querySelectorAll(".commune-row").forEach((el) =>
-      el.addEventListener("click", () => selectCommune(el.dataset.id)));
+      el.addEventListener("click", () => {
+        pendingCommune = el.dataset.id;
+        renderCommuneResults($("communeSearch").value);
+        updateSetupCta();
+      }));
   }
 
   function selectCommune(id) {
@@ -238,7 +275,7 @@
     $("readinessPct").textContent = readiness + "%";
     $("statBest").textContent = state.best + "%";
     $("statSessions").textContent = state.sessions;
-    $("statStreak").textContent = state.streak;
+    $("statStreak").textContent = state.streak + " j";
     setTimeout(() => setRing($("readinessRing"), readiness), 60);
 
     const mc = state.mistakes.length;
@@ -250,46 +287,39 @@
     renderSparkline();
   }
 
+  /* Mini-courbe de progression (carte préparation, viewBox 80×40). */
   function renderSparkline() {
-    const svg = $("sparkline"), empty = $("emptyHistory");
+    const svg = $("sparkline");
     const data = state.history.slice(-12);
-    if (data.length < 2) { svg.innerHTML = ""; empty.hidden = false; $("trendLabel").textContent = ""; return; }
-    empty.hidden = true;
-    const W = 300, H = 90, pad = 8;
-    const xs = (i) => pad + (i * (W - pad * 2)) / (data.length - 1);
-    const ys = (v) => H - pad - (v / 100) * (H - pad * 2);
-    let line = "", area = `M ${xs(0)} ${H - pad} `;
-    data.forEach((d, i) => { const cmd = i === 0 ? "M" : "L"; line += `${cmd} ${xs(i).toFixed(1)} ${ys(d.pct).toFixed(1)} `; area += `L ${xs(i).toFixed(1)} ${ys(d.pct).toFixed(1)} `; });
-    area += `L ${xs(data.length - 1)} ${H - pad} Z`;
+    if (data.length < 2) { svg.innerHTML = ""; svg.style.visibility = "hidden"; return; }
+    svg.style.visibility = "visible";
+    const W = 80, H = 40, padX = 2, padY = 6;
+    const xs = (i) => padX + (i * (W - padX * 2)) / (data.length - 1);
+    const ys = (v) => H - padY - (v / 100) * (H - padY * 2);
+    let line = "";
+    data.forEach((d, i) => { line += `${i === 0 ? "M" : "L"} ${xs(i).toFixed(1)} ${ys(d.pct).toFixed(1)} `; });
     const last = data[data.length - 1];
-    svg.innerHTML = `<path class="area" d="${area}"/><path class="line" d="${line}"/><circle cx="${xs(data.length - 1).toFixed(1)}" cy="${ys(last.pct).toFixed(1)}" r="4"/>`;
-    const delta = last.pct - data[0].pct;
-    $("trendLabel").textContent = (delta >= 0 ? "▲ +" : "▼ ") + Math.abs(delta) + " pts";
-    $("trendLabel").style.color = delta >= 0 ? "var(--ok)" : "var(--bad)";
+    svg.innerHTML = `<path class="line" d="${line}"/><circle cx="${xs(data.length - 1).toFixed(1)}" cy="${ys(last.pct).toFixed(1)}" r="3"/>`;
   }
 
   /* ======================================================================
    *  RÉVISION (toutes les questions, réponses affichées)
    * ==================================================================== */
-  let study = null; // { scope, items, i }
+  let study = null; // { scope, items, i, interactive }
   const STUDY_SCOPES = [
-    { key: "all", label: "Tout" },
-    { key: "federal", label: "Suisse" },
-    { key: "cantonal", label: "Vaud" },
-    { key: "commune", label: "Commune" },
+    { key: "all", label: "Tout", long: "Toutes les questions" },
+    { key: "federal", label: "Suisse", long: "Suisse (fédéral)" },
+    { key: "cantonal", label: "Vaud", long: "Canton de Vaud" },
+    { key: "commune", label: "Commune", long: "Ma commune" },
   ];
 
+  // Ordre d'affichage : Découverte puis Quiz. Quiz reste le mode par défaut.
   const STUDY_MODES = [
-    { key: "quiz", label: "✍️ Quiz" },
-    { key: "reveal", label: "👁️ Découverte" },
+    { key: "reveal", label: "Découverte" },
+    { key: "quiz", label: "Quiz" },
   ];
 
   function openStudy() {
-    const seg = $("studyScopes");
-    seg.innerHTML = STUDY_SCOPES.map((s, i) =>
-      `<button data-scope="${s.key}" class="${i === 0 ? "active" : ""}">${s.label}</button>`).join("");
-    seg.querySelectorAll("button").forEach((b) =>
-      b.addEventListener("click", () => { seg.querySelectorAll("button").forEach((x) => x.classList.remove("active")); b.classList.add("active"); loadStudyScope(b.dataset.scope); }));
     if (!study) study = { interactive: true, items: [], i: 0 }; // Quiz par défaut
     renderStudyMode();
     loadStudyScope("all");
@@ -310,11 +340,27 @@
     }));
   }
 
+  /* Feuille de sélection de la portée (Tout / Suisse / Vaud / Commune). */
+  function openScopeSheet() {
+    const box = $("scopeOptions");
+    box.innerHTML = STUDY_SCOPES.map((s) =>
+      `<button data-scope="${s.key}" class="${study && study.scope === s.key ? "sel" : ""}">
+         <span>${s.long}</span>${study && study.scope === s.key ? '<span class="sheet-check">✓</span>' : ""}
+       </button>`).join("");
+    box.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+      loadStudyScope(b.dataset.scope); closeScopeSheet();
+    }));
+    $("scopeSheet").hidden = false;
+  }
+  function closeScopeSheet() { $("scopeSheet").hidden = true; }
+
   function loadStudyScope(scope) {
     const d = communeDeck(state.commune);
     const src = scope === "all" ? d.federal.concat(d.cantonal, d.commune) : d[scope];
-    const interactive = study ? study.interactive : false;
+    const interactive = study ? study.interactive : true;
     study = { scope, items: src.map(buildQuestion), i: 0, interactive };
+    const sc = STUDY_SCOPES.find((s) => s.key === scope);
+    $("studyScopeLabel").textContent = "Révision · " + (sc ? sc.label : "Tout");
     renderStudy();
   }
 
@@ -324,6 +370,7 @@
     $("studyChip").textContent = cur.ref.scope + " · " + cur.ref.theme;
     $("studyCount").textContent = (study.i + 1) + "/" + study.items.length;
     $("studyQuestion").textContent = cur.ref.q;
+    $("studyProgressFill").style.width = ((study.i + 1) / study.items.length) * 100 + "%";
 
     const revealed = !study.interactive || answered;
     const box = $("studyOptions"); box.innerHTML = "";
@@ -349,11 +396,11 @@
       const head = $("studyExplainHead");
       if (study.interactive) {
         const good = cur.chosen === cur.answer;
-        head.textContent = good ? "✅ Bonne réponse" : "❌ À retenir";
-        head.className = "explain-head " + (good ? "ok" : "bad");
+        head.textContent = good ? "Bien vu !" : "À retenir";
+        head.className = "explain-head savais-head " + (good ? "ok" : "bad");
       } else {
-        head.textContent = "💡 Le savais-tu ?";
-        head.className = "explain-head ok";
+        head.textContent = "Le savais-tu ?";
+        head.className = "explain-head savais-head";
       }
       const exp = (cur.ref.explanation && cur.ref.explanation.trim())
         ? cur.ref.explanation
@@ -382,6 +429,7 @@
 
   const REGION_OF = {};
   CANTONS.forEach((c) => { REGION_OF[c.code] = c.region; });
+  const REGION_LONG = { de: "Suisse alémanique", fr: "Suisse romande", it: "Suisse italienne", multi: "Canton plurilingue" };
 
   function openExplore() {
     const svg = $("cantonMap");
@@ -398,7 +446,7 @@
         g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
       });
       $("mapLegend").innerHTML = Object.keys(REGION_LABEL).map((k) =>
-        `<span class="legend-item"><span class="legend-dot" style="background:${REGION_COLORS[k]}"></span>${REGION_LABEL[k]}</span>`).join("");
+        `<span class="legend-item" data-region="${k}"><span class="legend-dash" style="background:${REGION_COLORS[k]}"></span>${REGION_LABEL[k]}</span>`).join("");
       setupMap();
       svg.dataset.filled = "1";
     }
@@ -466,16 +514,42 @@
     });
     const box = $("cantonDetail");
     const c = code && CANTONS.find((x) => x.code === code);
-    if (!c) { box.innerHTML = EXPLORE_INTRO; return; }
+    // Légende : l'item de la région du canton sélectionné passe en gras/encre.
+    $("mapLegend").querySelectorAll(".legend-item").forEach((el) =>
+      el.classList.toggle("on", !!(c && el.dataset.region === c.region)));
+    if (!c) {
+      box.classList.remove("as-card");
+      box.innerHTML = EXPLORE_INTRO;
+      return;
+    }
+    const col = REGION_COLORS[c.region];
+    const cta = c.code === "VD"
+      ? `<div class="cid-cta-wrap"><button class="cid-cta" id="cantonQuizBtn" style="border-color:${col};color:${col}">5 questions sur le canton de Vaud →</button></div>`
+      : "";
+    box.classList.add("as-card");
     box.innerHTML =
-      `<div class="cd-head"><span class="cd-badge" style="background:${REGION_COLORS[c.region]}">${c.code}</span>
-         <div><b>${c.name}</b><small>Canton ${c.code} · ${REGION_LABEL[c.region]}</small></div></div>
-       <div class="cd-rows">
-         <div><span>Chef-lieu</span><b>${c.capital}</b></div>
-         <div><span>Entré dans la Confédération</span><b>${c.year}</b></div>
-         <div><span>Langue(s)</span><b>${c.langs}</b></div>
+      `<div class="cid-head" style="background:${col}">
+         <div class="cid-head-top"><span class="cid-name">${c.name}</span><span class="cid-code">${c.code}</span></div>
+         <div class="cid-region">${REGION_LONG[c.region]}</div>
        </div>
-       <p class="cd-fact">💡 ${c.fact}</p>`;
+       <div class="cid-cols">
+         <div><div class="cid-val">${c.capital}</div><div class="cid-lab">Chef-lieu</div></div>
+         <div><div class="cid-val">${c.year}</div><div class="cid-lab">Confédération</div></div>
+         <div><div class="cid-val">${c.langs}</div><div class="cid-lab">Langue</div></div>
+       </div>
+       <div class="cid-quote"><span class="cid-q" style="color:${col}">«</span><p>${c.fact}</p></div>
+       ${cta}`;
+    const qb = $("cantonQuizBtn");
+    if (qb) qb.addEventListener("click", startCantonQuiz);
+  }
+
+  /* Mini-quiz de 5 questions sur le canton de Vaud (depuis la banque cantonale). */
+  function startCantonQuiz() {
+    const d = communeDeck(state.commune);
+    const items = shuffle(d.cantonal.slice()).slice(0, 5).map(buildQuestion);
+    if (!items.length) return;
+    quiz = { mode: "practice", items: items, i: 0, correct: 0, answered: false };
+    showScreen("screen-quiz"); renderQuestion();
   }
 
   /* ======================================================================
@@ -484,7 +558,10 @@
   const STAT_THEMES = ["Géographie", "Histoire", "Politique", "Social"];
   const STAT_LEVELS = ["Suisse", "Vaud", "Commune"];
 
-  function statColor(pct) { return pct >= 70 ? "var(--ok)" : (pct >= 40 ? "var(--warning)" : "var(--bad)"); }
+  /* Palier de couleur d'une barre (seuil examen à 60 %). */
+  function barColor(pct) { return pct < 30 ? "#C8442E" : pct < 45 ? "#D8836F" : pct < 60 ? "#C08A2E" : "#3E7A4E"; }
+  const THEME_ART = { "Géographie": "la Géographie", "Histoire": "l'Histoire", "Politique": "la Politique", "Social": "le Social" };
+  const elle = (t) => THEME_ART[t] || t;
 
   function openStats() {
     const box = $("statsBody");
@@ -492,7 +569,7 @@
     Object.values(state.stats).forEach((s) => { tot.a += s.a; tot.c += s.c; });
 
     if (!tot.a) {
-      box.innerHTML = `<p class="stats-empty">Réponds à quelques questions (examen, entraînement ou révision en mode Quiz) pour voir tes statistiques apparaître ici. 📊</p>`;
+      box.innerHTML = `<p class="stats-empty">Réponds à quelques questions (examen ou révision en mode Quiz) pour voir ton bilan apparaître ici. 📊</p>`;
       showScreen("screen-stats"); return;
     }
 
@@ -501,33 +578,78 @@
       Object.entries(state.stats).forEach(([k, s]) => { if (filterFn(k)) { a += s.a; c += s.c; } });
       return { a, c, pct: a ? Math.round((c / a) * 100) : 0 };
     };
-    const row = (label, r) => {
-      if (!r.a) return `<div class="stat-row"><div class="stat-head"><b>${label}</b><span>— </span></div><div class="stat-bar"><i style="width:0"></i></div></div>`;
-      return `<div class="stat-row">
-          <div class="stat-head"><b>${label}</b><span>${r.pct}% · ${r.c}/${r.a}</span></div>
-          <div class="stat-bar"><i style="width:${r.pct}%;background:${statColor(r.pct)}"></i></div>
+
+    // Thèmes avec données, triés du plus faible au plus fort.
+    const themeStats = STAT_THEMES
+      .map((t) => Object.assign({ theme: t }, agg((k) => k.split("|")[1] === t)))
+      .filter((r) => r.a > 0)
+      .sort((x, y) => x.pct - y.pct);
+
+    const sbar = (r, threshold) => `
+        <div class="sbar-row">
+          <div class="sbar-head"><b>${r.label}</b><span class="${r.weak ? "weak" : ""}">${r.pct}%${r.frac ? " · " + r.frac : ""}</span></div>
+          <div class="sbar"><i style="width:${r.pct}%;background:${barColor(r.pct)}"></i><u style="left:${threshold}%"></u></div>
         </div>`;
-    };
 
     const overallPct = Math.round((tot.c / tot.a) * 100);
+
+    // Héros : point faible
+    let hero = "";
+    if (themeStats.length) {
+      const w = themeStats[0];
+      const toReview = w.a - w.c;
+      hero =
+        `<div class="stats-hero">
+           <div class="stats-hero-sur">Concentre-toi sur</div>
+           <div class="stats-hero-theme">${elle(w.theme)}</div>
+           <p class="stats-hero-msg">C'est ton thème le plus fragile : ${w.pct}% de réussite, soit ${toReview} question${toReview > 1 ? "s" : ""} à retravailler.</p>
+           <button class="btn btn-primary stats-hero-cta" id="statsHeroCta" data-theme="${w.theme}">Réviser ${elle(w.theme)}</button>
+         </div>`;
+    }
+
     box.innerHTML =
-      `<div class="stats-card"><div class="stats-overall">
-         <div class="big-pct" style="color:${statColor(overallPct)}">${overallPct}%</div>
-         <small>${tot.c} bonnes réponses sur ${tot.a}</small>
-       </div></div>` +
-      `<div class="stats-card"><h3>Par thème</h3>` +
-        STAT_THEMES.map((t) => row(t, agg((k) => k.split("|")[1] === t))).join("") + `</div>` +
-      `<div class="stats-card"><h3>Par niveau</h3>` +
-        STAT_LEVELS.map((l) => row(l === "Suisse" ? "Suisse" : (l === "Vaud" ? "Canton de Vaud" : "Ma commune"),
-          agg((k) => k.split("|")[0] === l))).join("") + `</div>` +
+      hero +
+      `<div class="stats-card">
+         <div class="stats-card-head"><span class="stats-card-title">Tous les thèmes</span><span class="stats-thresh">┃ seuil examen 60%</span></div>
+         <div class="sbar-list">` +
+           themeStats.map((r, i) => sbar({ label: r.theme, pct: r.pct, weak: i === 0 }, 60)).join("") +
+         `</div>
+       </div>` +
+      `<div class="stats-tiles">
+         <div class="stats-tile"><div class="stats-tile-val">${overallPct}%</div><div class="stats-tile-lab">Global</div></div>
+         <div class="stats-tile"><div class="stats-tile-val">${tot.a}</div><div class="stats-tile-lab">Répondues</div></div>
+         <div class="stats-tile"><div class="stats-tile-val">${state.mistakes.length}</div><div class="stats-tile-lab">À revoir</div></div>
+       </div>` +
+      `<div class="stats-card">
+         <div class="stats-card-head"><span class="stats-card-title">Par niveau</span></div>
+         <div class="sbar-list">` +
+           STAT_LEVELS.map((l) => {
+             const r = agg((k) => k.split("|")[0] === l);
+             const label = l === "Suisse" ? "Suisse" : (l === "Vaud" ? "Canton de Vaud" : "Ma commune");
+             return r.a ? sbar({ label, pct: r.pct, frac: r.c + "/" + r.a }, 60)
+                        : `<div class="sbar-row"><div class="sbar-head"><b>${label}</b><span>—</span></div><div class="sbar"><i style="width:0"></i></div></div>`;
+           }).join("") +
+         `</div>
+       </div>` +
       `<button class="btn btn-reset" id="btnResetStats">Réinitialiser mes statistiques et erreurs</button>`;
 
+    const hc = $("statsHeroCta");
+    if (hc) hc.addEventListener("click", () => startThemeReview(hc.dataset.theme));
     $("btnResetStats").addEventListener("click", () => {
       if (confirm("Réinitialiser toutes tes statistiques et ta liste d'erreurs ?")) {
         state.stats = {}; state.mistakes = []; save(); openStats();
       }
     });
     showScreen("screen-stats");
+  }
+
+  /* Révision ciblée d'un thème (quiz de correction immédiate). */
+  function startThemeReview(theme) {
+    const pool = allDeck(state.commune).filter((q) => q.theme === theme);
+    const items = shuffle(pool).slice(0, 12).map(buildQuestion);
+    if (!items.length) return;
+    quiz = { mode: "practice", items: items, i: 0, correct: 0, answered: false };
+    showScreen("screen-quiz"); renderQuestion();
   }
 
   /* ======================================================================
@@ -546,23 +668,63 @@
   /* ======================================================================
    *  FRISE CHRONOLOGIQUE
    * ==================================================================== */
+  const TL_KEY_YEARS = { "1291": 1, "1803": 1, "1848": 1, "1971": 1 };
+  let timelineFilter = "all";
+
+  function eraOf(yearStr) {
+    let y;
+    if (/av\.?\s*J/i.test(yearStr)) y = -(parseInt((yearStr.match(/\d+/) || [100])[0], 10));
+    else { const m = yearStr.match(/\d{3,4}/); y = m ? parseInt(m[0], 10) : 0; }
+    if (y < 500) return "Antiquité";
+    if (y < 1500) return "Moyen Âge";
+    if (y < 1798) return "Époque moderne";
+    return "Époque contemporaine";
+  }
+
+  function renderTimeline() {
+    const items = TIMELINE.filter((t) => timelineFilter === "all" || t.scope === timelineFilter);
+    let html = "", currentEra = null, open = false;
+    items.forEach((t) => {
+      const era = eraOf(t.year);
+      if (era !== currentEra) {
+        if (open) html += `</div>`;
+        html += `<div class="tl-era"><span></span>${era}<span></span></div><div class="tl-rail">`;
+        currentEra = era; open = true;
+      }
+      const isVd = t.scope === "vd";
+      const key = TL_KEY_YEARS[t.year];
+      const tag = isVd ? ` <em>VAUD</em>` : "";
+      html += `<div class="tl-node ${t.scope}">
+          <span class="tl-pin"></span>
+          <div class="tl-year">${t.year}${tag}</div>
+          <div class="tl-card${key ? " key" : ""}">
+            <b>${t.title}</b>
+            <p>${t.desc}${key ? ` <i>À retenir pour l'examen.</i>` : ""}</p>
+          </div>
+        </div>`;
+    });
+    if (open) html += `</div>`;
+    $("timelineList").innerHTML = html;
+  }
+
+  const TL_FILTERS = [
+    { key: "all", label: "Tout" },
+    { key: "ch", label: "Suisse", dot: "var(--red)" },
+    { key: "vd", label: "Vaud", dot: "var(--ok)" },
+  ];
+
   function openTimeline() {
-    const box = $("timelineList");
-    if (!box.dataset.filled) {
-      box.innerHTML = TIMELINE.map((t) =>
-        `<div class="tl-item ${t.scope}">
-           <div class="tl-dot">${t.icon}</div>
-           <div class="tl-body">
-             <div class="tl-year">${t.year}</div>
-             <h3>${t.title}</h3>
-             <p>${t.desc}</p>
-           </div>
-         </div>`).join("");
-      $("timelineLegend").innerHTML =
-        `<span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Suisse</span>` +
-        `<span class="legend-item"><span class="legend-dot" style="background:var(--ok)"></span>Vaud</span>`;
-      box.dataset.filled = "1";
-    }
+    const bar = $("timelineFilter");
+    bar.innerHTML = TL_FILTERS.map((f) => {
+      const n = f.key === "all" ? TIMELINE.length : TIMELINE.filter((t) => t.scope === f.key).length;
+      const active = f.key === timelineFilter;
+      const dot = f.dot ? `<span class="tl-fdot" style="background:${f.dot}"></span>` : "";
+      return `<button class="tl-pill${active ? " active" : ""}" data-f="${f.key}">${dot}${f.label}${f.key === "all" ? " · " + n : ""}</button>`;
+    }).join("");
+    bar.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+      timelineFilter = b.dataset.f; openTimeline();
+    }));
+    renderTimeline();
     showScreen("screen-timeline");
   }
 
@@ -664,6 +826,41 @@
     else finishQuiz();
   }
 
+  /* Palier de couleur d'une barre d'examen (seuil de réussite à 70 %). */
+  function barColorExam(pct) { return pct < 30 ? "#C8442E" : pct < 50 ? "#D8836F" : pct < 70 ? "#C08A2E" : "#3E7A4E"; }
+
+  /* Carte « Ton bilan par thème » (résultat d'examen échoué), triée du plus faible au plus fort. */
+  function themeBilan() {
+    const rows = THEMES.map((t) => {
+      const its = quiz.items.filter((it) => it.ref.theme === t);
+      const c = its.filter((it) => it.chosen === it.answer).length;
+      const a = its.length;
+      return { theme: t, a, c, pct: a ? Math.round((c / a) * 100) : 0 };
+    }).filter((r) => r.a > 0).sort((x, y) => x.pct - y.pct);
+
+    return `<div class="result-card">
+        <div class="stats-card-head"><span class="stats-card-title">Ton bilan par thème</span><span class="stats-thresh">┃ 70%</span></div>
+        <div class="sbar-list">` +
+        rows.map((r) => `
+          <div class="sbar-row">
+            <div class="sbar-head"><b>${r.theme}</b><span class="${r.pct < 70 ? "weak" : "good"}">${r.c}/${r.a}</span></div>
+            <div class="sbar"><i style="width:${r.pct}%;background:${barColorExam(r.pct)}"></i><u style="left:70%"></u></div>
+          </div>`).join("") +
+        `</div></div>`;
+  }
+
+  /* 3 tuiles récap (résultat d'examen réussi) : Sessions / Progression / Série. */
+  function recapTiles(prevPct) {
+    const pct = state.history.length ? state.history[state.history.length - 1].pct : 0;
+    let prog = "—";
+    if (prevPct !== null) { const d = pct - prevPct; prog = (d >= 0 ? "▲ +" : "▼ ") + Math.abs(d); }
+    return `<div class="recap-tiles">
+        <div class="recap-tile"><div class="recap-val">${state.sessions}</div><div class="recap-lab">Sessions</div></div>
+        <div class="recap-tile"><div class="recap-val">${prog}</div><div class="recap-lab">Progression</div></div>
+        <div class="recap-tile"><div class="recap-val">${state.streak} j</div><div class="recap-lab">Série</div></div>
+      </div>`;
+  }
+
   function finishQuiz() {
     if (!quiz) return;
     clearExamTimer();
@@ -682,38 +879,69 @@
     }
     save();
 
+    const prevPct = state.history.length >= 2 ? state.history[state.history.length - 2].pct : null;
+
     $("resultFrac").textContent = quiz.correct + "/" + total;
+    const pass = quiz.mode === "exam" && pct >= EXAM_PASS_PCT;
+    $("resultRing").style.stroke = pass ? "var(--ok)" : "var(--red)";
     setTimeout(() => { setRing($("resultRing"), pct); countUp($("resultPct"), pct, 900); }, 120);
 
-    // Gamification : badges, confettis, défi
-    const examPass = quiz.mode === "exam" && pct >= EXAM_PASS_PCT;
+    // Gamification : badges, confettis
+    const examPass = pass;
     if (examPass) unlock("exam");
     if (quiz.mode === "exam" && quiz.correct === EXAM_TOTAL) unlock("perfect");
     const clearedAll = quiz.isMistakes && state.mistakes.length === 0;
     if (clearedAll) unlock("cleaner");
     checkBadges();
-    // Confettis uniquement pour une vraie réussite (jamais sur un échec).
-    if (examPass || clearedAll) setTimeout(launchConfetti, 250);
+
+    // Confettis : sobres (points statiques) pour un examen réussi ; blast pour la liste d'erreurs vidée.
+    $("resultConfetti").hidden = !examPass;
+    if (clearedAll) setTimeout(launchConfetti, 250);
 
     const badge = $("resultBadge");
-    let title, msg;
+    const errs = quiz.items.filter((it) => it.chosen !== it.answer).length;
+    let titleHTML, msg;
+
     if (quiz.mode === "exam") {
-      const pass = pct >= EXAM_PASS_PCT;
       badge.hidden = false;
       badge.className = "result-badge " + (pass ? "pass" : "fail");
-      badge.textContent = pass ? "✓ Réussi" : "✕ Échoué";
-      title = pass ? "Examen réussi ! 🎉" : "Pas encore… 💪";
-      msg = `Réussite dès ${EXAM_PASS_PCT} % de bonnes réponses (${quiz.correct}/${EXAM_TOTAL}). ` +
-        (pass ? "Tu es prêt·e pour le vrai test." : "Continue à réviser les réponses, tu y es presque.");
+      badge.textContent = pass ? "✓ Examen réussi" : "✕ Pas encore réussi";
+      if (pass) {
+        titleHTML = "Félicitations,<br><i>tu es prêt·e.</i>";
+        const rec = pct >= state.best ? " Ton meilleur score à ce jour." : "";
+        msg = `${pct}% de bonnes réponses — bien au-dessus du seuil des ${EXAM_PASS_PCT}%.${rec}`;
+      } else {
+        titleHTML = "Continue, tu avances.";
+        msg = `Réussite dès ${EXAM_PASS_PCT}% de bonnes réponses. Chaque session compte.`;
+      }
+      $("resultBilan").innerHTML = pass ? recapTiles(prevPct) : themeBilan();
     } else {
       badge.hidden = true;
-      if (pct >= 80) { title = "Bravo ! 🎉"; msg = "Excellent. Passe en simulation d'examen pour te tester en conditions réelles."; }
-      else if (pct >= 60) { title = "Bien joué 👍"; msg = "Tu progresses. Un tour de révision et ça rentre."; }
-      else { title = "Continue 💪"; msg = "Utilise le mode révision pour apprendre les bonnes réponses."; }
+      $("resultBilan").innerHTML = "";
+      if (pct >= 80) { titleHTML = "Bravo ! 🎉"; msg = "Excellent. Passe en simulation d'examen pour te tester en conditions réelles."; }
+      else if (pct >= 60) { titleHTML = "Bien joué 👍"; msg = "Tu progresses. Un tour de révision et ça rentre."; }
+      else { titleHTML = "Continue 💪"; msg = "Utilise le mode révision pour apprendre les bonnes réponses."; }
     }
-    $("resultTitle").textContent = title;
+    $("resultTitle").innerHTML = titleHTML;
     $("resultMsg").textContent = msg;
-    $("btnReview").hidden = false;
+
+    // Actions : hiérarchie selon le résultat.
+    const rv = $("btnReview"), rt = $("btnRetry"), sh = $("btnShare"), hm = $("btnHome");
+    hm.hidden = false; hm.style.order = 4;
+    if (quiz.mode === "exam" && pass) {
+      sh.hidden = false; sh.className = "btn btn-primary big"; sh.textContent = "📲 Partager mon score"; sh.style.order = 1;
+      rv.hidden = false; rv.className = "btn btn-outline"; rv.textContent = "Revoir mes réponses"; rv.style.order = 2;
+      rt.hidden = true;
+    } else if (quiz.mode === "exam") {
+      rv.hidden = false; rv.className = "btn btn-primary big"; rv.textContent = `🔎 Revoir mes ${errs} erreur${errs > 1 ? "s" : ""}`; rv.style.order = 1;
+      rt.hidden = false; rt.className = "btn btn-outline"; rt.textContent = "Recommencer l'examen"; rt.style.order = 2;
+      sh.hidden = true;
+    } else {
+      rv.hidden = false; rv.className = "btn btn-primary big"; rv.textContent = "🔎 Revoir mes réponses"; rv.style.order = 1;
+      const canRetry = quiz.isMistakes && state.mistakes.length;
+      rt.hidden = !canRetry; rt.className = "btn btn-outline"; rt.textContent = "Recommencer"; rt.style.order = 2;
+      sh.hidden = true;
+    }
 
     // Message de partage (WhatsApp & co.) — avec défi famille pour l'examen.
     const commune = VD_DATA.communes[state.commune];
@@ -743,14 +971,47 @@
   }
 
   /* ---------------- Écran Succès ---------------- */
+  /* Progression vers le déblocage d'un badge encore verrouillé. */
+  function badgeProgress(id) {
+    const b = state.best, s = state.sessions, k = state.streak, m = state.mistakes.length;
+    switch (id) {
+      case "first":    return { pct: Math.min(100, s * 100), hint: s + " / 1 session" };
+      case "marathon": return { pct: Math.min(100, s / 10 * 100), hint: s + " sur 10" };
+      case "streak3":  return { pct: Math.min(100, k / 3 * 100), hint: k + " / 3 jours" };
+      case "exam":     return { pct: Math.min(100, b / 70 * 100), hint: "meilleur : " + b + "%" };
+      case "perfect":  return { pct: Math.min(100, b), hint: "meilleur : " + b + "%" };
+      case "cleaner":  return { pct: m ? Math.max(8, 100 - Math.min(90, m * 6)) : 100, hint: m ? "plus que " + m + " à vider" : "prêt à débloquer" };
+      default:         return { pct: 0, hint: "" };
+    }
+  }
+
   function openBadges() {
     const b = state.badges || {};
     const n = ACHIEVEMENTS.filter((a) => b[a.id]).length;
-    $("badgeProgress").textContent = n + " / " + ACHIEVEMENTS.length + " succès débloqués";
-    $("badgeGrid").innerHTML = ACHIEVEMENTS.map((a) =>
-      `<div class="badge-card ${b[a.id] ? "on" : "locked"}">
-         <div class="badge-ico">${a.ico}</div><b>${a.title}</b><small>${a.desc}</small>
-       </div>`).join("");
+    const N = ACHIEVEMENTS.length;
+    const half = n >= N ? "tous débloqués !" : (n >= N / 2 ? "à mi-chemin !" : "en bonne voie !");
+    $("badgeHero").innerHTML =
+      `<div class="badge-count"><span>${n}</span><em> / ${N}</em></div>
+       <p class="badge-sub">succès débloqués — ${half}</p>
+       <div class="badge-segs">` +
+        ACHIEVEMENTS.map((a) => `<span class="${b[a.id] ? "on" : ""}"></span>`).join("") +
+       `</div>`;
+    $("badgeGrid").innerHTML = ACHIEVEMENTS.map((a) => {
+      if (b[a.id]) {
+        return `<div class="badge-card on">
+           <div class="badge-medal">${a.ico}</div>
+           <b>${a.title}</b><small>${a.desc}</small>
+           <span class="badge-done">✓ Débloqué</span>
+         </div>`;
+      }
+      const p = badgeProgress(a.id);
+      return `<div class="badge-card locked">
+         <div class="badge-medal">${a.ico}</div>
+         <b>${a.title}</b><small>${a.desc}</small>
+         <div class="badge-bar"><i style="width:${p.pct}%"></i></div>
+         <span class="badge-hint">${p.hint}</span>
+       </div>`;
+    }).join("");
     showScreen("screen-badges");
   }
 
@@ -813,6 +1074,7 @@
    *  ÉVÉNEMENTS
    * ==================================================================== */
   $("communeSearch").addEventListener("input", (e) => renderCommuneResults(e.target.value));
+  $("btnSetupConfirm").addEventListener("click", () => { if (pendingCommune) selectCommune(pendingCommune); });
   $("setupBack").addEventListener("click", () => { renderHome(); showScreen("screen-home"); });
   $("btnChangeCommune").addEventListener("click", () => openSetup(true));
 
@@ -834,6 +1096,8 @@
   $("btnPrev").addEventListener("click", studyPrev);
   $("btnNextStudy").addEventListener("click", studyNext);
   $("btnQuitStudy").addEventListener("click", () => { renderHome(); showScreen("screen-home"); });
+  $("studyScopeBtn").addEventListener("click", openScopeSheet);
+  $("scopeSheet").addEventListener("click", (e) => { if (e.target === $("scopeSheet")) closeScopeSheet(); });
 
   $("btnNext").addEventListener("click", nextQuestion);
   $("btnQuitQuiz").addEventListener("click", () => { clearExamTimer(); renderHome(); showScreen("screen-home"); });

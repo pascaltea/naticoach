@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=44" />
+  <link rel="stylesheet" href="styles.css?v=45" />
 </head>
 <body>
   <div id="app">
@@ -21,9 +21,10 @@
     <section class="screen active" id="screen-setup">
       <button class="icon-btn setup-back" id="setupBack" hidden aria-label="Fermer">✕</button>
       <div class="setup-hero">
-        <img class="brand-mark" src="logo-app-icon.svg" alt="" width="60" height="60" />
-        <h1 id="setupTitle">Bienvenue</h1>
-        <p class="sub" id="setupSub">Choisis ta commune pour personnaliser ton entraînement.</p>
+        <img class="brand-mark" src="logo-app-icon.svg" alt="" width="56" height="56" />
+        <div class="setup-surtitle" id="setupSurtitle">Grüezi · <span>Bonjour</span> · Buongiorno</div>
+        <h1 id="setupTitle">Où habites-tu&nbsp;?</h1>
+        <p class="sub" id="setupSub">Ta commune personnalise les questions locales. Tu pourras la changer à tout moment.</p>
       </div>
       <div class="search-wrap">
         <span class="search-ico">🔍</span>
@@ -31,6 +32,10 @@
                placeholder="Rechercher ma commune…" autocomplete="off" />
       </div>
       <div id="communeResults" class="commune-results"></div>
+      <div class="setup-cta" id="setupCta" hidden>
+        <button class="btn btn-primary" id="btnSetupConfirm">C'est parti</button>
+        <p class="setup-note">300 communes vaudoises · aucune donnée ne quitte ton téléphone</p>
+      </div>
     </section>
 
     <!-- ============ ÉCRAN : ACCUEIL ============ -->
@@ -46,91 +51,96 @@
         </div>
       </header>
 
-      <div class="card readiness-card">
-        <div class="ring-wrap">
+      <button class="exam-cta" id="btnExam">
+        <span class="exam-cta-txt">
+          <b>Simuler l'examen</b>
+          <small>48 questions · 60 min · réussite 70 %</small>
+        </span>
+        <span class="exam-cta-arrow">›</span>
+      </button>
+
+      <div class="prep-card">
+        <div class="prep-ring">
           <svg viewBox="0 0 120 120" class="ring">
             <circle class="ring-bg" cx="60" cy="60" r="52"/>
             <circle class="ring-fg" cx="60" cy="60" r="52" id="readinessRing"/>
           </svg>
-          <div class="ring-center"><span id="readinessPct">0%</span><small>préparation</small></div>
+          <div class="prep-ring-c" id="readinessPct">0%</div>
         </div>
-        <div class="readiness-meta">
-          <div><strong id="statBest">0%</strong><span>Meilleur score</span></div>
-          <div><strong id="statSessions">0</strong><span>Sessions</span></div>
-          <div><strong id="statStreak">0</strong><span>Série (jours)</span></div>
+        <div class="prep-meta">
+          <div class="prep-label">Ta préparation</div>
+          <div class="prep-stats">
+            <div><b id="statBest">0%</b><span>meilleur</span></div>
+            <div><b id="statSessions">0</b><span>sessions</span></div>
+            <div><b id="statStreak">0</b><span>série</span></div>
+          </div>
         </div>
+        <svg viewBox="0 0 80 40" class="spark-mini" id="sparkline" preserveAspectRatio="none"></svg>
       </div>
 
-      <div class="modes">
-        <button class="mode-btn primary" id="btnExam">
-          <span class="mode-ico">📝</span>
-          <span class="mode-txt"><b>Simuler l'examen</b><small>48 questions · 60 min · réussite 70 %</small></span>
-          <span class="chev">›</span>
-        </button>
-        <button class="mode-btn" id="btnStudy">
+      <div class="mode-group-label">Réviser</div>
+      <div class="mode-rows">
+        <button class="mode-row" id="btnStudy">
           <span class="mode-ico">📖</span>
-          <span class="mode-txt"><b>Réviser les réponses</b><small>Toutes les questions · découverte ou quiz</small></span>
+          <span class="mode-row-txt"><b>Réviser les réponses</b><small>découverte ou quiz</small></span>
           <span class="chev">›</span>
         </button>
-        <button class="mode-btn" id="btnMistakes" hidden>
-          <span class="mode-ico">🔁</span>
-          <span class="mode-txt"><b>Réviser mes erreurs</b><small><span id="mistakesCount">0</span> question(s) à retravailler</small></span>
-          <span class="chev">›</span>
-        </button>
-        <button class="mode-btn" id="btnExplore">
-          <span class="mode-ico">🗺️</span>
-          <span class="mode-txt"><b>Explorer la Suisse</b><small>Carte interactive des 26 cantons</small></span>
-          <span class="chev">›</span>
-        </button>
-        <button class="mode-btn" id="btnTimeline">
-          <span class="mode-ico">🕰️</span>
-          <span class="mode-txt"><b>Frise chronologique</b><small>Les grandes dates suisses et vaudoises</small></span>
-          <span class="chev">›</span>
-        </button>
-        <button class="mode-btn" id="btnStats">
-          <span class="mode-ico">📊</span>
-          <span class="mode-txt"><b>Mes statistiques</b><small>Réussite par thème et par niveau</small></span>
-          <span class="chev">›</span>
-        </button>
-        <button class="mode-btn" id="btnBadges">
-          <span class="mode-ico">🏆</span>
-          <span class="mode-txt"><b>Mes succès</b><small><span id="badgeCount">0</span> badge(s) débloqué(s)</small></span>
+        <button class="mode-row" id="btnMistakes" hidden>
+          <span class="mode-ico alert">🔁</span>
+          <span class="mode-row-txt"><b>Réviser mes erreurs</b><small class="hot"><span id="mistakesCount">0</span> question(s) à retravailler</small></span>
           <span class="chev">›</span>
         </button>
       </div>
 
-      <div class="card progress-card">
-        <div class="card-title-row"><h2>Ta progression</h2><span class="muted" id="trendLabel"></span></div>
-        <svg viewBox="0 0 300 90" class="spark" id="sparkline" preserveAspectRatio="none"></svg>
-        <p class="muted tiny" id="emptyHistory">Fais ta première session pour voir ta courbe évoluer.</p>
+      <div class="mode-group-label">Découvrir</div>
+      <div class="mode-grid">
+        <button class="mode-tile" id="btnExplore"><span class="mode-ico">🗺️</span><b>Explorer la Suisse</b><small>26 cantons</small></button>
+        <button class="mode-tile" id="btnTimeline"><span class="mode-ico">🕰️</span><b>Frise chrono</b><small>CH · VD</small></button>
       </div>
 
-      <p class="footer-note"><img class="footer-flower" src="logo-edelweiss-red.svg" alt="" width="14" height="14" /> Questions officielles du Canton de Vaud · progression enregistrée sur cet appareil · hors-ligne</p>
+      <div class="mode-group-label">Suivre</div>
+      <div class="mode-grid">
+        <button class="mode-tile" id="btnStats"><span class="mode-ico">📊</span><b>Statistiques</b><small>par thème</small></button>
+        <button class="mode-tile" id="btnBadges"><span class="mode-ico">🏆</span><b>Succès</b><small><span id="badgeCount">0</span> badge(s)</small></button>
+      </div>
+
+      <p class="footer-note"><img class="footer-flower" src="logo-edelweiss-red.svg" alt="" width="14" height="14" /> Questions officielles du Canton de Vaud · hors-ligne</p>
     </section>
 
     <!-- ============ ÉCRAN : RÉVISION (réponses affichées) ============ -->
     <section class="screen" id="screen-study">
       <div class="quiz-top">
         <button class="icon-btn" id="btnQuitStudy" aria-label="Retour">←</button>
-        <div class="seg" id="studyScopes"></div>
+        <button class="scope-title" id="studyScopeBtn">
+          <span id="studyScopeLabel">Révision</span> <span class="chev">▾</span>
+        </button>
         <span class="quiz-count" id="studyCount">1/1</span>
       </div>
-      <div class="study-modebar"><div class="seg mini" id="studyMode"></div></div>
+      <div class="study-modebar"><div class="seg toggle2" id="studyMode"></div></div>
+      <div class="study-progress"><div class="study-progress-fill" id="studyProgressFill"></div></div>
       <div class="quiz-body">
         <span class="chip" id="studyChip"></span>
         <h2 class="question" id="studyQuestion"></h2>
         <div class="options" id="studyOptions"></div>
-        <div class="explain" id="studyExplain">
-          <div class="explain-illus" id="studyIllus"></div>
+        <div class="explain savais" id="studyExplain">
+          <img class="explain-flower" src="logo-edelweiss-flower.svg" alt="" width="26" height="26" />
           <div class="explain-text">
-            <div class="explain-head ok" id="studyExplainHead">💡 Le savais-tu ?</div>
+            <div class="explain-head savais-head" id="studyExplainHead">Le savais-tu ?</div>
             <p id="studyExplainText"></p>
+            <div class="explain-illus" id="studyIllus"></div>
           </div>
         </div>
       </div>
       <div class="quiz-foot study-foot">
         <button class="btn btn-ghost half" id="btnPrev">‹ Précédent</button>
         <button class="btn btn-primary half" id="btnNextStudy">Suivant ›</button>
+      </div>
+      <!-- Feuille de sélection de la portée -->
+      <div class="sheet" id="scopeSheet" hidden>
+        <div class="sheet-panel">
+          <div class="sheet-title">Portée de la révision</div>
+          <div id="scopeOptions" class="sheet-options"></div>
+        </div>
       </div>
     </section>
 
@@ -161,6 +171,13 @@
 
     <!-- ============ ÉCRAN : RÉSULTATS ============ -->
     <section class="screen" id="screen-result">
+      <div class="result-confetti" id="resultConfetti" hidden>
+        <i style="top:22px;left:36px;width:7px;height:7px;background:var(--red);opacity:.5"></i>
+        <i style="top:48px;right:52px;width:6px;height:6px;background:var(--gold);opacity:.55"></i>
+        <i style="top:88px;left:70px;width:5px;height:5px;background:var(--ok);opacity:.5"></i>
+        <i style="top:30px;right:110px;width:5px;height:5px;background:var(--red);opacity:.4"></i>
+        <i style="top:110px;right:38px;width:7px;height:7px;background:var(--gold);opacity:.4"></i>
+      </div>
       <div class="result-inner">
         <img class="result-mark" src="logo-edelweiss-red.svg" alt="" width="40" height="40" />
         <div class="ring-wrap big">
@@ -173,10 +190,11 @@
         <div id="resultBadge" class="result-badge" hidden></div>
         <h2 id="resultTitle"></h2>
         <p class="muted" id="resultMsg"></p>
+        <div id="resultBilan"></div>
         <div class="result-actions">
           <button class="btn btn-primary big" id="btnReview" hidden>🔎 Revoir mes réponses</button>
           <button class="btn btn-share" id="btnShare">📲 Partager mon score</button>
-          <button class="btn btn-ghost" id="btnRetry">Recommencer</button>
+          <button class="btn btn-outline" id="btnRetry">Recommencer</button>
           <button class="btn btn-ghost" id="btnHome">Accueil</button>
         </div>
       </div>
@@ -209,7 +227,7 @@
         <h2 class="explore-title">Mes succès</h2>
         <span></span>
       </div>
-      <p class="badge-progress" id="badgeProgress"></p>
+      <div id="badgeHero"></div>
       <div class="badge-grid" id="badgeGrid"></div>
     </section>
 
@@ -230,7 +248,7 @@
         <h2 class="explore-title">Frise chronologique</h2>
         <span></span>
       </div>
-      <div class="map-legend" id="timelineLegend"></div>
+      <div class="tl-filter" id="timelineFilter"></div>
       <div class="timeline" id="timelineList"></div>
     </section>
 
@@ -259,6 +277,6 @@
   <script src="swissmap.js"></script>
   <script src="timeline.js"></script>
   <script src="vd_official.js"></script>
-  <script src="app.js?v=42"></script>
+  <script src="app.js?v=45"></script>
 </body>
 </html>
