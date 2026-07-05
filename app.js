@@ -1012,6 +1012,26 @@
     VS: { legis: "Conseil général (ou Assemblée primaire)", exec: "Conseil municipal", head: "président·e de commune" },
   };
 
+  /* Données d'élection par canton (composition + durée du mandat). */
+  const ELECT = {
+    VD: { gcN: "150 député·es", ceN: "7 conseiller·ères", tCant: "5 ans", tCom: "5 ans" },
+    GE: { gcN: "100 député·es", ceN: "7 conseiller·ères", tCant: "5 ans", tCom: "5 ans" },
+    NE: { gcN: "100 député·es", ceN: "5 conseiller·ères", tCant: "4 ans", tCom: "4 ans" },
+    VS: { gcN: "130 député·es", ceN: "5 conseiller·ères", tCant: "4 ans", tCom: "4 ans" },
+  };
+
+  function qeCard(kind, role, name, meta, by, byKind) {
+    return `<div class="qe-card qe-${kind}">
+        <span class="qe-role">${role}</span>
+        <b>${name}</b>
+        <span class="qe-meta">${meta}</span>
+        <span class="qe-by qe-by-${byKind}">${by}</span>
+      </div>`;
+  }
+  function qeLevel(title, cards) {
+    return `<div class="qe-level"><span class="qe-lvl">${title}</span><div class="qe-cards">${cards}</div></div>`;
+  }
+
   function polLevel(title, sub, rows) {
     return `<div class="pol-level">
         <div class="pol-head"><b>${title}</b>${sub ? `<span>${sub}</span>` : ""}</div>` +
@@ -1041,14 +1061,34 @@
         { k: "leg", ico: "📜", power: "Législatif", body: ci.legis, note: "" },
         { k: "exe", ico: "🏛️", power: "Exécutif", body: ci.exec, note: "présidé·e par le·la " + ci.head },
       ]) +
-      `<div class="cs-card cs-highlight">
-         <div class="cs-card-h">🗳️ Qui vote pour qui ?</div>
-         <ul class="cs-list">
-           <li>Le <b>peuple</b> (Suisses dès <b>18 ans</b>) élit les <b>parlements</b> et les <b>gouvernements</b> aux 3 niveaux.</li>
-           <li>C'est l'<b>Assemblée fédérale</b> qui élit le <b>Conseil fédéral</b> (pas le peuple directement).</li>
-           <li><b>Démocratie directe</b> : le peuple vote aussi les <b>initiatives populaires</b> et les <b>référendums</b> (les votations).</li>
-         </ul>
-       </div>`;
+      (() => {
+        const e = ELECT[cantonOf()] || ELECT.VD;
+        return `<h3 class="cs-h">🗳️ Qui élit qui ?</h3>
+          <p class="cs-intro">Le <b>peuple</b> (Suisses dès <b>18 ans</b>) élit directement les <b>parlements</b> aux 3 niveaux, et aussi les <b>gouvernements</b> — sauf au niveau fédéral, où le Conseil fédéral est élu par le Parlement.</p>
+          <div class="qe-peuple">👥 Le peuple &nbsp;·&nbsp; citoyen·nes suisses dès 18 ans</div>
+          <div class="qe-arrow">élit ↓</div>` +
+          qeLevel("Confédération",
+            qeCard("leg", "Législatif · fait les lois", "Conseil national + Conseil des États", "200 + 46 · mandat 4 ans", "🗳️ élus directement par le peuple", "people") +
+            qeCard("exe", "Exécutif · gouverne", "Conseil fédéral", "7 ministres · mandat 4 ans", "🏛️ élu par le Parlement (pas le peuple)", "parl")
+          ) +
+          qeLevel("Canton de " + cantonNm,
+            qeCard("leg", "Législatif", "Grand Conseil", e.gcN + " · mandat " + e.tCant, "🗳️ élu directement par le peuple", "people") +
+            qeCard("exe", "Exécutif", "Conseil d'État", e.ceN + " · mandat " + e.tCant, "🗳️ élu directement par le peuple", "people")
+          ) +
+          qeLevel("Commune",
+            qeCard("leg", "Législatif", ci.legis, "mandat " + e.tCom, "🗳️ élu par le peuple (ou assemblée)", "people") +
+            qeCard("exe", "Exécutif", ci.exec, "présidé·e par le·la " + ci.head + " · mandat " + e.tCom, "🗳️ élu directement par le peuple", "people")
+          ) +
+          `<div class="cs-card cs-highlight">
+             <div class="cs-card-h">✅ À retenir</div>
+             <ul class="cs-list">
+               <li><b>Canton & commune</b> : le peuple élit <b>parlement ET gouvernement</b> directement.</li>
+               <li><b>Confédération</b> : le peuple élit le <b>Parlement</b> (les 2 chambres) ; c'est ensuite ce Parlement qui élit le <b>Conseil fédéral</b>.</li>
+               <li>La <b>présidence de la Confédération</b> tourne chaque année entre les 7 conseiller·ères fédéraux.</li>
+               <li><b>Démocratie directe</b> : le peuple vote aussi les <b>initiatives</b> et <b>référendums</b> (les votations).</li>
+             </ul>
+           </div>`;
+      })();
     showScreen("screen-politique");
   }
 

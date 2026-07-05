@@ -687,6 +687,22 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .cs-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
 .cs-list li { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; padding-left: 16px; position: relative; }
 .cs-list li::before { content: ""; position: absolute; left: 2px; top: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+/* Schéma « Qui élit qui ? » */
+.cs-h { font-family: var(--font-serif); font-size: 18px; font-weight: 500; margin: 22px 2px 8px; }
+.qe-peuple { text-align: center; background: var(--red); color: var(--on-red); font-weight: 600; font-size: 13.5px; padding: 11px 14px; border-radius: 13px; box-shadow: var(--shadow-sm); }
+.qe-arrow { text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); padding: 5px 0 2px; }
+.qe-level { margin-bottom: 14px; }
+.qe-lvl { display: block; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 0 0 7px 2px; }
+.qe-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.qe-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-sm); padding: 11px 12px; display: flex; flex-direction: column; gap: 3px; }
+.qe-leg { border-top: 3px solid #6E8CAE; }
+.qe-exe { border-top: 3px solid var(--red); }
+.qe-role { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--muted); }
+.qe-card b { font-family: var(--font-serif); font-size: 14px; font-weight: 500; line-height: 1.25; }
+.qe-meta { font-size: 11.5px; color: var(--ink-soft); line-height: 1.4; }
+.qe-by { margin-top: 6px; font-size: 11px; font-weight: 600; padding: 5px 8px; border-radius: 9px; line-height: 1.35; }
+.qe-by-people { background: var(--ok-bg); color: var(--ok); }
+.qe-by-parl { background: #F6EDD8; color: var(--red-dark); }
 .cs-pillar { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-sm); padding: 16px; margin-bottom: 11px; }
 .cs-pillar-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .cs-pillar-n { width: 38px; height: 38px; border-radius: 50%; color: #fff; display: grid; place-items: center; font-family: var(--font-serif); font-size: 19px; font-weight: 500; flex: 0 0 auto; }
