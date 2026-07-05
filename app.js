@@ -1126,6 +1126,74 @@
     showScreen("screen-moncanton");
   }
 
+  const csCard = (ico, title, body) => `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div><p>${body}</p></div>`;
+  const csList = (cls, ico, title, items) =>
+    `<div class="cs-card ${cls || ""}"><div class="cs-card-h">${ico} ${title}</div><ul class="cs-list">${items.map((t) => `<li>${t}</li>`).join("")}</ul></div>`;
+
+  function openNaturalisation() {
+    $("naturalisationBody").innerHTML =
+      `<p class="cs-intro">Devenir suisse par <b>naturalisation ordinaire</b> : les conditions et les étapes principales.</p>` +
+      csList("", "🏠", "Résidence", [
+        "<b>10 ans</b> de résidence en Suisse (les années entre 8 et 18 ans comptent double, min. 6 ans réels)",
+        "Être titulaire d'un <b>permis C</b> (établissement)",
+        "+ une durée de résidence dans le <b>canton</b> et la <b>commune</b> (variable selon les lieux)",
+      ]) +
+      csList("", "🤝", "Intégration", [
+        "Respecter la <b>Constitution</b> et l'ordre juridique ; ne pas mettre en danger la sécurité",
+        "Participer à la <b>vie économique</b> ou suivre une <b>formation</b>",
+        "Encourager l'intégration de sa famille",
+      ]) +
+      csCard("💬", "Langue", "Maîtriser une <b>langue nationale</b> : à l'<b>oral (niveau B1)</b> et à l'<b>écrit (niveau A2)</b> selon le cadre européen (CECR).") +
+      csCard("🧠", "Connaissances", "Connaître la <b>Suisse</b>, le <b>canton</b> et la <b>commune</b> — géographie, histoire, institutions, us et coutumes. C'est l'objet du <b>test</b> que tu prépares ici. 💪") +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h">🏛️ Trois niveaux décident</div><p>La naturalisation ordinaire nécessite l'accord des <b>trois</b> : autorisation de la <b>Confédération</b>, décision du <b>canton</b> et de la <b>commune</b>.</p></div>` +
+      csCard("⚡", "Naturalisation facilitée", "Procédure allégée (fédérale) dans certains cas : par ex. <b>conjoint·e de Suisse</b> (env. 5 ans de résidence + 3 ans d'union), ou personnes de la <b>3ᵉ génération</b>.") +
+      `<p class="cs-note">Des émoluments (frais) s'appliquent et la procédure peut durer <b>plusieurs années</b>. Les détails exacts dépendent du canton et de la commune.</p>`;
+    showScreen("screen-naturalisation");
+  }
+
+  function openFederalisme() {
+    $("federalismeBody").innerHTML =
+      `<p class="cs-intro">La Suisse est un <b>État fédéral</b> : le pouvoir est réparti entre <b>3 niveaux</b>, chacun avec ses compétences et ses impôts.</p>` +
+      csList("", "🏔️", "Confédération", ["Armée · monnaie (franc suisse) · affaires étrangères · douanes", "AVS/AI · routes nationales (autoroutes) · énergie"]) +
+      csList("", "🏛️", "Cantons (26)", ["Police · écoles · santé et hôpitaux · culture", "Chaque canton a sa <b>Constitution</b>, ses lois et ses tribunaux"]) +
+      csList("", "🏘️", "Communes (~2 100)", ["Écoles primaires · eau · déchets · aménagement local", "État civil · pompiers · routes communales"]) +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h">🧩 Subsidiarité</div><p>Ce qu'un niveau <b>inférieur</b> peut faire, il le fait ; le niveau supérieur n'intervient que si nécessaire. On paie donc des impôts aux <b>3 niveaux</b>.</p></div>`;
+    showScreen("screen-federalisme");
+  }
+
+  function openLangues() {
+    $("languesBody").innerHTML =
+      `<p class="cs-intro">La Suisse a <b>4 langues nationales</b>. Chacun a le droit de parler la sienne (liberté de la langue).</p>` +
+      csCard("🇩🇪", "Allemand — ~62 %", "La plus parlée. Majorité des cantons (Zurich, Berne, Bâle, Lucerne…). En Suisse on parle surtout le <b>suisse allemand</b> (dialecte).") +
+      csCard("🇫🇷", "Français — ~23 %", "La <b>Suisse romande</b> : Vaud, Genève, Neuchâtel, Jura, et une partie du Valais, de Fribourg et de Berne.") +
+      csCard("🇮🇹", "Italien — ~8 %", "Le <b>Tessin</b> et quelques vallées du sud des Grisons.") +
+      csCard("🏔️", "Romanche — ~0,5 %", "Parlé dans les <b>Grisons</b> ; 4ᵉ langue nationale, langue officielle pour les échanges avec les romanchophones.") +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h">🗺️ Cantons plurilingues</div><p><b>Bilingues</b> : Berne, Fribourg, Valais (français-allemand). <b>Trilingue</b> : Grisons (allemand, romanche, italien). Langues officielles de la Confédération : allemand, français, italien.</p></div>`;
+    showScreen("screen-langues");
+  }
+
+  function openNeutralite() {
+    $("neutraliteBody").innerHTML =
+      `<p class="cs-intro">La Suisse est <b>neutre</b> et une terre de dialogue et d'action humanitaire.</p>` +
+      csCard("🕊️", "La neutralité", "La Suisse ne participe pas aux conflits armés et ne prend pas parti militairement. Neutralité <b>permanente et armée</b>, reconnue au <b>Congrès de Vienne (1815)</b>.") +
+      csCard("🌍", "ONU", "La Suisse a adhéré à l'<b>ONU en 2002</b>, par votation populaire.") +
+      csCard("🛂", "Schengen — mais pas l'UE", "La Suisse fait partie de l'espace <b>Schengen</b> (libre circulation), mais n'est <b>pas membre de l'Union européenne</b>.") +
+      csCard("➕", "La Croix-Rouge", "Fondée à <b>Genève</b> par <b>Henri Dunant</b> (1863), qui reçut le tout premier <b>prix Nobel de la paix</b>.") +
+      csCard("🏢", "La Genève internationale", "Siège européen de l'<b>ONU</b>, du <b>CICR</b>, de l'<b>OMS</b>, de l'<b>OMC</b>… La Suisse offre ses « bons offices » pour la médiation.");
+    showScreen("screen-neutralite");
+  }
+
+  function openSymboles() {
+    $("symbolesBody").innerHTML =
+      `<p class="cs-intro">Quelques symboles et traditions qui font la Suisse — souvent au programme du test.</p>` +
+      csCard("🎇", "Fête nationale : 1er août", "Elle commémore le <b>Pacte de 1291</b> (alliance sur la prairie du <b>Grütli</b>). On allume des feux et des lampions.") +
+      csCard("🤝", "Le Pacte fédéral (1291)", "<b>Uri, Schwytz et Unterwald</b> s'allient : acte fondateur de la Confédération.") +
+      csCard("🏹", "Guillaume Tell", "Héros <b>légendaire</b> (la pomme, l'arbalète), symbole de la liberté et de la résistance à l'oppression.") +
+      csCard("🚩", "Le drapeau", "Une <b>croix blanche</b> sur fond <b>rouge</b> — l'un des rares drapeaux carrés. (Emblème protégé par la loi.)") +
+      csList("", "🎶", "Us et coutumes", ["Cor des Alpes · yodel · lutte suisse (Schwingen)", "Désalpe · carnaval · Fête des Vignerons", "Chocolat · fromage (fondue, raclette, Gruyère)"]);
+    showScreen("screen-symboles");
+  }
+
   /* ======================================================================
    *  QUIZ (entraînement + examen)
    * ==================================================================== */
@@ -1511,6 +1579,16 @@
   $("btnQuitDroits").addEventListener("click", () => showScreen("screen-home"));
   $("btnMonCanton").addEventListener("click", openMonCanton);
   $("btnQuitMonCanton").addEventListener("click", () => showScreen("screen-home"));
+  $("btnNaturalisation").addEventListener("click", openNaturalisation);
+  $("btnQuitNaturalisation").addEventListener("click", () => showScreen("screen-home"));
+  $("btnFederalisme").addEventListener("click", openFederalisme);
+  $("btnQuitFederalisme").addEventListener("click", () => showScreen("screen-home"));
+  $("btnLangues").addEventListener("click", openLangues);
+  $("btnQuitLangues").addEventListener("click", () => showScreen("screen-home"));
+  $("btnNeutralite").addEventListener("click", openNeutralite);
+  $("btnQuitNeutralite").addEventListener("click", () => showScreen("screen-home"));
+  $("btnSymboles").addEventListener("click", openSymboles);
+  $("btnQuitSymboles").addEventListener("click", () => showScreen("screen-home"));
   $("btnPiliers").addEventListener("click", openPiliers);
   $("btnQuitPiliers").addEventListener("click", () => showScreen("screen-home"));
   $("btnSante").addEventListener("click", openSante);

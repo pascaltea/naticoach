@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=53" />
+  <link rel="stylesheet" href="styles.css?v=54" />
 </head>
 <body>
   <div id="app">
@@ -142,7 +142,16 @@
       <div class="mode-grid">
         <button class="mode-tile" id="btnPolitique"><span class="mode-ico">🏛️</span><b>Système politique</b><small>qui fait quoi, qui élit qui</small></button>
         <button class="mode-tile" id="btnDemocratie"><span class="mode-ico">🗳️</span><b>Démocratie directe</b><small>initiatives & référendums</small></button>
+        <button class="mode-tile" id="btnFederalisme"><span class="mode-ico">🧩</span><b>Le fédéralisme</b><small>3 niveaux, qui fait quoi</small></button>
         <button class="mode-tile" id="btnDroits"><span class="mode-ico">⚖️</span><b>Droits & devoirs</b><small>du citoyen</small></button>
+        <button class="mode-tile" id="btnLangues"><span class="mode-ico">💬</span><b>Langues nationales</b><small>les 4 langues</small></button>
+        <button class="mode-tile" id="btnNeutralite"><span class="mode-ico">🕊️</span><b>Neutralité & monde</b><small>ONU, Croix-Rouge…</small></button>
+        <button class="mode-tile" id="btnSymboles"><span class="mode-ico">🎇</span><b>Symboles & traditions</b><small>1er août, us et coutumes</small></button>
+      </div>
+
+      <div class="mode-group-label">Vie pratique & démarche</div>
+      <div class="mode-grid">
+        <button class="mode-tile" id="btnNaturalisation"><span class="mode-ico">📖</span><b>La naturalisation</b><small>conditions & étapes</small></button>
         <button class="mode-tile" id="btnPiliers"><span class="mode-ico">🏦</span><b>Les 3 piliers</b><small>prévoyance / retraite</small></button>
         <button class="mode-tile" id="btnSante"><span class="mode-ico">🏥</span><b>Système de santé</b><small>assurance maladie</small></button>
       </div>
@@ -379,6 +388,56 @@
       <div id="monCantonBody"></div>
     </section>
 
+    <!-- ============ ÉCRAN : LA NATURALISATION ============ -->
+    <section class="screen" id="screen-naturalisation">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitNaturalisation" aria-label="Retour">←</button>
+        <h2 class="explore-title">La naturalisation</h2>
+        <span></span>
+      </div>
+      <div id="naturalisationBody"></div>
+    </section>
+
+    <!-- ============ ÉCRAN : LE FÉDÉRALISME ============ -->
+    <section class="screen" id="screen-federalisme">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitFederalisme" aria-label="Retour">←</button>
+        <h2 class="explore-title">Le fédéralisme</h2>
+        <span></span>
+      </div>
+      <div id="federalismeBody"></div>
+    </section>
+
+    <!-- ============ ÉCRAN : LANGUES NATIONALES ============ -->
+    <section class="screen" id="screen-langues">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitLangues" aria-label="Retour">←</button>
+        <h2 class="explore-title">Les langues nationales</h2>
+        <span></span>
+      </div>
+      <div id="languesBody"></div>
+    </section>
+
+    <!-- ============ ÉCRAN : NEUTRALITÉ & MONDE ============ -->
+    <section class="screen" id="screen-neutralite">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitNeutralite" aria-label="Retour">←</button>
+        <h2 class="explore-title">Neutralité & monde</h2>
+        <span></span>
+      </div>
+      <div id="neutraliteBody"></div>
+    </section>
+
+    <!-- ============ ÉCRAN : SYMBOLES & TRADITIONS ============ -->
+    <section class="screen" id="screen-symboles">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitSymboles" aria-label="Retour">←</button>
+        <h2 class="explore-title">Symboles &amp; traditions</h2>
+        <span></span>
+      </div>
+      <div id="symbolesBody"></div>
+    </section>
+
     <!-- ============ ÉCRAN : CORRECTION ============ -->
     <section class="screen" id="screen-review">
       <div class="quiz-top">
@@ -408,6 +467,6 @@
   <script src="ge_official.js"></script>
   <script src="ne_official.js"></script>
   <script src="vs_official.js"></script>
-  <script src="app.js?v=53"></script>
+  <script src="app.js?v=54"></script>
 </body>
 </html>
