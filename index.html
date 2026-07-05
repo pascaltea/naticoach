@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=49" />
+  <link rel="stylesheet" href="styles.css?v=50" />
 </head>
 <body>
   <div id="app">
@@ -300,27 +300,13 @@
         <h2 class="explore-title">Les 13 districts du Valais</h2>
         <span></span>
       </div>
-      <p class="muted tiny explore-sub">Schéma d'ouest en est, le long de la vallée du Rhône.</p>
+      <p class="muted tiny explore-sub">Touche un district pour le repérer.</p>
       <div class="vsmap-frame">
-        <svg viewBox="0 0 700 300" class="vsmap-svg" role="img" aria-label="Schéma des 13 districts du Valais">
-          <path d="M40 250 C 150 246 230 224 320 196 S 500 168 575 162 L 645 118" fill="none" stroke="var(--track)" stroke-width="24" stroke-linecap="round"/>
-          <path d="M40 250 C 150 246 230 224 320 196 S 500 168 575 162 L 645 118" fill="none" stroke="#BFD3E6" stroke-width="3" stroke-linecap="round" opacity=".9"/>
-          <g class="vsd" font-family="var(--font-ui)" font-size="13" font-weight="700" text-anchor="middle">
-            <g fill="#3E7A4E"><circle cx="70" cy="238" r="15"/><circle cx="118" cy="208" r="15"/><circle cx="172" cy="240" r="15"/><circle cx="168" cy="288" r="15"/></g>
-            <g fill="#C8442E"><circle cx="256" cy="198" r="15"/><circle cx="308" cy="186" r="15"/><circle cx="306" cy="256" r="15"/><circle cx="372" cy="182" r="15"/></g>
-            <g fill="#5B7DB1"><circle cx="438" cy="162" r="15"/><circle cx="498" cy="168" r="15"/><circle cx="512" cy="236" r="15"/><circle cx="568" cy="160" r="15"/><circle cx="632" cy="112" r="15"/></g>
-            <g fill="#FFFFFF">
-              <text x="70" y="243">1</text><text x="118" y="213">2</text><text x="172" y="245">3</text><text x="168" y="293">4</text>
-              <text x="256" y="203">5</text><text x="308" y="191">6</text><text x="306" y="261">7</text><text x="372" y="187">8</text>
-              <text x="438" y="167">9</text><text x="498" y="173">10</text><text x="512" y="241">11</text><text x="568" y="165">12</text><text x="632" y="117">13</text>
-            </g>
-          </g>
-          <text x="42" y="285" font-family="var(--font-ui)" font-size="12" font-weight="700" fill="#8A7D6A">← Léman</text>
-          <text x="600" y="100" font-family="var(--font-ui)" font-size="12" font-weight="700" fill="#8A7D6A">Gothard →</text>
-        </svg>
+        <svg class="vsmap-svg" id="vsMapSvg" role="img" aria-label="Carte des 13 districts du Valais"></svg>
       </div>
+      <div class="map-legend" id="vsMapLegend"></div>
       <div class="vsd-list" id="vsdList"></div>
-      <p class="footer-note" style="margin-top:14px">Les <b>13 étoiles</b> du drapeau valaisan représentent ces <b>13 districts</b>. Schéma original NatiCoach (non géographique).</p>
+      <p class="footer-note" style="margin-top:14px">Les <b>13 étoiles</b> du drapeau valaisan représentent ces <b>13 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes).</p>
     </section>
 
     <!-- ============ ÉCRAN : CORRECTION ============ -->
@@ -347,10 +333,11 @@
   <script src="cantons.js"></script>
   <script src="swissmap.js"></script>
   <script src="timeline.js"></script>
+  <script src="vsdistricts.js"></script>
   <script src="vd_official.js"></script>
   <script src="ge_official.js"></script>
   <script src="ne_official.js"></script>
   <script src="vs_official.js"></script>
-  <script src="app.js?v=49"></script>
+  <script src="app.js?v=50"></script>
 </body>
 </html>

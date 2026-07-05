@@ -650,9 +650,13 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .tl-card.key p i { font-family: var(--font-serif); }
 
 /* ---------- Districts du Valais (ressource) ---------- */
-.vsmap-frame { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 8px; box-shadow: var(--shadow-sm); margin-bottom: 16px; }
+.vsmap-frame { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px; box-shadow: var(--shadow-sm); margin-bottom: 12px; }
 .vsmap-svg { width: 100%; height: auto; display: block; }
-.vsmap-svg text { font-family: var(--font-ui); }
+.vsd-path { stroke: #fff; stroke-width: 0.8; cursor: pointer; transition: filter .15s; }
+.vsd-path.sel { stroke: var(--ink); stroke-width: 2; }
+.vsd-label { font-family: var(--font-ui); font-size: 13px; font-weight: 700; fill: #fff; pointer-events: none;
+  paint-order: stroke; stroke: rgba(0,0,0,0.30); stroke-width: 0.7; }
+.vsd-chip.on { border-color: var(--red); background: var(--bad-bg); font-weight: 700; }
 .vsd-list { display: flex; flex-direction: column; gap: 14px; }
 .vsd-group { }
 .vsd-region { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }

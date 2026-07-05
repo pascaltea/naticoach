@@ -889,19 +889,46 @@
     showScreen("screen-timeline");
   }
 
-  /* ---------------- Les 13 districts du Valais (ressource) ---------------- */
-  const VS_DISTRICTS = [
-    { region: "Bas-Valais", color: "#3E7A4E", items: ["Monthey", "Saint-Maurice", "Martigny", "Entremont"] },
-    { region: "Valais central", color: "#C8442E", items: ["Conthey", "Sion", "Hérens", "Sierre"] },
-    { region: "Haut-Valais", color: "#5B7DB1", items: ["Loèche", "Rarogne", "Viège", "Brigue", "Conches (Goms)"] },
-  ];
+  /* ---------------- Les 13 districts du Valais (vraie carte) ---------------- */
+  const VS_REGION = {
+    bas:  { color: "#3E7A4E", label: "Bas-Valais" },
+    cen:  { color: "#C8442E", label: "Valais central" },
+    haut: { color: "#5B7DB1", label: "Haut-Valais" },
+  };
   function openVsmap() {
-    let n = 0;
-    $("vsdList").innerHTML = VS_DISTRICTS.map((g) =>
+    const svg = $("vsMapSvg");
+    if (typeof VS_MAP !== "undefined" && !svg.dataset.filled) {
+      svg.setAttribute("viewBox", VS_MAP.viewBox);
+      svg.innerHTML =
+        VS_MAP.districts.map((d) =>
+          `<path class="vsd-path" data-id="${d.id}" d="${d.d}" fill="${VS_REGION[d.region].color}" fill-rule="evenodd"/>`).join("") +
+        VS_MAP.districts.map((d) =>
+          `<text class="vsd-label" data-id="${d.id}" x="${d.cx}" y="${d.cy}" text-anchor="middle">${d.name}</text>`).join("");
+      svg.querySelectorAll(".vsd-path").forEach((p) => p.addEventListener("click", () => {
+        const on = !p.classList.contains("sel");
+        svg.querySelectorAll(".vsd-path").forEach((x) => x.classList.remove("sel"));
+        document.querySelectorAll(".vsd-chip").forEach((x) => x.classList.remove("on"));
+        if (on) {
+          p.classList.add("sel"); svg.appendChild(p);
+          const lbl = svg.querySelector(`.vsd-label[data-id="${p.dataset.id}"]`);
+          if (lbl) svg.appendChild(lbl);   // garde le nom au-dessus du district sélectionné
+          const chip = document.querySelector(`.vsd-chip[data-id="${p.dataset.id}"]`);
+          if (chip) chip.classList.add("on");
+        }
+      }));
+      // légende par région
+      $("vsMapLegend").innerHTML = Object.keys(VS_REGION).map((k) =>
+        `<span class="legend-item"><span class="legend-dot" style="background:${VS_REGION[k].color}"></span>${VS_REGION[k].label}</span>`).join("");
+      svg.dataset.filled = "1";
+    }
+    // liste groupée par région (ordre géographique bas→haut)
+    const byReg = { bas: [], cen: [], haut: [] };
+    (typeof VS_MAP !== "undefined" ? VS_MAP.districts : []).forEach((d) => byReg[d.region].push(d));
+    $("vsdList").innerHTML = Object.keys(VS_REGION).map((k) =>
       `<div class="vsd-group">
-         <div class="vsd-region"><span class="vsd-dot" style="background:${g.color}"></span>${g.region}</div>
+         <div class="vsd-region"><span class="vsd-dot" style="background:${VS_REGION[k].color}"></span>${VS_REGION[k].label}</div>
          <div class="vsd-items">` +
-         g.items.map((name) => `<span class="vsd-chip"><b style="color:${g.color}">${++n}</b> ${name}</span>`).join("") +
+         byReg[k].map((d) => `<span class="vsd-chip" data-id="${d.id}">${d.name}</span>`).join("") +
          `</div>
        </div>`).join("");
     showScreen("screen-vsmap");
