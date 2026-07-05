@@ -24,6 +24,7 @@
   const CANTON_FORMAT = { VD: "mcq", GE: "mcq", NE: "cards", VS: "cards" };
   const isCards = () => CANTON_FORMAT[cantonOf()] === "cards";
   const CANTON_NAME = { VD: "Vaud", GE: "Genève", NE: "Neuchâtel", VS: "Valais" };
+  const CANTON_SCOPE = { VD: "Canton de Vaud", GE: "Canton de Genève", NE: "Canton de Neuchâtel", VS: "Canton du Valais" };
   function cardsData() {
     if (state.canton === "NE" && typeof NE_DATA !== "undefined") return NE_DATA;
     if (state.canton === "VS" && typeof VS_DATA !== "undefined") return VS_DATA;
@@ -216,7 +217,7 @@
   /* Deck de fiches (Neuchâtel / Valais) : {q, a, theme, scope}, scindé Suisse / canton. */
   function cardsDeck() {
     const src = cardsData().questions;
-    const cLabel = "Canton de " + CANTON_NAME[cantonOf()];
+    const cLabel = CANTON_SCOPE[cantonOf()];
     const mk = (q) => ({ q: q.q, a: q.a, theme: q.theme, scope: q.level === "Suisse" ? "Suisse" : cLabel });
     return {
       federal: src.filter((q) => q.level === "Suisse").map(mk),
@@ -404,7 +405,7 @@
     if (c === "GE" || c === "NE" || c === "VS") return [
       { key: "all", label: "Tout", long: "Toutes les questions" },
       { key: "federal", label: "Suisse", long: "Suisse (fédéral)" },
-      { key: "cantonal", label: CANTON_NAME[c], long: "Canton de " + CANTON_NAME[c] },
+      { key: "cantonal", label: CANTON_NAME[c], long: CANTON_SCOPE[c] },
     ];
     return [
       { key: "all", label: "Tout", long: "Toutes les questions" },
