@@ -1,5 +1,5 @@
 /* Service worker — mises à jour fiables (réseau d'abord pour le code), cache pour l'offline. */
-const CACHE = "swisscitoyen-v45";
+const CACHE = "swisscitoyen-v46";
 const ASSETS = [
   "./",
   "./index.html",
@@ -14,6 +14,7 @@ const ASSETS = [
   "./swissmap.js",
   "./timeline.js",
   "./vd_official.js",
+  "./ge_official.js",
   "./manifest.webmanifest",
   "./icon.svg",
   "./logo-app-icon.svg",

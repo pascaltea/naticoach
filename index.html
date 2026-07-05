@@ -12,29 +12,55 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=45" />
+  <link rel="stylesheet" href="styles.css?v=46" />
 </head>
 <body>
   <div id="app">
 
-    <!-- ============ ÉCRAN : CONFIGURATION / CHOIX DE COMMUNE ============ -->
+    <!-- ============ ÉCRAN : CONFIGURATION (canton puis commune) ============ -->
     <section class="screen active" id="screen-setup">
-      <button class="icon-btn setup-back" id="setupBack" hidden aria-label="Fermer">✕</button>
-      <div class="setup-hero">
-        <img class="brand-mark" src="logo-app-icon.svg" alt="" width="56" height="56" />
-        <div class="setup-surtitle" id="setupSurtitle">Grüezi · <span>Bonjour</span> · Buongiorno</div>
-        <h1 id="setupTitle">Où habites-tu&nbsp;?</h1>
-        <p class="sub" id="setupSub">Ta commune personnalise les questions locales. Tu pourras la changer à tout moment.</p>
+      <button class="icon-btn setup-back" id="setupBack" hidden aria-label="Retour">←</button>
+
+      <!-- Étape 1 : choix du canton -->
+      <div id="setupCantonStep">
+        <div class="setup-hero">
+          <img class="brand-mark" src="logo-app-icon.svg" alt="" width="56" height="56" />
+          <div class="setup-surtitle">Grüezi · <span>Bonjour</span> · Buongiorno</div>
+          <h1>Où te fais-tu naturaliser&nbsp;?</h1>
+          <p class="sub">Choisis ton canton. Le questionnaire officiel s'adapte automatiquement.</p>
+        </div>
+        <div class="canton-cards">
+          <button class="canton-card" data-canton="VD">
+            <span class="canton-emoji">🌅</span>
+            <span class="canton-name">Vaud</span>
+            <span class="canton-desc">Suisse · canton · ta commune</span>
+          </button>
+          <button class="canton-card" data-canton="GE">
+            <span class="canton-emoji">⛲</span>
+            <span class="canton-name">Genève</span>
+            <span class="canton-desc">Suisse · canton</span>
+          </button>
+        </div>
+        <p class="setup-note setup-note-top">Tu pourras changer de canton à tout moment.</p>
       </div>
-      <div class="search-wrap">
-        <span class="search-ico">🔍</span>
-        <input id="communeSearch" class="search-input" type="search" inputmode="search"
-               placeholder="Rechercher ma commune…" autocomplete="off" />
-      </div>
-      <div id="communeResults" class="commune-results"></div>
-      <div class="setup-cta" id="setupCta" hidden>
-        <button class="btn btn-primary" id="btnSetupConfirm">C'est parti</button>
-        <p class="setup-note">300 communes vaudoises · aucune donnée ne quitte ton téléphone</p>
+
+      <!-- Étape 2 (Vaud) : choix de la commune -->
+      <div id="setupCommuneStep" hidden>
+        <div class="setup-hero">
+          <img class="brand-mark" src="logo-app-icon.svg" alt="" width="56" height="56" />
+          <h1>Ta commune vaudoise</h1>
+          <p class="sub">Elle personnalise les questions locales. Tu pourras la changer à tout moment.</p>
+        </div>
+        <div class="search-wrap">
+          <span class="search-ico">🔍</span>
+          <input id="communeSearch" class="search-input" type="search" inputmode="search"
+                 placeholder="Rechercher ma commune…" autocomplete="off" />
+        </div>
+        <div id="communeResults" class="commune-results"></div>
+        <div class="setup-cta" id="setupCta" hidden>
+          <button class="btn btn-primary" id="btnSetupConfirm">C'est parti</button>
+          <p class="setup-note">300 communes vaudoises · aucune donnée ne quitte ton téléphone</p>
+        </div>
       </div>
     </section>
 
@@ -54,7 +80,7 @@
       <button class="exam-cta" id="btnExam">
         <span class="exam-cta-txt">
           <b>Simuler l'examen</b>
-          <small>48 questions · 60 min · réussite 70 %</small>
+          <small id="examSub">48 questions · 60 min · réussite 70 %</small>
         </span>
         <span class="exam-cta-arrow">›</span>
       </button>
@@ -104,7 +130,7 @@
         <button class="mode-tile" id="btnBadges"><span class="mode-ico">🏆</span><b>Succès</b><small><span id="badgeCount">0</span> badge(s)</small></button>
       </div>
 
-      <p class="footer-note"><img class="footer-flower" src="logo-edelweiss-red.svg" alt="" width="14" height="14" /> Questions officielles du Canton de Vaud · hors-ligne</p>
+      <p class="footer-note"><img class="footer-flower" src="logo-edelweiss-red.svg" alt="" width="14" height="14" /> <span id="homeFooter">Questions officielles du Canton de Vaud · hors-ligne</span></p>
     </section>
 
     <!-- ============ ÉCRAN : RÉVISION (réponses affichées) ============ -->
@@ -277,6 +303,7 @@
   <script src="swissmap.js"></script>
   <script src="timeline.js"></script>
   <script src="vd_official.js"></script>
-  <script src="app.js?v=45"></script>
+  <script src="ge_official.js"></script>
+  <script src="app.js?v=46"></script>
 </body>
 </html>

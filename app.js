@@ -9,21 +9,35 @@
   const RING_LEN = 2 * Math.PI * 52;
   const STORE_KEY = "swisscitoyen.v1";
   const THEMES = ["Géographie", "Histoire", "Politique", "Social"];
-  const EXAM_TOTAL = 48;          // 16 Suisse + 16 canton + 16 commune
+  const EXAM_TOTAL = 48;          // Vaud : 16 Suisse + 16 canton + 16 commune
   const EXAM_PER_CELL = 4;        // 4 par (niveau × thème)
   const EXAM_MINUTES = 60;
-  const EXAM_PASS_PCT = 70;       // réussite officielle : 70 %
+  const EXAM_PASS_PCT = 70;       // réussite officielle Vaud : 70 %
+
+  /* Configuration d'examen par canton (Vaud / Genève). */
+  const EXAM_CFG = {
+    VD: { total: 48, passCorrect: 34, minutes: 60, passLabel: "70 % de bonnes réponses" },
+    GE: { total: 45, passCorrect: 40, minutes: 45, passLabel: "40 bonnes réponses sur 45 (5 fautes maximum)" },
+  };
+  const cantonOf = () => (state.canton === "GE" ? "GE" : "VD");
 
   /* ---------------- Persistance ---------------- */
   const defaultState = () => ({
     history: [], sessions: 0, best: 0, streak: 0, lastPlayed: null,
-    commune: null,
+    canton: null,   // "VD" | "GE"
+    commune: null,  // (Vaud uniquement)
     mistakes: [],   // [{q, options, answer, theme, scope}]
     stats: {},      // { "Niveau|Thème": {a, c} }
     badges: {},     // { badgeId: true }
   });
   function load() {
-    try { const r = localStorage.getItem(STORE_KEY); return r ? Object.assign(defaultState(), JSON.parse(r)) : defaultState(); }
+    try {
+      const r = localStorage.getItem(STORE_KEY);
+      const s = r ? Object.assign(defaultState(), JSON.parse(r)) : defaultState();
+      // Migration : un utilisateur existant avec une commune est un utilisateur Vaud.
+      if (!s.canton && s.commune) s.canton = "VD";
+      return s;
+    }
     catch (e) { return defaultState(); }
   }
   function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
@@ -121,6 +135,7 @@
   /* Niveau à partir de la portée (pour les stats). */
   function levelOf(scope) {
     if (scope && scope.indexOf("Canton de Vaud") >= 0) return "Vaud";
+    if (scope && scope.indexOf("Canton de Genève") >= 0) return "Genève";
     if (scope && scope.indexOf("Commune") >= 0) return "Commune";
     return "Suisse";
   }
@@ -175,6 +190,22 @@
   }
   function allDeck(id) { const d = communeDeck(id); return d.federal.concat(d.cantonal, d.commune); }
 
+  /* Deck Genève : questions officielles (window.GE_DATA), scindées Suisse / Genève. */
+  function geDeck() {
+    const map = (q, scope) => enrich({ q: q.q, options: q.options, answer: q.answer, theme: q.theme }, scope);
+    const src = (typeof GE_DATA !== "undefined") ? GE_DATA.questions : [];
+    return {
+      name: "Genève",
+      federal: src.filter((q) => q.level === "Suisse").map((q) => map(q, "Suisse")),
+      cantonal: src.filter((q) => q.level === "Genève").map((q) => map(q, "Canton de Genève")),
+      commune: [],
+    };
+  }
+
+  /* Deck du canton courant. */
+  function currentDeck() { return cantonOf() === "GE" ? geDeck() : communeDeck(state.commune); }
+  function allCurrentDeck() { const d = currentDeck(); return d.federal.concat(d.cantonal, d.commune); }
+
   /* Compose un examen fidèle : 4 questions par (niveau × thème) = 48. */
   function buildExam(id) {
     const d = communeDeck(id);
@@ -198,16 +229,30 @@
 
   function openSetup(isChange) {
     $("setupBack").hidden = !isChange;
-    $("setupTitle").textContent = isChange ? "Changer de commune" : "Où habites-tu ?";
-    $("setupSub").textContent = isChange
-      ? "Sélectionne ta nouvelle commune. Tu pourras la changer à tout moment."
-      : "Ta commune personnalise les questions locales. Tu pourras la changer à tout moment.";
-    $("communeSearch").value = "";
-    pendingCommune = state.commune || null;
-    renderCommuneResults("");
-    updateSetupCta();
+    showCantonStep();
     showScreen("screen-setup");
-    setTimeout(() => $("communeSearch").focus(), 100);
+  }
+
+  function showCantonStep() {
+    $("setupCantonStep").hidden = false;
+    $("setupCommuneStep").hidden = true;
+    document.querySelectorAll(".canton-card").forEach((el) =>
+      el.classList.toggle("sel", el.dataset.canton === state.canton));
+  }
+
+  function pickCanton(canton) {
+    if (canton === "GE") {
+      state.canton = "GE"; state.commune = null; save();
+      renderHome(); showScreen("screen-home");
+    } else {
+      $("setupCantonStep").hidden = true;
+      $("setupCommuneStep").hidden = false;
+      $("communeSearch").value = "";
+      pendingCommune = (state.canton === "VD" ? state.commune : null);
+      renderCommuneResults("");
+      updateSetupCta();
+      setTimeout(() => $("communeSearch").focus(), 100);
+    }
   }
 
   function updateSetupCta() {
@@ -259,7 +304,7 @@
   }
 
   function selectCommune(id) {
-    state.commune = id; save();
+    state.canton = "VD"; state.commune = id; save();
     renderHome(); showScreen("screen-home");
   }
 
@@ -267,8 +312,16 @@
    *  ACCUEIL
    * ==================================================================== */
   function renderHome() {
+    const ge = cantonOf() === "GE";
     const c = VD_DATA.communes[state.commune];
-    $("homeCommune").textContent = c ? c.name : "Choisir…";
+    $("homeCommune").textContent = ge ? "Genève" : (c ? c.name : "Choisir…");
+    const cfg = EXAM_CFG[cantonOf()];
+    $("examSub").textContent = ge
+      ? `${cfg.total} questions · max 5 fautes`
+      : `${cfg.total} questions · ${cfg.minutes} min · réussite 70 %`;
+    $("homeFooter").textContent = ge
+      ? "Questions officielles Suisse & Canton de Genève · hors-ligne"
+      : "Questions officielles du Canton de Vaud · hors-ligne";
 
     const recent = state.history.slice(-5);
     const readiness = recent.length ? Math.round(recent.reduce((s, h) => s + h.pct, 0) / recent.length) : 0;
@@ -306,12 +359,19 @@
    *  RÉVISION (toutes les questions, réponses affichées)
    * ==================================================================== */
   let study = null; // { scope, items, i, interactive }
-  const STUDY_SCOPES = [
-    { key: "all", label: "Tout", long: "Toutes les questions" },
-    { key: "federal", label: "Suisse", long: "Suisse (fédéral)" },
-    { key: "cantonal", label: "Vaud", long: "Canton de Vaud" },
-    { key: "commune", label: "Commune", long: "Ma commune" },
-  ];
+  function studyScopes() {
+    if (cantonOf() === "GE") return [
+      { key: "all", label: "Tout", long: "Toutes les questions" },
+      { key: "federal", label: "Suisse", long: "Suisse (fédéral)" },
+      { key: "cantonal", label: "Genève", long: "Canton de Genève" },
+    ];
+    return [
+      { key: "all", label: "Tout", long: "Toutes les questions" },
+      { key: "federal", label: "Suisse", long: "Suisse (fédéral)" },
+      { key: "cantonal", label: "Vaud", long: "Canton de Vaud" },
+      { key: "commune", label: "Commune", long: "Ma commune" },
+    ];
+  }
 
   // Ordre d'affichage : Découverte puis Quiz. Quiz reste le mode par défaut.
   const STUDY_MODES = [
@@ -343,7 +403,7 @@
   /* Feuille de sélection de la portée (Tout / Suisse / Vaud / Commune). */
   function openScopeSheet() {
     const box = $("scopeOptions");
-    box.innerHTML = STUDY_SCOPES.map((s) =>
+    box.innerHTML = studyScopes().map((s) =>
       `<button data-scope="${s.key}" class="${study && study.scope === s.key ? "sel" : ""}">
          <span>${s.long}</span>${study && study.scope === s.key ? '<span class="sheet-check">✓</span>' : ""}
        </button>`).join("");
@@ -355,11 +415,11 @@
   function closeScopeSheet() { $("scopeSheet").hidden = true; }
 
   function loadStudyScope(scope) {
-    const d = communeDeck(state.commune);
-    const src = scope === "all" ? d.federal.concat(d.cantonal, d.commune) : d[scope];
+    const d = currentDeck();
+    const src = scope === "all" ? d.federal.concat(d.cantonal, d.commune) : (d[scope] || []);
     const interactive = study ? study.interactive : true;
     study = { scope, items: src.map(buildQuestion), i: 0, interactive };
-    const sc = STUDY_SCOPES.find((s) => s.key === scope);
+    const sc = studyScopes().find((s) => s.key === scope);
     $("studyScopeLabel").textContent = "Révision · " + (sc ? sc.label : "Tout");
     renderStudy();
   }
@@ -523,7 +583,7 @@
       return;
     }
     const col = REGION_COLORS[c.region];
-    const cta = c.code === "VD"
+    const cta = (c.code === "VD" && cantonOf() === "VD")
       ? `<div class="cid-cta-wrap"><button class="cid-cta" id="cantonQuizBtn" style="border-color:${col};color:${col}">5 questions sur le canton de Vaud →</button></div>`
       : "";
     box.classList.add("as-card");
@@ -556,7 +616,8 @@
    *  STATISTIQUES
    * ==================================================================== */
   const STAT_THEMES = ["Géographie", "Histoire", "Politique", "Social"];
-  const STAT_LEVELS = ["Suisse", "Vaud", "Commune"];
+  const statLevels = () => (cantonOf() === "GE" ? ["Suisse", "Genève"] : ["Suisse", "Vaud", "Commune"]);
+  const levelLabel = (l) => ({ Suisse: "Suisse", Vaud: "Canton de Vaud", "Genève": "Canton de Genève", Commune: "Ma commune" }[l] || l);
 
   /* Palier de couleur d'une barre (seuil examen à 60 %). */
   function barColor(pct) { return pct < 30 ? "#C8442E" : pct < 45 ? "#D8836F" : pct < 60 ? "#C08A2E" : "#3E7A4E"; }
@@ -623,9 +684,9 @@
       `<div class="stats-card">
          <div class="stats-card-head"><span class="stats-card-title">Par niveau</span></div>
          <div class="sbar-list">` +
-           STAT_LEVELS.map((l) => {
+           statLevels().map((l) => {
              const r = agg((k) => k.split("|")[0] === l);
-             const label = l === "Suisse" ? "Suisse" : (l === "Vaud" ? "Canton de Vaud" : "Ma commune");
+             const label = levelLabel(l);
              return r.a ? sbar({ label, pct: r.pct, frac: r.c + "/" + r.a }, 60)
                         : `<div class="sbar-row"><div class="sbar-head"><b>${label}</b><span>—</span></div><div class="sbar"><i style="width:0"></i></div></div>`;
            }).join("") +
@@ -645,7 +706,7 @@
 
   /* Révision ciblée d'un thème (quiz de correction immédiate). */
   function startThemeReview(theme) {
-    const pool = allDeck(state.commune).filter((q) => q.theme === theme);
+    const pool = allCurrentDeck().filter((q) => q.theme === theme);
     const items = shuffle(pool).slice(0, 12).map(buildQuestion);
     if (!items.length) return;
     quiz = { mode: "practice", items: items, i: 0, correct: 0, answered: false };
@@ -744,8 +805,19 @@
   }
 
   function startExam() {
-    const pool = buildExam(state.commune);
-    quiz = { mode: "exam", items: pool.map(buildQuestion), i: 0, correct: 0, answered: false, endAt: Date.now() + EXAM_MINUTES * 60000 };
+    const cfg = EXAM_CFG[cantonOf()];
+    let items;
+    if (cantonOf() === "GE") {
+      const d = geDeck();
+      items = shuffle(d.federal.concat(d.cantonal)).slice(0, cfg.total).map(buildQuestion);
+    } else {
+      items = buildExam(state.commune).map(buildQuestion);
+    }
+    quiz = {
+      mode: "exam", items: items, i: 0, correct: 0, answered: false,
+      total: cfg.total, passCorrect: cfg.passCorrect, passLabel: cfg.passLabel,
+      endAt: Date.now() + cfg.minutes * 60000,
+    };
     showScreen("screen-quiz"); renderQuestion(); startExamTimer();
   }
 
@@ -864,7 +936,7 @@
   function finishQuiz() {
     if (!quiz) return;
     clearExamTimer();
-    const total = quiz.mode === "exam" ? EXAM_TOTAL : quiz.items.length;
+    const total = quiz.mode === "exam" ? (quiz.total || EXAM_TOTAL) : quiz.items.length;
     const pct = Math.round((quiz.correct / total) * 100);
 
     state.sessions++;
@@ -882,14 +954,14 @@
     const prevPct = state.history.length >= 2 ? state.history[state.history.length - 2].pct : null;
 
     $("resultFrac").textContent = quiz.correct + "/" + total;
-    const pass = quiz.mode === "exam" && pct >= EXAM_PASS_PCT;
+    const pass = quiz.mode === "exam" && quiz.correct >= quiz.passCorrect;
     $("resultRing").style.stroke = pass ? "var(--ok)" : "var(--red)";
     setTimeout(() => { setRing($("resultRing"), pct); countUp($("resultPct"), pct, 900); }, 120);
 
     // Gamification : badges, confettis
     const examPass = pass;
     if (examPass) unlock("exam");
-    if (quiz.mode === "exam" && quiz.correct === EXAM_TOTAL) unlock("perfect");
+    if (quiz.mode === "exam" && quiz.correct === total) unlock("perfect");
     const clearedAll = quiz.isMistakes && state.mistakes.length === 0;
     if (clearedAll) unlock("cleaner");
     checkBadges();
@@ -909,10 +981,10 @@
       if (pass) {
         titleHTML = "Félicitations,<br><i>tu es prêt·e.</i>";
         const rec = pct >= state.best ? " Ton meilleur score à ce jour." : "";
-        msg = `${pct}% de bonnes réponses — bien au-dessus du seuil des ${EXAM_PASS_PCT}%.${rec}`;
+        msg = `${quiz.correct}/${total} bonnes réponses (${pct}%) — au-dessus du seuil requis.${rec}`;
       } else {
         titleHTML = "Continue, tu avances.";
-        msg = `Réussite dès ${EXAM_PASS_PCT}% de bonnes réponses. Chaque session compte.`;
+        msg = `Réussite : ${quiz.passLabel || "70 % de bonnes réponses"}. Chaque session compte.`;
       }
       $("resultBilan").innerHTML = pass ? recapTiles(prevPct) : themeBilan();
     } else {
@@ -943,14 +1015,14 @@
       sh.hidden = true;
     }
 
-    // Message de partage (WhatsApp & co.) — avec défi famille pour l'examen.
-    const commune = VD_DATA.communes[state.commune];
-    const lieu = commune ? " (commune de " + commune.name + ")" : "";
+    // Message de partage (WhatsApp & co.).
+    let lieu = "";
+    if (cantonOf() === "GE") lieu = " (canton de Genève)";
+    else { const commune = VD_DATA.communes[state.commune]; if (commune) lieu = " (commune de " + commune.name + ")"; }
     if (quiz.mode === "exam") {
-      const pass = pct >= EXAM_PASS_PCT;
       lastShareText =
         `NatiCoach — Simulation du test de naturalisation${lieu}\n` +
-        `Mon score : ${quiz.correct}/${EXAM_TOTAL} (${pct}%) — ${pass ? "réussi ✅" : "pas encore 💪"}`;
+        `Mon score : ${quiz.correct}/${total} (${pct}%) — ${pass ? "réussi ✅" : "pas encore 💪"}`;
     } else {
       lastShareText =
         `NatiCoach — Entraînement au test de naturalisation${lieu}\n` +
@@ -1075,7 +1147,12 @@
    * ==================================================================== */
   $("communeSearch").addEventListener("input", (e) => renderCommuneResults(e.target.value));
   $("btnSetupConfirm").addEventListener("click", () => { if (pendingCommune) selectCommune(pendingCommune); });
-  $("setupBack").addEventListener("click", () => { renderHome(); showScreen("screen-home"); });
+  $("setupBack").addEventListener("click", () => {
+    if (!$("setupCommuneStep").hidden) showCantonStep();
+    else { renderHome(); showScreen("screen-home"); }
+  });
+  document.querySelectorAll(".canton-card").forEach((el) =>
+    el.addEventListener("click", () => pickCanton(el.dataset.canton)));
   $("btnChangeCommune").addEventListener("click", () => openSetup(true));
 
   $("btnExam").addEventListener("click", startExam);
@@ -1113,6 +1190,7 @@
 
   /* ---------------- Démarrage ---------------- */
   checkBadges();
-  if (state.commune && VD_DATA.communes[state.commune]) { renderHome(); showScreen("screen-home"); }
+  const ready = state.canton === "GE" || (state.canton === "VD" && state.commune && VD_DATA.communes[state.commune]);
+  if (ready) { renderHome(); showScreen("screen-home"); }
   else { openSetup(false); }
 })();
