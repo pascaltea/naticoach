@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=60" />
+  <link rel="stylesheet" href="styles.css?v=62" />
 </head>
 <body>
   <div id="app">
@@ -170,6 +170,7 @@
       <div class="mode-group-label">Vie pratique & démarche</div>
       <div class="mode-grid">
         <button class="mode-tile" id="btnNaturalisation"><span class="mode-ico">📖</span><b>La naturalisation</b><small>conditions & étapes</small></button>
+        <button class="mode-tile" id="btnAssurances"><span class="mode-ico">🛡️</span><b>Assurances sociales</b><small>vue d'ensemble</small></button>
         <button class="mode-tile" id="btnPiliers"><span class="mode-ico">🏦</span><b>Les 3 piliers</b><small>prévoyance / retraite</small></button>
         <button class="mode-tile" id="btnSante"><span class="mode-ico">🏥</span><b>Système de santé</b><small>assurance maladie</small></button>
       </div>
@@ -369,6 +370,16 @@
       <div id="santeBody"></div>
     </section>
 
+    <!-- ============ ÉCRAN : ASSURANCES SOCIALES ============ -->
+    <section class="screen" id="screen-assurances">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitAssurances" aria-label="Retour">←</button>
+        <h2 class="explore-title">Les assurances sociales</h2>
+        <span></span>
+      </div>
+      <div id="assurancesBody"></div>
+    </section>
+
     <!-- ============ ÉCRAN : DÉMOCRATIE DIRECTE ============ -->
     <section class="screen" id="screen-democratie">
       <div class="quiz-top">
@@ -478,6 +489,6 @@
   <script src="ge_official.js"></script>
   <script src="ne_official.js?v=56"></script>
   <script src="vs_official.js?v=56"></script>
-  <script src="app.js?v=60"></script>
+  <script src="app.js?v=62"></script>
 </body>
 </html>

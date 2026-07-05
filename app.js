@@ -1183,6 +1183,33 @@
     showScreen("screen-sante");
   }
 
+  function openAssurances() {
+    const branch = (sig, name, desc) =>
+      `<div class="as-branch"><span class="as-sig">${sig}</span>
+         <div class="as-txt"><b>${name}</b><small>${desc}</small></div></div>`;
+    const domain = (ico, title, rows) =>
+      `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div>${rows}</div>`;
+    $("assurancesBody").innerHTML =
+      `<p class="cs-intro">La Suisse protège chacun contre les grands risques de la vie par un système d'<b>assurances sociales</b>. La plupart sont <b>obligatoires</b> et financées par des <b>cotisations</b> prélevées sur les salaires.</p>` +
+      domain("👵", "Vieillesse · invalidité · décès",
+        branch("AVS", "Assurance-vieillesse et survivants", "Rente de retraite (âge de référence 65 ans) et rentes aux survivants (conjoint, orphelins). <b>1er pilier</b>, obligatoire.") +
+        branch("AI", "Assurance-invalidité", "Mesures de réadaptation et rente en cas d'incapacité de gain durable. 1er pilier.") +
+        branch("PC", "Prestations complémentaires", "Complètent l'AVS/AI lorsqu'elles ne suffisent pas à couvrir les besoins vitaux.") +
+        branch("LPP", "Prévoyance professionnelle", "La caisse de pension complète l'AVS pour garder son niveau de vie. <b>2e pilier</b> → voir « Les 3 piliers ».")) +
+      domain("🩺", "Maladie · accident",
+        branch("LAMal", "Assurance-maladie", "Soins en cas de maladie et de maternité. Obligatoire pour tout résident → voir « Système de santé ».") +
+        branch("LAA", "Assurance-accidents", "Accidents professionnels, non professionnels et maladies professionnelles. Obligatoire pour les salarié·es (l'employeur paie la part accidents pro).")) +
+      domain("💼", "Revenu remplacé",
+        branch("APG", "Allocations pour perte de gain", "Compensent le salaire pendant le <b>service militaire/civil</b>, le <b>congé maternité</b> (14 sem.) et le <b>congé paternité</b> (2 sem.).") +
+        branch("AC", "Assurance-chômage", "Indemnités en cas de perte d'emploi (après au moins 12 mois de cotisation) et aide à la réinsertion. Obligatoire pour les salarié·es.")) +
+      domain("👨‍👩‍👧", "Famille",
+        branch("AF", "Allocations familiales", "Allocation pour enfant (min. <b>200 CHF</b>/mois) et de formation (min. <b>250 CHF</b>/mois). Minimums fédéraux — les cantons peuvent faire plus.")) +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h">💰 Comment est-ce financé ?</div>
+         <p>La plupart des assurances sociales sont payées par des <b>cotisations paritaires</b> : un pourcentage du salaire, <b>moitié par l'employé, moitié par l'employeur</b>. Exception : l'assurance-maladie (LAMal), payée par une <b>prime individuelle</b> par personne, indépendante du revenu.</p></div>` +
+      `<p class="cs-note">La prévoyance vieillesse (AVS + LPP + 3ᵉ pilier) est détaillée dans « Les 3 piliers » ; l'assurance-maladie dans « Système de santé ».</p>`;
+    showScreen("screen-assurances");
+  }
+
   function openDemocratie() {
     const card = (ico, title, body) =>
       `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div><p>${body}</p></div>`;
@@ -1736,6 +1763,8 @@
   $("btnQuitPiliers").addEventListener("click", () => showScreen("screen-home"));
   $("btnSante").addEventListener("click", openSante);
   $("btnQuitSante").addEventListener("click", () => showScreen("screen-home"));
+  $("btnAssurances").addEventListener("click", openAssurances);
+  $("btnQuitAssurances").addEventListener("click", () => showScreen("screen-home"));
   $("btnMistakes").addEventListener("click", startMistakes);
   $("btnStats").addEventListener("click", openStats);
   $("btnQuitStats").addEventListener("click", () => showScreen("screen-home"));
