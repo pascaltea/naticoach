@@ -510,6 +510,11 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .explain.savais .explain-text p { font-size: 13.5px; line-height: 1.55; color: var(--ink-soft); }
 .explain.savais .explain-illus { width: 100%; margin-top: 10px; }
 .reveal-btn { margin-top: 4px; }
+.card-choices { list-style: none; display: flex; flex-direction: column; gap: 9px; margin: 0 0 6px; }
+.card-choices li { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 13px 16px 13px 40px; font-size: 15.5px; color: var(--ink); position: relative; box-shadow: var(--shadow-sm); }
+.card-choices li::before { content: ""; position: absolute; left: 17px; top: 50%; transform: translateY(-50%);
+  width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
 
 /* Feuille de sélection (bottom-sheet) */
 .sheet { position: fixed; inset: 0; z-index: 40; background: rgba(15,20,28,.4); display: flex; align-items: flex-end; animation: fade .2s ease; }
@@ -643,6 +648,18 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .tl-card.key { background: var(--badge-bg); border: none; }
 .tl-card.key b { color: var(--red-dark); }
 .tl-card.key p i { font-family: var(--font-serif); }
+
+/* ---------- Districts du Valais (ressource) ---------- */
+.vsmap-frame { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 8px; box-shadow: var(--shadow-sm); margin-bottom: 16px; }
+.vsmap-svg { width: 100%; height: auto; display: block; }
+.vsmap-svg text { font-family: var(--font-ui); }
+.vsd-list { display: flex; flex-direction: column; gap: 14px; }
+.vsd-group { }
+.vsd-region { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.vsd-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+.vsd-items { display: flex; flex-wrap: wrap; gap: 8px; }
+.vsd-chip { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; font-size: 13.5px; color: var(--ink); box-shadow: var(--shadow-sm); }
+.vsd-chip b { font-variant-numeric: tabular-nums; margin-right: 5px; }
 
 /* ---------- Sélecteur de canton (Vaud / Genève) ---------- */
 .canton-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 6px; }

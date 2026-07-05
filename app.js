@@ -341,6 +341,7 @@
     const cards = isCards();
     const c = VD_DATA.communes[state.commune];
     $("homeCommune").textContent = cn === "VD" ? (c ? c.name : "Choisir…") : CANTON_NAME[cn];
+    $("btnVsMap").hidden = cn !== "VS";   // ressource districts : Valais uniquement
 
     // Blocs à score (prépa, révision QCM, suivi) : uniquement pour les cantons QCM.
     const pc = document.querySelector(".prep-card"); if (pc) pc.hidden = cards;
@@ -475,14 +476,34 @@
     renderStudy();
   }
 
+  /* Sépare une question de ses propositions listées après le « ? » (« … ? a/ b/ c »). */
+  function splitChoices(q) {
+    const i = q.indexOf("?");
+    if (i < 0) return { text: q, choices: null };
+    const head = q.slice(0, i + 1).trim();
+    const rest = q.slice(i + 1).trim();
+    if (rest && rest.indexOf("/") >= 0) {
+      const choices = rest.split("/").map((s) => s.trim()).filter(Boolean);
+      if (choices.length >= 2) return { text: head, choices };
+    }
+    return { text: q, choices: null };
+  }
+
   /* Rendu d'une fiche (Neuchâtel / Valais) : question → réponse officielle révélée. */
   function renderStudyCard() {
     const cur = study.items[study.i];
+    const parsed = splitChoices(cur.q);
     $("studyChip").textContent = cur.scope + " · " + cur.theme;
     $("studyCount").textContent = (study.i + 1) + "/" + study.items.length;
-    $("studyQuestion").textContent = cur.q;
+    $("studyQuestion").textContent = parsed.text;
     $("studyProgressFill").style.width = ((study.i + 1) / study.items.length) * 100 + "%";
     const box = $("studyOptions"); box.innerHTML = "";
+    if (parsed.choices) {
+      const ul = document.createElement("ul");
+      ul.className = "card-choices";
+      parsed.choices.forEach((ch) => { const li = document.createElement("li"); li.textContent = ch; ul.appendChild(li); });
+      box.appendChild(ul);
+    }
     if (!cur.revealed) {
       const b = document.createElement("button");
       b.className = "btn btn-outline reveal-btn";
@@ -868,6 +889,24 @@
     showScreen("screen-timeline");
   }
 
+  /* ---------------- Les 13 districts du Valais (ressource) ---------------- */
+  const VS_DISTRICTS = [
+    { region: "Bas-Valais", color: "#3E7A4E", items: ["Monthey", "Saint-Maurice", "Martigny", "Entremont"] },
+    { region: "Valais central", color: "#C8442E", items: ["Conthey", "Sion", "Hérens", "Sierre"] },
+    { region: "Haut-Valais", color: "#5B7DB1", items: ["Loèche", "Rarogne", "Viège", "Brigue", "Conches (Goms)"] },
+  ];
+  function openVsmap() {
+    let n = 0;
+    $("vsdList").innerHTML = VS_DISTRICTS.map((g) =>
+      `<div class="vsd-group">
+         <div class="vsd-region"><span class="vsd-dot" style="background:${g.color}"></span>${g.region}</div>
+         <div class="vsd-items">` +
+         g.items.map((name) => `<span class="vsd-chip"><b style="color:${g.color}">${++n}</b> ${name}</span>`).join("") +
+         `</div>
+       </div>`).join("");
+    showScreen("screen-vsmap");
+  }
+
   /* ======================================================================
    *  QUIZ (entraînement + examen)
    * ==================================================================== */
@@ -1243,6 +1282,8 @@
   $("zoomReset").addEventListener("click", () => { mapView.v = Object.assign({}, mapView.base); applyView(); });
   $("btnTimeline").addEventListener("click", openTimeline);
   $("btnQuitTimeline").addEventListener("click", () => showScreen("screen-home"));
+  $("btnVsMap").addEventListener("click", openVsmap);
+  $("btnQuitVsmap").addEventListener("click", () => showScreen("screen-home"));
   $("btnMistakes").addEventListener("click", startMistakes);
   $("btnStats").addEventListener("click", openStats);
   $("btnQuitStats").addEventListener("click", () => showScreen("screen-home"));
