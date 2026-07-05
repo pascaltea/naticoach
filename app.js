@@ -341,6 +341,8 @@
     const cards = isCards();
     const c = VD_DATA.communes[state.commune];
     $("homeCommune").textContent = cn === "VD" ? (c ? c.name : "Choisir…") : CANTON_NAME[cn];
+    $("friseTileSub").textContent = "Suisse · " + CANTON_NAME[cn];
+
     // Ressource « districts » : cantons ayant une carte (Vaud, Valais).
     const dm = districtMap();
     $("btnVsMap").hidden = !dm;
@@ -835,21 +837,32 @@
   /* ======================================================================
    *  FRISE CHRONOLOGIQUE
    * ==================================================================== */
-  const TL_KEY_YEARS = { "1291": 1, "1803": 1, "1848": 1, "1971": 1 };
+  const TL_KEY_YEARS = { "1291": 1, "1848": 1, "1971": 1 };
   let timelineFilter = "all";
 
+  function yearVal(yearStr) {
+    if (/av\.?\s*J/i.test(yearStr)) return -(parseInt((yearStr.match(/\d+/) || [100])[0], 10));
+    const m = yearStr.match(/\d{3,4}/); return m ? parseInt(m[0], 10) : 0;
+  }
   function eraOf(yearStr) {
-    let y;
-    if (/av\.?\s*J/i.test(yearStr)) y = -(parseInt((yearStr.match(/\d+/) || [100])[0], 10));
-    else { const m = yearStr.match(/\d{3,4}/); y = m ? parseInt(m[0], 10) : 0; }
+    const y = yearVal(yearStr);
     if (y < 500) return "Antiquité";
     if (y < 1500) return "Moyen Âge";
     if (y < 1798) return "Époque moderne";
     return "Époque contemporaine";
   }
 
+  /* Événements affichés = Suisse (fédéral) + canton courant. */
+  function timelineBase() {
+    const cn = cantonOf();
+    return TIMELINE.filter((t) => t.scope === "ch" || t.scope === cn);
+  }
+
   function renderTimeline() {
-    const items = TIMELINE.filter((t) => timelineFilter === "all" || t.scope === timelineFilter);
+    const cn = cantonOf();
+    const items = timelineBase()
+      .filter((t) => timelineFilter === "all" || t.scope === timelineFilter)
+      .slice().sort((a, b) => yearVal(a.year) - yearVal(b.year));
     let html = "", currentEra = null, open = false;
     items.forEach((t) => {
       const era = eraOf(t.year);
@@ -858,10 +871,10 @@
         html += `<div class="tl-era"><span></span>${era}<span></span></div><div class="tl-rail">`;
         currentEra = era; open = true;
       }
-      const isVd = t.scope === "vd";
-      const key = TL_KEY_YEARS[t.year];
-      const tag = isVd ? ` <em>VAUD</em>` : "";
-      html += `<div class="tl-node ${t.scope}">
+      const isCanton = t.scope !== "ch";
+      const key = TL_KEY_YEARS[t.year] || /rejoint la Confédération/i.test(t.title);
+      const tag = isCanton ? ` <em>${CANTON_NAME[cn].toUpperCase()}</em>` : "";
+      html += `<div class="tl-node ${isCanton ? "vd" : "ch"}">
           <span class="tl-pin"></span>
           <div class="tl-year">${t.year}${tag}</div>
           <div class="tl-card${key ? " key" : ""}">
@@ -874,16 +887,19 @@
     $("timelineList").innerHTML = html;
   }
 
-  const TL_FILTERS = [
-    { key: "all", label: "Tout" },
-    { key: "ch", label: "Suisse", dot: "var(--red)" },
-    { key: "vd", label: "Vaud", dot: "var(--ok)" },
-  ];
-
   function openTimeline() {
+    const cn = cantonOf();
+    // Le filtre courant peut être invalide après un changement de canton.
+    if (timelineFilter !== "all" && timelineFilter !== "ch" && timelineFilter !== cn) timelineFilter = "all";
+    const base = timelineBase();
+    const filters = [
+      { key: "all", label: "Tout", dot: null },
+      { key: "ch", label: "Suisse", dot: "var(--red)" },
+      { key: cn, label: CANTON_NAME[cn], dot: "var(--ok)" },
+    ];
     const bar = $("timelineFilter");
-    bar.innerHTML = TL_FILTERS.map((f) => {
-      const n = f.key === "all" ? TIMELINE.length : TIMELINE.filter((t) => t.scope === f.key).length;
+    bar.innerHTML = filters.map((f) => {
+      const n = f.key === "all" ? base.length : base.filter((t) => t.scope === f.key).length;
       const active = f.key === timelineFilter;
       const dot = f.dot ? `<span class="tl-fdot" style="background:${f.dot}"></span>` : "";
       return `<button class="tl-pill${active ? " active" : ""}" data-f="${f.key}">${dot}${f.label}${f.key === "all" ? " · " + n : ""}</button>`;
