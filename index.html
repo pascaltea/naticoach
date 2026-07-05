@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=50" />
+  <link rel="stylesheet" href="styles.css?v=51" />
 </head>
 <body>
   <div id="app">
@@ -134,7 +134,7 @@
       <div class="mode-grid">
         <button class="mode-tile" id="btnExplore"><span class="mode-ico">🗺️</span><b>Explorer la Suisse</b><small>26 cantons</small></button>
         <button class="mode-tile" id="btnTimeline"><span class="mode-ico">🕰️</span><b>Frise chrono</b><small>CH · VD</small></button>
-        <button class="mode-tile" id="btnVsMap" hidden><span class="mode-ico">📍</span><b>13 districts</b><small>du Valais</small></button>
+        <button class="mode-tile" id="btnVsMap" hidden><span class="mode-ico">📍</span><b id="districtTileTitle">Districts</b><small id="districtTileSub">du canton</small></button>
       </div>
 
       <div id="grpSuivre">
@@ -297,7 +297,7 @@
     <section class="screen" id="screen-vsmap">
       <div class="quiz-top">
         <button class="icon-btn" id="btnQuitVsmap" aria-label="Retour">←</button>
-        <h2 class="explore-title">Les 13 districts du Valais</h2>
+        <h2 class="explore-title" id="vsMapTitle">Districts</h2>
         <span></span>
       </div>
       <p class="muted tiny explore-sub">Touche un district pour le repérer.</p>
@@ -306,7 +306,7 @@
       </div>
       <div class="map-legend" id="vsMapLegend"></div>
       <div class="vsd-list" id="vsdList"></div>
-      <p class="footer-note" style="margin-top:14px">Les <b>13 étoiles</b> du drapeau valaisan représentent ces <b>13 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes).</p>
+      <p class="footer-note" style="margin-top:14px" id="vsMapNote"></p>
     </section>
 
     <!-- ============ ÉCRAN : CORRECTION ============ -->
@@ -333,11 +333,11 @@
   <script src="cantons.js"></script>
   <script src="swissmap.js"></script>
   <script src="timeline.js"></script>
-  <script src="vsdistricts.js"></script>
+  <script src="districts.js"></script>
   <script src="vd_official.js"></script>
   <script src="ge_official.js"></script>
   <script src="ne_official.js"></script>
   <script src="vs_official.js"></script>
-  <script src="app.js?v=50"></script>
+  <script src="app.js?v=51"></script>
 </body>
 </html>

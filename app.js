@@ -341,7 +341,13 @@
     const cards = isCards();
     const c = VD_DATA.communes[state.commune];
     $("homeCommune").textContent = cn === "VD" ? (c ? c.name : "Choisir…") : CANTON_NAME[cn];
-    $("btnVsMap").hidden = cn !== "VS";   // ressource districts : Valais uniquement
+    // Ressource « districts » : cantons ayant une carte (Vaud, Valais).
+    const dm = districtMap();
+    $("btnVsMap").hidden = !dm;
+    if (dm) {
+      $("districtTileTitle").textContent = dm.districts.length + " districts";
+      $("districtTileSub").textContent = cn === "VS" ? "du Valais" : "vaudois";
+    }
 
     // Blocs à score (prépa, révision QCM, suivi) : uniquement pour les cantons QCM.
     const pc = document.querySelector(".prep-card"); if (pc) pc.hidden = cards;
@@ -889,21 +895,29 @@
     showScreen("screen-timeline");
   }
 
-  /* ---------------- Les 13 districts du Valais (vraie carte) ---------------- */
+  /* ---------------- Carte des districts (Vaud / Valais) ---------------- */
   const VS_REGION = {
     bas:  { color: "#3E7A4E", label: "Bas-Valais" },
     cen:  { color: "#C8442E", label: "Valais central" },
     haut: { color: "#5B7DB1", label: "Haut-Valais" },
   };
-  function openVsmap() {
+  function districtMap() { return (typeof DISTRICTS_MAPS !== "undefined") ? DISTRICTS_MAPS[cantonOf()] : null; }
+
+  function openDistricts() {
+    const m = districtMap();
+    if (!m) return;
     const svg = $("vsMapSvg");
-    if (typeof VS_MAP !== "undefined" && !svg.dataset.filled) {
-      svg.setAttribute("viewBox", VS_MAP.viewBox);
+    $("vsMapTitle").textContent = `Les ${m.districts.length} districts ${cantonOf() === "VS" ? "du Valais" : "vaudois"}`;
+    $("vsMapNote").innerHTML = cantonOf() === "VS"
+      ? "Les <b>13 étoiles</b> du drapeau valaisan représentent ces <b>13 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes)."
+      : "Le canton de Vaud compte <b>10 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes).";
+
+    // (Re)construire la carte si le canton a changé.
+    if (svg.dataset.canton !== cantonOf()) {
+      svg.setAttribute("viewBox", m.viewBox);
       svg.innerHTML =
-        VS_MAP.districts.map((d) =>
-          `<path class="vsd-path" data-id="${d.id}" d="${d.d}" fill="${VS_REGION[d.region].color}" fill-rule="evenodd"/>`).join("") +
-        VS_MAP.districts.map((d) =>
-          `<text class="vsd-label" data-id="${d.id}" x="${d.cx}" y="${d.cy}" text-anchor="middle">${d.name}</text>`).join("");
+        m.districts.map((d) => `<path class="vsd-path" data-id="${d.id}" d="${d.d}" fill="${d.color}" fill-rule="evenodd"/>`).join("") +
+        m.districts.map((d) => `<text class="vsd-label" data-id="${d.id}" x="${d.cx}" y="${d.cy}" text-anchor="middle">${d.name}</text>`).join("");
       svg.querySelectorAll(".vsd-path").forEach((p) => p.addEventListener("click", () => {
         const on = !p.classList.contains("sel");
         svg.querySelectorAll(".vsd-path").forEach((x) => x.classList.remove("sel"));
@@ -911,26 +925,33 @@
         if (on) {
           p.classList.add("sel"); svg.appendChild(p);
           const lbl = svg.querySelector(`.vsd-label[data-id="${p.dataset.id}"]`);
-          if (lbl) svg.appendChild(lbl);   // garde le nom au-dessus du district sélectionné
+          if (lbl) svg.appendChild(lbl);
           const chip = document.querySelector(`.vsd-chip[data-id="${p.dataset.id}"]`);
           if (chip) chip.classList.add("on");
         }
       }));
-      // légende par région
+      svg.dataset.canton = cantonOf();
+    }
+
+    // Légende (par région) + liste.
+    if (m.hasRegions) {
       $("vsMapLegend").innerHTML = Object.keys(VS_REGION).map((k) =>
         `<span class="legend-item"><span class="legend-dot" style="background:${VS_REGION[k].color}"></span>${VS_REGION[k].label}</span>`).join("");
-      svg.dataset.filled = "1";
+      const byReg = { bas: [], cen: [], haut: [] };
+      m.districts.forEach((d) => byReg[d.region].push(d));
+      $("vsdList").innerHTML = Object.keys(VS_REGION).map((k) =>
+        `<div class="vsd-group">
+           <div class="vsd-region"><span class="vsd-dot" style="background:${VS_REGION[k].color}"></span>${VS_REGION[k].label}</div>
+           <div class="vsd-items">` +
+           byReg[k].map((d) => `<span class="vsd-chip" data-id="${d.id}">${d.name}</span>`).join("") +
+           `</div></div>`).join("");
+    } else {
+      $("vsMapLegend").innerHTML = "";
+      $("vsdList").innerHTML =
+        `<div class="vsd-group"><div class="vsd-items">` +
+        m.districts.map((d) => `<span class="vsd-chip" data-id="${d.id}"><span class="vsd-dot" style="background:${d.color};display:inline-block;vertical-align:-1px;margin-right:6px"></span>${d.name}</span>`).join("") +
+        `</div></div>`;
     }
-    // liste groupée par région (ordre géographique bas→haut)
-    const byReg = { bas: [], cen: [], haut: [] };
-    (typeof VS_MAP !== "undefined" ? VS_MAP.districts : []).forEach((d) => byReg[d.region].push(d));
-    $("vsdList").innerHTML = Object.keys(VS_REGION).map((k) =>
-      `<div class="vsd-group">
-         <div class="vsd-region"><span class="vsd-dot" style="background:${VS_REGION[k].color}"></span>${VS_REGION[k].label}</div>
-         <div class="vsd-items">` +
-         byReg[k].map((d) => `<span class="vsd-chip" data-id="${d.id}">${d.name}</span>`).join("") +
-         `</div>
-       </div>`).join("");
     showScreen("screen-vsmap");
   }
 
@@ -1309,7 +1330,7 @@
   $("zoomReset").addEventListener("click", () => { mapView.v = Object.assign({}, mapView.base); applyView(); });
   $("btnTimeline").addEventListener("click", openTimeline);
   $("btnQuitTimeline").addEventListener("click", () => showScreen("screen-home"));
-  $("btnVsMap").addEventListener("click", openVsmap);
+  $("btnVsMap").addEventListener("click", openDistricts);
   $("btnQuitVsmap").addEventListener("click", () => showScreen("screen-home"));
   $("btnMistakes").addEventListener("click", startMistakes);
   $("btnStats").addEventListener("click", openStats);
