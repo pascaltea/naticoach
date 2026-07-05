@@ -1122,13 +1122,14 @@
     VS: { legis: "Conseil général (ou Assemblée primaire)", exec: "Conseil municipal", head: "président·e de commune" },
   };
 
-  /* Données d'élection par canton (composition + durée du mandat). */
+  /* Données d'élection par canton (composition + durée du mandat, en années). */
   const ELECT = {
-    VD: { gcN: "150 député·es", ceN: "7 conseiller·ères", tCant: "5 ans", tCom: "5 ans" },
-    GE: { gcN: "100 député·es", ceN: "7 conseiller·ères", tCant: "5 ans", tCom: "5 ans" },
-    NE: { gcN: "100 député·es", ceN: "5 conseiller·ères", tCant: "4 ans", tCom: "4 ans" },
-    VS: { gcN: "130 député·es", ceN: "5 conseiller·ères", tCant: "4 ans", tCom: "4 ans" },
+    VD: { gc: 150, ce: 7, tCant: 5, tCom: 5 },
+    GE: { gc: 100, ce: 7, tCant: 5, tCom: 5 },
+    NE: { gc: 100, ce: 5, tCant: 4, tCom: 4 },
+    VS: { gc: 130, ce: 5, tCant: 4, tCom: 4 },
   };
+  const termLabel = (yrs) => state.lang === "en" ? (yrs + "-year term") : ("mandat " + yrs + " ans");
 
   function qeCard(kind, role, name, meta, by, byKind) {
     return `<div class="qe-card qe-${kind}">
@@ -1153,73 +1154,83 @@
   }
 
   function openPolitique() {
-    const ci = COMMUNE_INST[cantonOf()] || COMMUNE_INST.VD;
-    const cantonNm = CANTON_NAME[cantonOf()];
+    const cn = cantonOf();
+    const ci = COMMUNE_INST[cn] || COMMUNE_INST.VD;
+    const cantonNm = cnName(cn);
+    const legis = t("commune.legis." + cn, ci.legis);
+    const exec = t("commune.exec." + cn, ci.exec);
+    const head = t("commune.head." + cn, ci.head);
+    const cantonTitle = fmt(t("pol.cantonT", "Canton de {c}"), { c: cantonNm });
+    const gc = t("pol.gc", "Grand Conseil"), ce = t("pol.ce", "Conseil d'État");
+    const chairedBy = state.lang === "en" ? ("chaired by the " + head) : ("présidé·e par le·la " + head);
     $("politiqueBody").innerHTML =
-      `<p class="cs-intro">La Suisse repose sur <b>3 niveaux</b> (Confédération · Canton · Commune) et sur la <b>séparation des 3 pouvoirs</b> : qui fait les lois, qui gouverne, qui juge.</p>` +
-      polLevel("Confédération", "niveau fédéral · Suisse", [
-        { k: "leg", ico: "📜", power: "Législatif — fait les lois", body: "Assemblée fédérale", note: "Conseil national (200 · élu par le peuple) + Conseil des États (46 · représente les cantons)" },
-        { k: "exe", ico: "🏛️", power: "Exécutif — gouverne", body: "Conseil fédéral (7 ministres)", note: "Présidence tournante 1 an : le·la Président·e de la Confédération" },
-        { k: "jud", ico: "⚖️", power: "Judiciaire — juge", body: "Tribunal fédéral", note: "à Lausanne" },
+      `<p class="cs-intro">${t("pol.intro", "La Suisse repose sur <b>3 niveaux</b> (Confédération · Canton · Commune) et sur la <b>séparation des 3 pouvoirs</b> : qui fait les lois, qui gouverne, qui juge.")}</p>` +
+      polLevel(t("pol.confedT", "Confédération"), t("pol.confedSub", "niveau fédéral · Suisse"), [
+        { k: "leg", ico: "📜", power: t("pol.legis", "Législatif — fait les lois"), body: t("pol.assemblee", "Assemblée fédérale"), note: t("pol.assembleeNote", "Conseil national (200 · élu par le peuple) + Conseil des États (46 · représente les cantons)") },
+        { k: "exe", ico: "🏛️", power: t("pol.exec", "Exécutif — gouverne"), body: t("pol.cf", "Conseil fédéral (7 ministres)"), note: t("pol.cfNote", "Présidence tournante 1 an : le·la Président·e de la Confédération") },
+        { k: "jud", ico: "⚖️", power: t("pol.judic", "Judiciaire — juge"), body: t("pol.tf", "Tribunal fédéral"), note: t("pol.tfNote", "à Lausanne") },
       ]) +
-      polLevel("Canton de " + cantonNm, "niveau cantonal", [
-        { k: "leg", ico: "📜", power: "Législatif", body: "Grand Conseil", note: "le parlement cantonal" },
-        { k: "exe", ico: "🏛️", power: "Exécutif", body: "Conseil d'État", note: "le gouvernement cantonal" },
-        { k: "jud", ico: "⚖️", power: "Judiciaire", body: "Tribunal cantonal", note: "" },
+      polLevel(cantonTitle, t("pol.cantonSub", "niveau cantonal"), [
+        { k: "leg", ico: "📜", power: t("pol.legisShort", "Législatif"), body: gc, note: t("pol.gcNote", "le parlement cantonal") },
+        { k: "exe", ico: "🏛️", power: t("pol.execShort", "Exécutif"), body: ce, note: t("pol.ceNote", "le gouvernement cantonal") },
+        { k: "jud", ico: "⚖️", power: t("pol.judic", "Judiciaire"), body: t("pol.tc", "Tribunal cantonal"), note: "" },
       ]) +
-      polLevel("Commune", "niveau communal · " + cantonNm, [
-        { k: "leg", ico: "📜", power: "Législatif", body: ci.legis, note: "" },
-        { k: "exe", ico: "🏛️", power: "Exécutif", body: ci.exec, note: "présidé·e par le·la " + ci.head },
+      polLevel(t("pol.communeT", "Commune"), fmt(t("pol.communeSub", "niveau communal · {c}"), { c: cantonNm }), [
+        { k: "leg", ico: "📜", power: t("pol.legisShort", "Législatif"), body: legis, note: "" },
+        { k: "exe", ico: "🏛️", power: t("pol.execShort", "Exécutif"), body: exec, note: chairedBy },
       ]) +
       (() => {
-        const e = ELECT[cantonOf()] || ELECT.VD;
-        return `<h3 class="cs-h">🗳️ Qui élit qui ?</h3>
-          <p class="cs-intro">Le <b>peuple</b> (Suisses dès <b>18 ans</b>) élit directement les <b>parlements</b> aux 3 niveaux, et aussi les <b>gouvernements</b> — sauf au niveau fédéral, où le Conseil fédéral est élu par le Parlement.</p>
-          <div class="qe-peuple">👥 Le peuple &nbsp;·&nbsp; citoyen·nes suisses dès 18 ans</div>
-          <div class="qe-arrow">élit ↓</div>` +
-          qeLevel("Confédération",
-            qeCard("leg", "Législatif · fait les lois", "Conseil national + Conseil des États", "200 + 46 · mandat 4 ans", "🗳️ élus directement par le peuple", "people") +
-            qeCard("exe", "Exécutif · gouverne", "Conseil fédéral", "7 ministres · mandat 4 ans", "🏛️ élu par le Parlement (pas le peuple)", "parl")
+        const e = ELECT[cn] || ELECT.VD;
+        const gcN = e.gc + " " + t("pol.deputes", "député·es");
+        const ceN = e.ce + " " + t("pol.conseillers", "conseiller·ères");
+        return `<h3 class="cs-h">${t("pol.qeH", "🗳️ Qui élit qui ?")}</h3>
+          <p class="cs-intro">${t("pol.qeIntro", "Le <b>peuple</b> (Suisses dès <b>18 ans</b>) élit directement les <b>parlements</b> aux 3 niveaux, et aussi les <b>gouvernements</b> — sauf au niveau fédéral, où le Conseil fédéral est élu par le Parlement.")}</p>
+          <div class="qe-peuple">${t("pol.people", "👥 Le peuple &nbsp;·&nbsp; citoyen·nes suisses dès 18 ans")}</div>
+          <div class="qe-arrow">${t("pol.elects", "élit ↓")}</div>` +
+          qeLevel(t("pol.confedT", "Confédération"),
+            qeCard("leg", t("pol.roleLegFed", "Législatif · fait les lois"), t("pol.cnCe", "Conseil national + Conseil des États"), t("pol.cnCeMeta", "200 + 46 · mandat 4 ans"), t("pol.byPeopleFed", "🗳️ élus directement par le peuple"), "people") +
+            qeCard("exe", t("pol.roleExeFed", "Exécutif · gouverne"), t("pol.cf", "Conseil fédéral"), t("pol.cfMeta", "7 ministres · mandat 4 ans"), t("pol.byParl", "🏛️ élu par le Parlement (pas le peuple)"), "parl")
           ) +
-          qeLevel("Canton de " + cantonNm,
-            qeCard("leg", "Législatif", "Grand Conseil", e.gcN + " · mandat " + e.tCant, "🗳️ élu directement par le peuple", "people") +
-            qeCard("exe", "Exécutif", "Conseil d'État", e.ceN + " · mandat " + e.tCant, "🗳️ élu directement par le peuple", "people")
+          qeLevel(cantonTitle,
+            qeCard("leg", t("pol.legisShort", "Législatif"), gc, gcN + " · " + termLabel(e.tCant), t("pol.byPeople", "🗳️ élu directement par le peuple"), "people") +
+            qeCard("exe", t("pol.execShort", "Exécutif"), ce, ceN + " · " + termLabel(e.tCant), t("pol.byPeople", "🗳️ élu directement par le peuple"), "people")
           ) +
-          qeLevel("Commune",
-            qeCard("leg", "Législatif", ci.legis, "mandat " + e.tCom, "🗳️ élu par le peuple (ou assemblée)", "people") +
-            qeCard("exe", "Exécutif", ci.exec, "présidé·e par le·la " + ci.head + " · mandat " + e.tCom, "🗳️ élu directement par le peuple", "people")
+          qeLevel(t("pol.communeT", "Commune"),
+            qeCard("leg", t("pol.legisShort", "Législatif"), legis, termLabel(e.tCom), t("pol.byPeopleOr", "🗳️ élu par le peuple (ou assemblée)"), "people") +
+            qeCard("exe", t("pol.execShort", "Exécutif"), exec, chairedBy + " · " + termLabel(e.tCom), t("pol.byPeople", "🗳️ élu directement par le peuple"), "people")
           ) +
           `<div class="cs-card cs-highlight">
-             <div class="cs-card-h">✅ À retenir</div>
-             <ul class="cs-list">
-               <li><b>Canton & commune</b> : le peuple élit <b>parlement ET gouvernement</b> directement.</li>
-               <li><b>Confédération</b> : le peuple élit le <b>Parlement</b> (les 2 chambres) ; c'est ensuite ce Parlement qui élit le <b>Conseil fédéral</b>.</li>
-               <li>La <b>présidence de la Confédération</b> tourne chaque année entre les 7 conseiller·ères fédéraux.</li>
-               <li><b>Démocratie directe</b> : le peuple vote aussi les <b>initiatives</b> et <b>référendums</b> (les votations).</li>
-             </ul>
+             <div class="cs-card-h">${t("pol.takeawayH", "✅ À retenir")}</div>
+             <ul class="cs-list">${t("pol.takeaway", [
+               "<b>Canton & commune</b> : le peuple élit <b>parlement ET gouvernement</b> directement.",
+               "<b>Confédération</b> : le peuple élit le <b>Parlement</b> (les 2 chambres) ; c'est ensuite ce Parlement qui élit le <b>Conseil fédéral</b>.",
+               "La <b>présidence de la Confédération</b> tourne chaque année entre les 7 conseiller·ères fédéraux.",
+               "<b>Démocratie directe</b> : le peuple vote aussi les <b>initiatives</b> et <b>référendums</b> (les votations).",
+             ]).map((li) => `<li>${li}</li>`).join("")}</ul>
            </div>`;
       })();
     showScreen("screen-politique");
   }
 
   function openPiliers() {
+    const sysLbl = t("pil.sys", "Système"), butLbl = t("pil.but", "But");
     const pillar = (n, color, name, sub, tag, sys, but) =>
       `<div class="cs-pillar">
          <div class="cs-pillar-top"><span class="cs-pillar-n" style="background:${color}">${n}</span>
            <div><b>${name}</b><small>${sub}</small></div></div>
          <span class="cs-tag" style="color:${color};border-color:${color}">${tag}</span>
-         <div class="cs-pillar-row"><span>Système</span><b>${sys}</b></div>
-         <div class="cs-pillar-row"><span>But</span><b>${but}</b></div>
+         <div class="cs-pillar-row"><span>${sysLbl}</span><b>${sys}</b></div>
+         <div class="cs-pillar-row"><span>${butLbl}</span><b>${but}</b></div>
        </div>`;
     $("piliersBody").innerHTML =
-      `<p class="cs-intro">La <b>prévoyance vieillesse</b> suisse repose sur <b>3 piliers</b>, pour garder son niveau de vie une fois à la retraite.</p>` +
-      pillar("1", "#C8442E", "AVS / AI", "Assurance-vieillesse, survivants et invalidité", "Obligatoire · État",
-             "Répartition : les personnes qui travaillent financent les retraité·es", "Couvrir les besoins vitaux (minimum)") +
-      pillar("2", "#3E7A4E", "LPP", "Prévoyance professionnelle (caisse de pension)", "Obligatoire dès ~22 050 CHF/an",
-             "Capitalisation : on épargne pour soi (employeur + employé cotisent)", "Maintenir le niveau de vie habituel") +
-      pillar("3", "#5B7DB1", "3ᵉ pilier", "Prévoyance privée — 3a (lié) · 3b (libre)", "Facultatif",
-             "Épargne individuelle (avantages fiscaux pour le 3a)", "Compléter les 1er et 2e piliers") +
-      `<p class="cs-note">Avec les 1er et 2e piliers réunis, on vise environ <b>60 %</b> du dernier salaire à la retraite.</p>`;
+      `<p class="cs-intro">${t("pil.intro", "La <b>prévoyance vieillesse</b> suisse repose sur <b>3 piliers</b>, pour garder son niveau de vie une fois à la retraite.")}</p>` +
+      pillar("1", "#C8442E", t("pil.1name", "AVS / AI"), t("pil.1sub", "Assurance-vieillesse, survivants et invalidité"), t("pil.1tag", "Obligatoire · État"),
+             t("pil.1sys", "Répartition : les personnes qui travaillent financent les retraité·es"), t("pil.1but", "Couvrir les besoins vitaux (minimum)")) +
+      pillar("2", "#3E7A4E", t("pil.2name", "LPP"), t("pil.2sub", "Prévoyance professionnelle (caisse de pension)"), t("pil.2tag", "Obligatoire dès ~22 050 CHF/an"),
+             t("pil.2sys", "Capitalisation : on épargne pour soi (employeur + employé cotisent)"), t("pil.2but", "Maintenir le niveau de vie habituel")) +
+      pillar("3", "#5B7DB1", t("pil.3name", "3ᵉ pilier"), t("pil.3sub", "Prévoyance privée — 3a (lié) · 3b (libre)"), t("pil.3tag", "Facultatif"),
+             t("pil.3sys", "Épargne individuelle (avantages fiscaux pour le 3a)"), t("pil.3but", "Compléter les 1er et 2e piliers")) +
+      `<p class="cs-note">${t("pil.note", "Avec les 1er et 2e piliers réunis, on vise environ <b>60 %</b> du dernier salaire à la retraite.")}</p>`;
     showScreen("screen-piliers");
   }
 
@@ -1227,12 +1238,12 @@
     const card = (ico, title, body) =>
       `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div><p>${body}</p></div>`;
     $("santeBody").innerHTML =
-      `<p class="cs-intro">En Suisse, l'<b>assurance maladie de base est obligatoire</b> — mais fournie par des <b>caisses privées</b> que chacun choisit librement.</p>` +
-      card("🩺", "Assurance de base (LAMal)", "Obligatoire pour toute personne qui habite en Suisse (à souscrire dans les 3 mois). Les prestations de base sont les mêmes partout.") +
-      card("🔄", "Libre choix de la caisse", "On choisit librement sa caisse maladie (assureur), et on peut en changer chaque année. Les caisses ne peuvent pas refuser l'assurance de base.") +
-      card("💰", "Prime & participation", "Chacun paie une <b>prime</b> mensuelle par personne (indépendante du revenu). S'ajoutent une <b>franchise</b> annuelle et une <b>quote-part</b> (part des frais à sa charge).") +
-      card("🤝", "Subsides", "Les personnes et familles à revenu modeste reçoivent des <b>subsides</b> (réductions de primes) versés par le canton.") +
-      card("➕", "Assurances complémentaires", "Facultatives (LCA) : chambre privée à l'hôpital, soins dentaires, médecines alternatives… Les caisses peuvent y poser des conditions.");
+      `<p class="cs-intro">${t("san.intro", "En Suisse, l'<b>assurance maladie de base est obligatoire</b> — mais fournie par des <b>caisses privées</b> que chacun choisit librement.")}</p>` +
+      card("🩺", t("san.baseT", "Assurance de base (LAMal)"), t("san.base", "Obligatoire pour toute personne qui habite en Suisse (à souscrire dans les 3 mois). Les prestations de base sont les mêmes partout.")) +
+      card("🔄", t("san.freeT", "Libre choix de la caisse"), t("san.free", "On choisit librement sa caisse maladie (assureur), et on peut en changer chaque année. Les caisses ne peuvent pas refuser l'assurance de base.")) +
+      card("💰", t("san.primeT", "Prime & participation"), t("san.prime", "Chacun paie une <b>prime</b> mensuelle par personne (indépendante du revenu). S'ajoutent une <b>franchise</b> annuelle et une <b>quote-part</b> (part des frais à sa charge).")) +
+      card("🤝", t("san.subT", "Subsides"), t("san.sub", "Les personnes et familles à revenu modeste reçoivent des <b>subsides</b> (réductions de primes) versés par le canton.")) +
+      card("➕", t("san.compT", "Assurances complémentaires"), t("san.comp", "Facultatives (LCA) : chambre privée à l'hôpital, soins dentaires, médecines alternatives… Les caisses peuvent y poser des conditions."));
     showScreen("screen-sante");
   }
 
@@ -1243,23 +1254,23 @@
     const domain = (ico, title, rows) =>
       `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div>${rows}</div>`;
     $("assurancesBody").innerHTML =
-      `<p class="cs-intro">La Suisse protège chacun contre les grands risques de la vie par un système d'<b>assurances sociales</b>. La plupart sont <b>obligatoires</b> et financées par des <b>cotisations</b> prélevées sur les salaires.</p>` +
-      domain("👵", "Vieillesse · invalidité · décès",
-        branch("AVS", "Assurance-vieillesse et survivants", "Rente de retraite (âge de référence 65 ans) et rentes aux survivants (conjoint, orphelins). <b>1er pilier</b>, obligatoire.") +
-        branch("AI", "Assurance-invalidité", "Mesures de réadaptation et rente en cas d'incapacité de gain durable. 1er pilier.") +
-        branch("PC", "Prestations complémentaires", "Complètent l'AVS/AI lorsqu'elles ne suffisent pas à couvrir les besoins vitaux.") +
-        branch("LPP", "Prévoyance professionnelle", "La caisse de pension complète l'AVS pour garder son niveau de vie. <b>2e pilier</b> → voir « Les 3 piliers ».")) +
-      domain("🩺", "Maladie · accident",
-        branch("LAMal", "Assurance-maladie", "Soins en cas de maladie et de maternité. Obligatoire pour tout résident → voir « Système de santé ».") +
-        branch("LAA", "Assurance-accidents", "Accidents professionnels, non professionnels et maladies professionnelles. Obligatoire pour les salarié·es (l'employeur paie la part accidents pro).")) +
-      domain("💼", "Revenu remplacé",
-        branch("APG", "Allocations pour perte de gain", "Compensent le salaire pendant le <b>service militaire/civil</b>, le <b>congé maternité</b> (14 sem.) et le <b>congé paternité</b> (2 sem.).") +
-        branch("AC", "Assurance-chômage", "Indemnités en cas de perte d'emploi (après au moins 12 mois de cotisation) et aide à la réinsertion. Obligatoire pour les salarié·es.")) +
-      domain("👨‍👩‍👧", "Famille",
-        branch("AF", "Allocations familiales", "Allocation pour enfant (min. <b>200 CHF</b>/mois) et de formation (min. <b>250 CHF</b>/mois). Minimums fédéraux — les cantons peuvent faire plus.")) +
-      `<div class="cs-card cs-highlight"><div class="cs-card-h">💰 Comment est-ce financé ?</div>
-         <p>La plupart des assurances sociales sont payées par des <b>cotisations paritaires</b> : un pourcentage du salaire, <b>moitié par l'employé, moitié par l'employeur</b>. Exception : l'assurance-maladie (LAMal), payée par une <b>prime individuelle</b> par personne, indépendante du revenu.</p></div>` +
-      `<p class="cs-note">La prévoyance vieillesse (AVS + LPP + 3ᵉ pilier) est détaillée dans « Les 3 piliers » ; l'assurance-maladie dans « Système de santé ».</p>`;
+      `<p class="cs-intro">${t("asr.intro", "La Suisse protège chacun contre les grands risques de la vie par un système d'<b>assurances sociales</b>. La plupart sont <b>obligatoires</b> et financées par des <b>cotisations</b> prélevées sur les salaires.")}</p>` +
+      domain("👵", t("asr.d1", "Vieillesse · invalidité · décès"),
+        branch("AVS", t("asr.avsN", "Assurance-vieillesse et survivants"), t("asr.avsD", "Rente de retraite (âge de référence 65 ans) et rentes aux survivants (conjoint, orphelins). <b>1er pilier</b>, obligatoire.")) +
+        branch("AI", t("asr.aiN", "Assurance-invalidité"), t("asr.aiD", "Mesures de réadaptation et rente en cas d'incapacité de gain durable. 1er pilier.")) +
+        branch("PC", t("asr.pcN", "Prestations complémentaires"), t("asr.pcD", "Complètent l'AVS/AI lorsqu'elles ne suffisent pas à couvrir les besoins vitaux.")) +
+        branch("LPP", t("asr.lppN", "Prévoyance professionnelle"), t("asr.lppD", "La caisse de pension complète l'AVS pour garder son niveau de vie. <b>2e pilier</b> → voir « Les 3 piliers »."))) +
+      domain("🩺", t("asr.d2", "Maladie · accident"),
+        branch("LAMal", t("asr.lamalN", "Assurance-maladie"), t("asr.lamalD", "Soins en cas de maladie et de maternité. Obligatoire pour tout résident → voir « Système de santé ».")) +
+        branch("LAA", t("asr.laaN", "Assurance-accidents"), t("asr.laaD", "Accidents professionnels, non professionnels et maladies professionnelles. Obligatoire pour les salarié·es (l'employeur paie la part accidents pro)."))) +
+      domain("💼", t("asr.d3", "Revenu remplacé"),
+        branch("APG", t("asr.apgN", "Allocations pour perte de gain"), t("asr.apgD", "Compensent le salaire pendant le <b>service militaire/civil</b>, le <b>congé maternité</b> (14 sem.) et le <b>congé paternité</b> (2 sem.).")) +
+        branch("AC", t("asr.acN", "Assurance-chômage"), t("asr.acD", "Indemnités en cas de perte d'emploi (après au moins 12 mois de cotisation) et aide à la réinsertion. Obligatoire pour les salarié·es."))) +
+      domain("👨‍👩‍👧", t("asr.d4", "Famille"),
+        branch("AF", t("asr.afN", "Allocations familiales"), t("asr.afD", "Allocation pour enfant (min. <b>200 CHF</b>/mois) et de formation (min. <b>250 CHF</b>/mois). Minimums fédéraux — les cantons peuvent faire plus."))) +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h">💰 ${t("asr.finT", "Comment est-ce financé ?")}</div>
+         <p>${t("asr.fin", "La plupart des assurances sociales sont payées par des <b>cotisations paritaires</b> : un pourcentage du salaire, <b>moitié par l'employé, moitié par l'employeur</b>. Exception : l'assurance-maladie (LAMal), payée par une <b>prime individuelle</b> par personne, indépendante du revenu.")}</p></div>` +
+      `<p class="cs-note">${t("asr.note", "La prévoyance vieillesse (AVS + LPP + 3ᵉ pilier) est détaillée dans « Les 3 piliers » ; l'assurance-maladie dans « Système de santé ».")}</p>`;
     showScreen("screen-assurances");
   }
 
@@ -1267,13 +1278,13 @@
     const card = (ico, title, body) =>
       `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div><p>${body}</p></div>`;
     $("democratieBody").innerHTML =
-      `<p class="cs-intro">La <b>démocratie directe</b> permet au peuple de décider lui-même, en plus d'élire ses représentant·es. On vote environ <b>4 fois par an</b>.</p>` +
-      card("🗳️", "Les votations", "Aux 3 niveaux (fédéral, cantonal, communal), le peuple se prononce directement sur des objets — pas seulement sur des personnes.") +
-      card("📝", "Initiative populaire", "Proposer une modification de la <b>Constitution</b>. Au niveau fédéral : <b>100 000 signatures</b> en <b>18 mois</b>. Elle est ensuite soumise au vote du peuple.") +
-      card("🛑", "Référendum facultatif", "S'opposer à une <b>loi</b> votée par le Parlement. Il faut <b>50 000 signatures</b> (ou 8 cantons) en <b>100 jours</b> pour la soumettre au vote.") +
-      card("✅", "Référendum obligatoire", "Toute modification de la Constitution (et certaines adhésions internationales) est <b>automatiquement</b> soumise au vote.") +
-      `<div class="cs-card cs-highlight"><div class="cs-card-h">⚖️ La double majorité</div><p>Pour modifier la Constitution, il faut la majorité du <b>peuple</b> <b>ET</b> la majorité des <b>cantons</b>.</p></div>` +
-      `<p class="cs-note">Droits politiques dès <b>18 ans</b> pour les Suisses. Dans quelques cantons (Glaris, Appenzell Rhodes-Intérieures), on vote encore à main levée : la <b>Landsgemeinde</b>.</p>`;
+      `<p class="cs-intro">${t("dem.intro", "La <b>démocratie directe</b> permet au peuple de décider lui-même, en plus d'élire ses représentant·es. On vote environ <b>4 fois par an</b>.")}</p>` +
+      card("🗳️", t("dem.voteT", "Les votations"), t("dem.vote", "Aux 3 niveaux (fédéral, cantonal, communal), le peuple se prononce directement sur des objets — pas seulement sur des personnes.")) +
+      card("📝", t("dem.iniT", "Initiative populaire"), t("dem.ini", "Proposer une modification de la <b>Constitution</b>. Au niveau fédéral : <b>100 000 signatures</b> en <b>18 mois</b>. Elle est ensuite soumise au vote du peuple.")) +
+      card("🛑", t("dem.refFT", "Référendum facultatif"), t("dem.refF", "S'opposer à une <b>loi</b> votée par le Parlement. Il faut <b>50 000 signatures</b> (ou 8 cantons) en <b>100 jours</b> pour la soumettre au vote.")) +
+      card("✅", t("dem.refOT", "Référendum obligatoire"), t("dem.refO", "Toute modification de la Constitution (et certaines adhésions internationales) est <b>automatiquement</b> soumise au vote.")) +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h">⚖️ ${t("dem.dblT", "La double majorité")}</div><p>${t("dem.dbl", "Pour modifier la Constitution, il faut la majorité du <b>peuple</b> <b>ET</b> la majorité des <b>cantons</b>.")}</p></div>` +
+      `<p class="cs-note">${t("dem.note", "Droits politiques dès <b>18 ans</b> pour les Suisses. Dans quelques cantons (Glaris, Appenzell Rhodes-Intérieures), on vote encore à main levée : la <b>Landsgemeinde</b>.")}</p>`;
     showScreen("screen-democratie");
   }
 
@@ -1284,42 +1295,52 @@
          <ul class="cs-list">${items.map((t) => `<li>${t}</li>`).join("")}</ul>
        </div>`;
     $("droitsBody").innerHTML =
-      `<p class="cs-intro">La citoyenneté, c'est un équilibre entre des <b>droits</b> et des <b>devoirs</b>.</p>` +
-      section("duty", "📋", "Mes devoirs", [
+      `<p class="cs-intro">${t("dro.intro", "La citoyenneté, c'est un équilibre entre des <b>droits</b> et des <b>devoirs</b>.")}</p>` +
+      section("duty", "📋", t("dro.dutyT", "Mes devoirs"), t("dro.duty", [
         "Respecter la <b>Constitution</b> et les <b>lois</b>",
         "Payer ses <b>impôts</b>",
         "Envoyer ses enfants à l'école (<b>scolarité obligatoire</b>)",
         "S'assurer (<b>assurance maladie</b> de base obligatoire)",
         "<b>Service militaire ou civil</b> (hommes suisses) — sinon taxe d'exemption",
-      ]) +
-      section("right", "🗽", "Mes droits", [
+      ])) +
+      section("right", "🗽", t("dro.rightT", "Mes droits"), t("dro.right", [
         "<b>Libertés fondamentales</b> : opinion & information, croyance & conscience, réunion & association, langue",
         "<b>Droits politiques</b> dès 18 ans : voter, élire, être élu·e, signer initiatives & référendums",
         "<b>Liberté d'établissement</b> : s'installer où l'on veut en Suisse",
         "<b>Égalité</b> devant la loi ; interdiction de discrimination",
         "<b>Protection consulaire</b> de la Suisse à l'étranger",
-      ]);
+      ]));
     showScreen("screen-droits");
   }
 
   /* Fiche d'identité du canton de l'utilisateur. */
   const CANTON_PROFILE = {
     VD: { capital: "Lausanne", joined: "1803", langs: "Français", communes: "~300", districts: "10", pop: "~815 000", gc: 150, ce: 7, motto: "Liberté et patrie",
-      facts: ["Terrasses de Lavaux inscrites à l'UNESCO", "Lausanne, capitale olympique (siège du CIO)", "Bordé par le lac Léman ; le plus peuplé des cantons romands"] },
+      facts: ["Terrasses de Lavaux inscrites à l'UNESCO", "Lausanne, capitale olympique (siège du CIO)", "Bordé par le lac Léman ; le plus peuplé des cantons romands"],
+      en: { langs: "French", motto: "Liberté et patrie — « Liberty and homeland »",
+        facts: ["Lavaux terraces listed by UNESCO", "Lausanne, Olympic Capital (seat of the IOC)", "Bordered by Lake Geneva; the most populous French-speaking canton"] } },
     GE: { capital: "Genève", joined: "1815", langs: "Français", communes: "45", districts: "—", pop: "~510 000", gc: 100, ce: 7, motto: "Post Tenebras Lux — « Après les ténèbres, la lumière »",
-      facts: ["Genève internationale : ONU, CICR, OMS…", "Le jet d'eau et la rade", "L'Escalade (1602) ; ville de Calvin et de la Réforme"] },
+      facts: ["Genève internationale : ONU, CICR, OMS…", "Le jet d'eau et la rade", "L'Escalade (1602) ; ville de Calvin et de la Réforme"],
+      en: { langs: "French", motto: "Post Tenebras Lux — « After darkness, light »",
+        facts: ["International Geneva: UN, ICRC, WHO…", "The Jet d'Eau and the harbour", "The Escalade (1602); city of Calvin and the Reformation"] } },
     NE: { capital: "Neuchâtel", joined: "1815 (république dès 1848)", langs: "Français", communes: "~27", districts: "— (abolis en 2018)", pop: "~176 000", gc: 100, ce: 5, motto: "",
-      facts: ["Berceau de l'horlogerie ; urbanisme horloger (La Chaux-de-Fonds / Le Locle) à l'UNESCO", "1er canton à accorder le droit de vote aux étrangers (niveau communal)", "République et Canton de Neuchâtel"] },
+      facts: ["Berceau de l'horlogerie ; urbanisme horloger (La Chaux-de-Fonds / Le Locle) à l'UNESCO", "1er canton à accorder le droit de vote aux étrangers (niveau communal)", "République et Canton de Neuchâtel"],
+      en: { langs: "French", joined: "1815 (republic from 1848)", districts: "— (abolished in 2018)",
+        facts: ["Cradle of watchmaking; watchmaking urban planning (La Chaux-de-Fonds / Le Locle) at UNESCO", "First canton to grant foreigners the right to vote (communal level)", "Republic and Canton of Neuchâtel"] } },
     VS: { capital: "Sion", joined: "1815", langs: "Français et Allemand (canton bilingue)", communes: "~122", districts: "13", pop: "~355 000", gc: 130, ce: 5, motto: "",
-      facts: ["Le Cervin et la Pointe Dufour, plus haut sommet de Suisse", "Canton bilingue français / allemand", "Les 13 étoiles du drapeau = les 13 districts ; vignoble et grands barrages"] },
+      facts: ["Le Cervin et la Pointe Dufour, plus haut sommet de Suisse", "Canton bilingue français / allemand", "Les 13 étoiles du drapeau = les 13 districts ; vignoble et grands barrages"],
+      en: { langs: "French and German (bilingual canton)",
+        facts: ["The Matterhorn and Dufourspitze, Switzerland's highest peak", "Bilingual French / German canton", "The 13 stars of the flag = the 13 districts; vineyards and large dams"] } },
   };
   function openMonCanton() {
     const cn = cantonOf();
     const p = CANTON_PROFILE[cn];
-    const nm = CANTON_NAME[cn];
+    const en = state.lang === "en" ? (p.en || {}) : {};
+    const pv = (k) => (en[k] != null ? en[k] : p[k]);
+    const nm = cnName(cn);
     const col = (typeof REGION_COLORS !== "undefined") ? REGION_COLORS[cn === "VS" ? "multi" : "fr"] : "#C65D3B";
-    const regLong = cn === "VS" ? "Canton plurilingue" : "Suisse romande";
-    $("monCantonTitle").textContent = CANTON_SCOPE[cn];
+    const regLong = cn === "VS" ? t("mc.region.multi", "Canton plurilingue") : t("mc.region.fr", "Suisse romande");
+    $("monCantonTitle").textContent = cScope(cn);
     const row = (label, val) => `<div class="mc-row"><span>${label}</span><b>${val}</b></div>`;
     $("monCantonBody").innerHTML =
       `<div class="mc-head" style="background:${col}">
@@ -1327,25 +1348,25 @@
          <div class="mc-region">${regLong}</div>
        </div>
        <div class="cs-card">
-         ${row("Chef-lieu", p.capital)}
-         ${row("Entrée dans la Confédération", p.joined)}
-         ${row("Langue(s)", p.langs)}
-         ${row("Communes", p.communes)}
-         ${row("Districts", p.districts)}
-         ${row("Population", p.pop + " hab.")}
+         ${row(t("mc.capital", "Chef-lieu"), pv("capital"))}
+         ${row(t("mc.joined", "Entrée dans la Confédération"), pv("joined"))}
+         ${row(t("mc.langs", "Langue(s)"), pv("langs"))}
+         ${row(t("mc.communes", "Communes"), pv("communes"))}
+         ${row(t("mc.districts", "Districts"), pv("districts"))}
+         ${row(t("mc.pop", "Population"), pv("pop") + " " + t("mc.popUnit", "hab."))}
        </div>
        <div class="cs-card">
-         <div class="cs-card-h">🏛️ Institutions cantonales</div>
-         ${row("Grand Conseil (législatif)", p.gc + " sièges")}
-         ${row("Conseil d'État (exécutif)", p.ce + " membres")}
-         ${row("Législature", "5 ans")}
+         <div class="cs-card-h">🏛️ ${t("mc.instT", "Institutions cantonales")}</div>
+         ${row(t("mc.gc", "Grand Conseil (législatif)"), p.gc + " " + t("mc.gcUnit", "sièges"))}
+         ${row(t("mc.ce", "Conseil d'État (exécutif)"), p.ce + " " + t("mc.ceUnit", "membres"))}
+         ${row(t("mc.legislature", "Législature"), t("mc.years5", "5 ans"))}
        </div>` +
-      (p.motto ? `<div class="cs-card"><div class="cs-card-h">🛡️ Devise</div><p><i>${p.motto}</i></p></div>` : "") +
+      (pv("motto") ? `<div class="cs-card"><div class="cs-card-h">🛡️ ${t("mc.mottoT", "Devise")}</div><p><i>${pv("motto")}</i></p></div>` : "") +
       `<div class="cs-card cs-highlight">
-         <div class="cs-card-h">✨ À savoir</div>
-         <ul class="cs-list">${p.facts.map((f) => `<li>${f}</li>`).join("")}</ul>
+         <div class="cs-card-h">✨ ${t("mc.knowT", "À savoir")}</div>
+         <ul class="cs-list">${pv("facts").map((f) => `<li>${f}</li>`).join("")}</ul>
        </div>
-       <p class="cs-note">Chiffres indicatifs (population et nombre de communes évoluent avec les fusions).</p>`;
+       <p class="cs-note">${t("mc.note", "Chiffres indicatifs (population et nombre de communes évoluent avec les fusions).")}</p>`;
     showScreen("screen-moncanton");
   }
 
@@ -1355,65 +1376,65 @@
 
   function openNaturalisation() {
     $("naturalisationBody").innerHTML =
-      `<p class="cs-intro">Devenir suisse par <b>naturalisation ordinaire</b> : les conditions et les étapes principales.</p>` +
-      csList("", "🏠", "Résidence", [
+      `<p class="cs-intro">${t("nat.intro", "Devenir suisse par <b>naturalisation ordinaire</b> : les conditions et les étapes principales.")}</p>` +
+      csList("", "🏠", t("nat.resT", "Résidence"), t("nat.res", [
         "<b>10 ans</b> de résidence en Suisse (les années entre 8 et 18 ans comptent double, min. 6 ans réels)",
         "Être titulaire d'un <b>permis C</b> (établissement)",
         "+ une durée de résidence dans le <b>canton</b> et la <b>commune</b> (variable selon les lieux)",
-      ]) +
-      csList("", "🤝", "Intégration", [
+      ])) +
+      csList("", "🤝", t("nat.intT", "Intégration"), t("nat.int", [
         "Respecter la <b>Constitution</b> et l'ordre juridique ; ne pas mettre en danger la sécurité",
         "Participer à la <b>vie économique</b> ou suivre une <b>formation</b>",
         "Encourager l'intégration de sa famille",
-      ]) +
-      csCard("💬", "Langue", "Maîtriser une <b>langue nationale</b> : à l'<b>oral (niveau B1)</b> et à l'<b>écrit (niveau A2)</b> selon le cadre européen (CECR).") +
-      csCard("🧠", "Connaissances", "Connaître la <b>Suisse</b>, le <b>canton</b> et la <b>commune</b> — géographie, histoire, institutions, us et coutumes. C'est l'objet du <b>test</b> que tu prépares ici. 💪") +
-      `<div class="cs-card cs-highlight"><div class="cs-card-h">🏛️ Trois niveaux décident</div><p>La naturalisation ordinaire nécessite l'accord des <b>trois</b> : autorisation de la <b>Confédération</b>, décision du <b>canton</b> et de la <b>commune</b>.</p></div>` +
-      csCard("⚡", "Naturalisation facilitée", "Procédure allégée (fédérale) dans certains cas : par ex. <b>conjoint·e de Suisse</b> (env. 5 ans de résidence + 3 ans d'union), ou personnes de la <b>3ᵉ génération</b>.") +
-      `<p class="cs-note">Des émoluments (frais) s'appliquent et la procédure peut durer <b>plusieurs années</b>. Les détails exacts dépendent du canton et de la commune.</p>`;
+      ])) +
+      csCard("💬", t("nat.langT", "Langue"), t("nat.lang", "Maîtriser une <b>langue nationale</b> : à l'<b>oral (niveau B1)</b> et à l'<b>écrit (niveau A2)</b> selon le cadre européen (CECR).")) +
+      csCard("🧠", t("nat.knowT", "Connaissances"), t("nat.know", "Connaître la <b>Suisse</b>, le <b>canton</b> et la <b>commune</b> — géographie, histoire, institutions, us et coutumes. C'est l'objet du <b>test</b> que tu prépares ici. 💪")) +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h">🏛️ ${t("nat.threeT", "Trois niveaux décident")}</div><p>${t("nat.three", "La naturalisation ordinaire nécessite l'accord des <b>trois</b> : autorisation de la <b>Confédération</b>, décision du <b>canton</b> et de la <b>commune</b>.")}</p></div>` +
+      csCard("⚡", t("nat.easyT", "Naturalisation facilitée"), t("nat.easy", "Procédure allégée (fédérale) dans certains cas : par ex. <b>conjoint·e de Suisse</b> (env. 5 ans de résidence + 3 ans d'union), ou personnes de la <b>3ᵉ génération</b>.")) +
+      `<p class="cs-note">${t("nat.note", "Des émoluments (frais) s'appliquent et la procédure peut durer <b>plusieurs années</b>. Les détails exacts dépendent du canton et de la commune.")}</p>`;
     showScreen("screen-naturalisation");
   }
 
   function openFederalisme() {
     $("federalismeBody").innerHTML =
-      `<p class="cs-intro">La Suisse est un <b>État fédéral</b> : le pouvoir est réparti entre <b>3 niveaux</b>, chacun avec ses compétences et ses impôts.</p>` +
-      csList("", "🏔️", "Confédération", ["Armée · monnaie (franc suisse) · affaires étrangères · douanes", "AVS/AI · routes nationales (autoroutes) · énergie"]) +
-      csList("", "🏛️", "Cantons (26)", ["Police · écoles · santé et hôpitaux · culture", "Chaque canton a sa <b>Constitution</b>, ses lois et ses tribunaux"]) +
-      csList("", "🏘️", "Communes (~2 100)", ["Écoles primaires · eau · déchets · aménagement local", "État civil · pompiers · routes communales"]) +
-      `<div class="cs-card cs-highlight"><div class="cs-card-h">🧩 Subsidiarité</div><p>Ce qu'un niveau <b>inférieur</b> peut faire, il le fait ; le niveau supérieur n'intervient que si nécessaire. On paie donc des impôts aux <b>3 niveaux</b>.</p></div>`;
+      `<p class="cs-intro">${t("fed.intro", "La Suisse est un <b>État fédéral</b> : le pouvoir est réparti entre <b>3 niveaux</b>, chacun avec ses compétences et ses impôts.")}</p>` +
+      csList("", "🏔️", t("fed.confedT", "Confédération"), t("fed.confed", ["Armée · monnaie (franc suisse) · affaires étrangères · douanes", "AVS/AI · routes nationales (autoroutes) · énergie"])) +
+      csList("", "🏛️", t("fed.cantonsT", "Cantons (26)"), t("fed.cantons", ["Police · écoles · santé et hôpitaux · culture", "Chaque canton a sa <b>Constitution</b>, ses lois et ses tribunaux"])) +
+      csList("", "🏘️", t("fed.communesT", "Communes (~2 100)"), t("fed.communes", ["Écoles primaires · eau · déchets · aménagement local", "État civil · pompiers · routes communales"])) +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h">🧩 ${t("fed.subT", "Subsidiarité")}</div><p>${t("fed.sub", "Ce qu'un niveau <b>inférieur</b> peut faire, il le fait ; le niveau supérieur n'intervient que si nécessaire. On paie donc des impôts aux <b>3 niveaux</b>.")}</p></div>`;
     showScreen("screen-federalisme");
   }
 
   function openLangues() {
     $("languesBody").innerHTML =
-      `<p class="cs-intro">La Suisse a <b>4 langues nationales</b>. Chacun a le droit de parler la sienne (liberté de la langue).</p>` +
-      csCard("🇩🇪", "Allemand — ~62 %", "La plus parlée. Majorité des cantons (Zurich, Berne, Bâle, Lucerne…). En Suisse on parle surtout le <b>suisse allemand</b> (dialecte).") +
-      csCard("🇫🇷", "Français — ~23 %", "La <b>Suisse romande</b> : Vaud, Genève, Neuchâtel, Jura, et une partie du Valais, de Fribourg et de Berne.") +
-      csCard("🇮🇹", "Italien — ~8 %", "Le <b>Tessin</b> et quelques vallées du sud des Grisons.") +
-      csCard("🏔️", "Romanche — ~0,5 %", "Parlé dans les <b>Grisons</b> ; 4ᵉ langue nationale, langue officielle pour les échanges avec les romanchophones.") +
-      `<div class="cs-card cs-highlight"><div class="cs-card-h">🗺️ Cantons plurilingues</div><p><b>Bilingues</b> : Berne, Fribourg, Valais (français-allemand). <b>Trilingue</b> : Grisons (allemand, romanche, italien). Langues officielles de la Confédération : allemand, français, italien.</p></div>`;
+      `<p class="cs-intro">${t("lang.intro", "La Suisse a <b>4 langues nationales</b>. Chacun a le droit de parler la sienne (liberté de la langue).")}</p>` +
+      csCard("🇩🇪", t("lang.deT", "Allemand — ~62 %"), t("lang.de", "La plus parlée. Majorité des cantons (Zurich, Berne, Bâle, Lucerne…). En Suisse on parle surtout le <b>suisse allemand</b> (dialecte).")) +
+      csCard("🇫🇷", t("lang.frT", "Français — ~23 %"), t("lang.fr", "La <b>Suisse romande</b> : Vaud, Genève, Neuchâtel, Jura, et une partie du Valais, de Fribourg et de Berne.")) +
+      csCard("🇮🇹", t("lang.itT", "Italien — ~8 %"), t("lang.it", "Le <b>Tessin</b> et quelques vallées du sud des Grisons.")) +
+      csCard("🏔️", t("lang.rmT", "Romanche — ~0,5 %"), t("lang.rm", "Parlé dans les <b>Grisons</b> ; 4ᵉ langue nationale, langue officielle pour les échanges avec les romanchophones.")) +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h">🗺️ ${t("lang.multiT", "Cantons plurilingues")}</div><p>${t("lang.multi", "<b>Bilingues</b> : Berne, Fribourg, Valais (français-allemand). <b>Trilingue</b> : Grisons (allemand, romanche, italien). Langues officielles de la Confédération : allemand, français, italien.")}</p></div>`;
     showScreen("screen-langues");
   }
 
   function openNeutralite() {
     $("neutraliteBody").innerHTML =
-      `<p class="cs-intro">La Suisse est <b>neutre</b> et une terre de dialogue et d'action humanitaire.</p>` +
-      csCard("🕊️", "La neutralité", "La Suisse ne participe pas aux conflits armés et ne prend pas parti militairement. Neutralité <b>permanente et armée</b>, reconnue au <b>Congrès de Vienne (1815)</b>.") +
-      csCard("🌍", "ONU", "La Suisse a adhéré à l'<b>ONU en 2002</b>, par votation populaire.") +
-      csCard("🛂", "Schengen — mais pas l'UE", "La Suisse fait partie de l'espace <b>Schengen</b> (libre circulation), mais n'est <b>pas membre de l'Union européenne</b>.") +
-      csCard("➕", "La Croix-Rouge", "Fondée à <b>Genève</b> par <b>Henri Dunant</b> (1863), qui reçut le tout premier <b>prix Nobel de la paix</b>.") +
-      csCard("🏢", "La Genève internationale", "Siège européen de l'<b>ONU</b>, du <b>CICR</b>, de l'<b>OMS</b>, de l'<b>OMC</b>… La Suisse offre ses « bons offices » pour la médiation.");
+      `<p class="cs-intro">${t("neu.intro", "La Suisse est <b>neutre</b> et une terre de dialogue et d'action humanitaire.")}</p>` +
+      csCard("🕊️", t("neu.neuT", "La neutralité"), t("neu.neu", "La Suisse ne participe pas aux conflits armés et ne prend pas parti militairement. Neutralité <b>permanente et armée</b>, reconnue au <b>Congrès de Vienne (1815)</b>.")) +
+      csCard("🌍", t("neu.onuT", "ONU"), t("neu.onu", "La Suisse a adhéré à l'<b>ONU en 2002</b>, par votation populaire.")) +
+      csCard("🛂", t("neu.schT", "Schengen — mais pas l'UE"), t("neu.sch", "La Suisse fait partie de l'espace <b>Schengen</b> (libre circulation), mais n'est <b>pas membre de l'Union européenne</b>.")) +
+      csCard("➕", t("neu.crT", "La Croix-Rouge"), t("neu.cr", "Fondée à <b>Genève</b> par <b>Henri Dunant</b> (1863), qui reçut le tout premier <b>prix Nobel de la paix</b>.")) +
+      csCard("🏢", t("neu.gvaT", "La Genève internationale"), t("neu.gva", "Siège européen de l'<b>ONU</b>, du <b>CICR</b>, de l'<b>OMS</b>, de l'<b>OMC</b>… La Suisse offre ses « bons offices » pour la médiation."));
     showScreen("screen-neutralite");
   }
 
   function openSymboles() {
     $("symbolesBody").innerHTML =
-      `<p class="cs-intro">Quelques symboles et traditions qui font la Suisse — souvent au programme du test.</p>` +
-      csCard("🎇", "Fête nationale : 1er août", "Elle commémore le <b>Pacte de 1291</b> (alliance sur la prairie du <b>Grütli</b>). On allume des feux et des lampions.") +
-      csCard("🤝", "Le Pacte fédéral (1291)", "<b>Uri, Schwytz et Unterwald</b> s'allient : acte fondateur de la Confédération.") +
-      csCard("🏹", "Guillaume Tell", "Héros <b>légendaire</b> (la pomme, l'arbalète), symbole de la liberté et de la résistance à l'oppression.") +
-      csCard("🚩", "Le drapeau", "Une <b>croix blanche</b> sur fond <b>rouge</b> — l'un des rares drapeaux carrés. (Emblème protégé par la loi.)") +
-      csList("", "🎶", "Us et coutumes", ["Cor des Alpes · yodel · lutte suisse (Schwingen)", "Désalpe · carnaval · Fête des Vignerons", "Chocolat · fromage (fondue, raclette, Gruyère)"]);
+      `<p class="cs-intro">${t("sym.intro", "Quelques symboles et traditions qui font la Suisse — souvent au programme du test.")}</p>` +
+      csCard("🎇", t("sym.natT", "Fête nationale : 1er août"), t("sym.nat", "Elle commémore le <b>Pacte de 1291</b> (alliance sur la prairie du <b>Grütli</b>). On allume des feux et des lampions.")) +
+      csCard("🤝", t("sym.pacteT", "Le Pacte fédéral (1291)"), t("sym.pacte", "<b>Uri, Schwytz et Unterwald</b> s'allient : acte fondateur de la Confédération.")) +
+      csCard("🏹", t("sym.tellT", "Guillaume Tell"), t("sym.tell", "Héros <b>légendaire</b> (la pomme, l'arbalète), symbole de la liberté et de la résistance à l'oppression.")) +
+      csCard("🚩", t("sym.flagT", "Le drapeau"), t("sym.flag", "Une <b>croix blanche</b> sur fond <b>rouge</b> — l'un des rares drapeaux carrés. (Emblème protégé par la loi.)")) +
+      csList("", "🎶", t("sym.custT", "Us et coutumes"), t("sym.cust", ["Cor des Alpes · yodel · lutte suisse (Schwingen)", "Désalpe · carnaval · Fête des Vignerons", "Chocolat · fromage (fondue, raclette, Gruyère)"]));
     showScreen("screen-symboles");
   }
 
