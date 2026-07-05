@@ -1,10 +1,10 @@
 /* Service worker — mises à jour fiables (réseau d'abord pour le code), cache pour l'offline. */
-const CACHE = "swisscitoyen-v62";
+const CACHE = "swisscitoyen-v63";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
-  "./app.js",
+  "./app.js","./i18n.js",
   "./questions.js",
   "./illustrations.js",
   "./explanations.js",

@@ -25,6 +25,11 @@
   const isCards = () => CANTON_FORMAT[cantonOf()] === "cards";
   const CANTON_NAME = { VD: "Vaud", GE: "Genève", NE: "Neuchâtel", VS: "Valais" };
   const CANTON_SCOPE = { VD: "Canton de Vaud", GE: "Canton de Genève", NE: "Canton de Neuchâtel", VS: "Canton du Valais" };
+  const CANTON_NAME_EN = { VD: "Vaud", GE: "Geneva", NE: "Neuchâtel", VS: "Valais" };
+  const CANTON_SCOPE_EN = { VD: "Canton of Vaud", GE: "Canton of Geneva", NE: "Canton of Neuchâtel", VS: "Canton of Valais" };
+  const cnName = (cn) => (state.lang === "en" ? CANTON_NAME_EN : CANTON_NAME)[cn || cantonOf()];
+  const cScope = (cn) => (state.lang === "en" ? CANTON_SCOPE_EN : CANTON_SCOPE)[cn || cantonOf()];
+  const fmt = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => (o[k] != null ? o[k] : ""));
   function cardsData() {
     if (state.canton === "NE" && typeof NE_DATA !== "undefined") return NE_DATA;
     if (state.canton === "VS" && typeof VS_DATA !== "undefined") return VS_DATA;
@@ -34,6 +39,7 @@
   /* ---------------- Persistance ---------------- */
   const defaultState = () => ({
     history: [], sessions: 0, best: 0, streak: 0, lastPlayed: null,
+    lang: "fr",     // "fr" (source) | "en"
     canton: null,   // "VD" | "GE"
     commune: null,  // (Vaud uniquement)
     mistakes: [],   // [{q, options, answer, theme, scope}]
@@ -67,6 +73,51 @@
   function setRing(el, pct) {
     el.style.strokeDasharray = RING_LEN;
     el.style.strokeDashoffset = RING_LEN * (1 - Math.max(0, Math.min(100, pct)) / 100);
+  }
+
+  /* ---------------- i18n (français source, anglais en surcouche) ---------------- */
+  const EN = () => (window.I18N && window.I18N.en) || {};
+  /* t("clé", "repli fr") : renvoie l'anglais si lang=en et la clé existe, sinon le français. */
+  function t(key, fr) {
+    if (state.lang === "en") { const d = EN(); if (d[key] != null) return d[key]; }
+    return fr != null ? fr : key;
+  }
+  const _frSnap = {};   // texte français d'origine, capturé une fois, pour restaurer
+  function applyStaticI18n() {
+    const d = EN();
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const k = el.getAttribute("data-i18n");
+      if (!(k in _frSnap)) _frSnap[k] = el.innerHTML;
+      el.innerHTML = (state.lang === "en" && d[k] != null) ? d[k] : _frSnap[k];
+    });
+    document.querySelectorAll("[data-i18n-ph]").forEach((el) => {
+      const k = el.getAttribute("data-i18n-ph");
+      if (!(k in _frSnap)) _frSnap[k] = el.getAttribute("placeholder") || "";
+      el.setAttribute("placeholder", (state.lang === "en" && d[k] != null) ? d[k] : _frSnap[k]);
+    });
+    document.documentElement.lang = state.lang;
+    document.querySelectorAll(".lang-btn").forEach((b) =>
+      b.classList.toggle("on", b.dataset.lang === state.lang));
+  }
+  function setLang(lang) {
+    if (lang !== "fr" && lang !== "en") return;
+    state.lang = lang; save();
+    applyStaticI18n();
+    rerenderActive();
+  }
+  /* Re-rend l'écran courant après un changement de langue (contenu généré en JS). */
+  function rerenderActive() {
+    const active = document.querySelector(".screen.active");
+    const id = active ? active.id : "";
+    const map = {
+      "screen-home": renderHome, "screen-politique": openPolitique, "screen-piliers": openPiliers,
+      "screen-sante": openSante, "screen-assurances": openAssurances, "screen-democratie": openDemocratie,
+      "screen-droits": openDroits, "screen-moncanton": openMonCanton, "screen-naturalisation": openNaturalisation,
+      "screen-federalisme": openFederalisme, "screen-langues": openLangues, "screen-neutralite": openNeutralite,
+      "screen-symboles": openSymboles, "screen-timeline": openTimeline, "screen-vsmap": openDistricts,
+      "screen-explore": openExplore, "screen-stats": openStats, "screen-badges": openBadges,
+    };
+    if (map[id]) { try { map[id](); } catch (e) {} }
   }
 
   /* ---------------- Animations ---------------- */
@@ -340,15 +391,15 @@
     const cn = cantonOf();
     const cards = isCards();
     const c = VD_DATA.communes[state.commune];
-    $("homeCommune").textContent = cn === "VD" ? (c ? c.name : "Choisir…") : CANTON_NAME[cn];
-    $("friseTileSub").textContent = "Suisse · " + CANTON_NAME[cn];
+    $("homeCommune").textContent = cn === "VD" ? (c ? c.name : t("misc.chooseCommune", "Choisir…")) : cnName(cn);
+    $("friseTileSub").textContent = t("misc.swiss", "Suisse") + " · " + cnName(cn);
 
     // Ressource « districts » : cantons ayant une carte (Vaud, Valais).
     const dm = districtMap();
     $("btnVsMap").hidden = !dm;
     if (dm) {
-      $("districtTileTitle").textContent = dm.districts.length + " districts";
-      $("districtTileSub").textContent = cn === "VS" ? "du Valais" : "vaudois";
+      $("districtTileTitle").textContent = dm.districts.length + " " + t("misc.districts", "districts");
+      $("districtTileSub").textContent = cn === "VS" ? t("district.subVS", "du Valais") : t("district.subVD", "vaudois");
     }
 
     // Blocs à score (prépa, révision QCM, suivi) : uniquement pour les cantons QCM.
@@ -358,34 +409,36 @@
 
     if (cards) {
       const n = cardsData().questions.length;
-      $("examTitle").textContent = "S'entraîner";
-      $("examSub").textContent = `${n} questions officielles · QCM & fiches`;
-      $("examZoneSub").textContent = "Le questionnaire officiel — c'est uniquement là-dessus que tu es évalué·e.";
-      $("homeFooter").textContent = `Questions officielles Suisse & Canton de ${CANTON_NAME[cn]} · hors-ligne`;
+      $("examTitle").textContent = t("exam.train", "S'entraîner");
+      $("examSub").textContent = fmt(t("exam.subCards", "{n} questions officielles · QCM & fiches"), { n: n });
+      $("examZoneSub").textContent = t("home.zoneExamSubCards", "Le questionnaire officiel — c'est uniquement là-dessus que tu es évalué·e.");
+      $("homeFooter").textContent = fmt(t("home.footerCards", "Questions officielles Suisse & {c} · hors-ligne"), { c: cScope(cn) });
       return;
     }
 
     const cfg = EXAM_CFG[cn];
-    $("examZoneSub").textContent = "Le questionnaire officiel et ton suivi — c'est uniquement là-dessus que tu es évalué·e.";
-    $("examTitle").textContent = "Simuler l'examen";
+    $("examZoneSub").textContent = t("home.zoneExamSub", "Le questionnaire officiel et ton suivi — c'est uniquement là-dessus que tu es évalué·e.");
+    $("examTitle").textContent = t("exam.simulate", "Simuler l'examen");
     $("examSub").textContent = cn === "GE"
-      ? `${cfg.total} questions · max 5 fautes`
-      : `${cfg.total} questions · ${cfg.minutes} min · réussite 70 %`;
+      ? fmt(t("exam.subGE", "{n} questions · max 5 fautes"), { n: cfg.total })
+      : fmt(t("exam.subVD", "{n} questions · {m} min · réussite 70 %"), { n: cfg.total, m: cfg.minutes });
     $("homeFooter").textContent = cn === "GE"
-      ? "Questions officielles Suisse & Canton de Genève · hors-ligne"
-      : "Questions officielles du Canton de Vaud · hors-ligne";
+      ? t("home.footerGE", "Questions officielles Suisse & Canton de Genève · hors-ligne")
+      : t("home.footerVD", "Questions officielles du Canton de Vaud · hors-ligne");
 
     const recent = state.history.slice(-5);
     const readiness = recent.length ? Math.round(recent.reduce((s, h) => s + h.pct, 0) / recent.length) : 0;
     $("readinessPct").textContent = readiness + "%";
     $("statBest").textContent = state.best + "%";
     $("statSessions").textContent = state.sessions;
-    $("statStreak").textContent = state.streak + " j";
+    $("statStreak").textContent = state.streak + " " + t("misc.dayUnit", "j");
     setTimeout(() => setRing($("readinessRing"), readiness), 60);
 
     const mc = state.mistakes.length;
     $("btnMistakes").hidden = mc === 0;
     $("mistakesCount").textContent = mc;
+    $("mistakesLabel").textContent = t("home.mistakesSub", "question(s) à retravailler");
+    $("badgeLabel").textContent = t("home.badgesSub", "badge(s)");
 
     $("badgeCount").textContent = ACHIEVEMENTS.filter((a) => state.badges && state.badges[a.id]).length;
 
@@ -1789,7 +1842,11 @@
     window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
   }
 
+  document.querySelectorAll(".lang-btn").forEach((b) =>
+    b.addEventListener("click", () => setLang(b.dataset.lang)));
+
   /* ---------------- Démarrage ---------------- */
+  applyStaticI18n();
   checkBadges();
   const ready = state.canton === "GE" || state.canton === "NE" || state.canton === "VS"
     || (state.canton === "VD" && state.commune && VD_DATA.communes[state.commune]);

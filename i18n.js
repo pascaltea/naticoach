@@ -1,0 +1,137 @@
+/* =========================================================================
+ * NatiCoach — internationalisation (i18n)
+ * Le FRANÇAIS est la langue source : il reste en dur dans le HTML et le JS
+ * (valeur de repli). Ce fichier ne contient que les traductions ANGLAISES.
+ *   - HTML statique : attribut data-i18n="clé" (ou data-i18n-ph pour placeholder).
+ *   - JS généré : t("clé", "texte français de repli").
+ * Les QUESTIONS officielles ne sont PAS traduites (l'examen se passe en français).
+ * ========================================================================= */
+window.I18N = {
+  en: {
+    /* ---------- Configuration ---------- */
+    "setup.surtitle": "Grüezi · <span>Hello</span> · Buongiorno",
+    "setup.q": "Where are you being naturalised?",
+    "setup.sub": "Choose your canton. The official questionnaire adapts automatically.",
+    "setup.desc.VD": "Switzerland · canton · your municipality",
+    "setup.desc.GE": "Switzerland · canton",
+    "setup.desc.NE": "Switzerland · canton · Q&A cards",
+    "setup.desc.VS": "Switzerland · canton · Q&A cards",
+    "setup.noteTop": "You can change canton at any time.",
+    "setup.communeTitle": "Your Vaud municipality",
+    "setup.communeSub": "It personalises the local questions. You can change it at any time.",
+    "setup.searchPh": "Search my municipality…",
+    "setup.confirm": "Let's go",
+    "setup.note": "300 Vaud municipalities · no data leaves your phone",
+
+    /* ---------- Accueil ---------- */
+    "home.zoneExam": "🎯 For the exam",
+    "home.zoneExamSub": "The official questionnaire and your progress — this is the only thing you are tested on.",
+    "home.zoneExamSubCards": "The official questionnaire — this is the only thing you are tested on.",
+    "home.reviseLabel": "Revise",
+    "home.study": "Revise the answers",
+    "home.studySub": "discovery or quiz",
+    "home.mistakes": "Revise my mistakes",
+    "home.mistakesSub": "question(s) to rework",
+    "home.trackLabel": "Track",
+    "home.stats": "Statistics",
+    "home.statsSub": "by topic",
+    "home.badges": "Achievements",
+    "home.badgesSub": "badge(s)",
+    "home.zoneBonus": "✨ Go further",
+    "home.zoneBonusSub": "To deepen your Swiss culture. Useful but not required: everything you are tested on is in the official questionnaire.",
+    "home.discover": "Discover",
+    "home.explore": "Explore Switzerland",
+    "home.exploreSub": "26 cantons",
+    "home.timeline": "Timeline",
+    "home.timelineSub": "Switzerland · canton",
+    "home.districtsSub": "of the canton",
+    "home.monCanton": "My canton",
+    "home.monCantonSub": "identity sheet",
+    "home.understand": "Understand Switzerland",
+    "home.politique": "Political system",
+    "home.politiqueSub": "who does what, who elects whom",
+    "home.democratie": "Direct democracy",
+    "home.democratieSub": "initiatives & referendums",
+    "home.federalisme": "Federalism",
+    "home.federalismeSub": "3 levels, who does what",
+    "home.droits": "Rights & duties",
+    "home.droitsSub": "of the citizen",
+    "home.langues": "National languages",
+    "home.languesSub": "the 4 languages",
+    "home.neutralite": "Neutrality & the world",
+    "home.neutraliteSub": "UN, Red Cross…",
+    "home.symboles": "Symbols & traditions",
+    "home.symbolesSub": "1 August, customs",
+    "home.pratique": "Practical life & process",
+    "home.naturalisation": "Naturalisation",
+    "home.naturalisationSub": "conditions & steps",
+    "home.assurances": "Social insurance",
+    "home.assurancesSub": "overview",
+    "home.piliers": "The 3 pillars",
+    "home.piliersSub": "pension / retirement",
+    "home.sante": "Healthcare system",
+    "home.santeSub": "health insurance",
+    "home.footerVD": "Official questions of the Canton of Vaud · offline",
+    "home.footerGE": "Official questions of Switzerland & Canton of Geneva · offline",
+
+    /* ---------- Examen / CTA ---------- */
+    "exam.simulate": "Simulate the exam",
+    "exam.train": "Train",
+    "exam.prep": "Your preparation",
+    "exam.best": "best",
+    "exam.sessions": "sessions",
+    "exam.streak": "streak",
+    "exam.subGE": "{n} questions · max 5 wrong",
+    "exam.subVD": "{n} questions · {m} min · pass 70%",
+    "exam.subCards": "{n} official questions · MCQ & cards",
+
+    /* ---------- Titres d'écrans ---------- */
+    "title.explore": "Explore Switzerland",
+    "title.badges": "My achievements",
+    "title.stats": "My statistics",
+    "title.timeline": "Timeline",
+    "title.politique": "The political system",
+    "title.piliers": "The 3 pillars",
+    "title.sante": "The healthcare system",
+    "title.assurances": "Social insurance",
+    "title.democratie": "Direct democracy",
+    "title.droits": "Rights & duties",
+    "title.naturalisation": "Naturalisation",
+    "title.federalisme": "Federalism",
+    "title.langues": "The national languages",
+    "title.neutralite": "Neutrality & the world",
+    "title.symboles": "Symbols & traditions",
+
+    /* ---------- Révision / Quiz / Résultat ---------- */
+    "study.savais": "Did you know?",
+    "study.prev": "‹ Previous",
+    "study.next": "Next ›",
+    "study.done": "Done ✓",
+    "study.scopeTitle": "Revision scope",
+    "study.reveal": "Show the official answer",
+    "study.officialAnswer": "Official answer",
+    "study.wellSeen": "Well spotted!",
+    "study.label": "Revision",
+    "quiz.continue": "Continue",
+    "result.review": "🔎 Review my answers",
+    "result.share": "📲 Share my score",
+    "result.retry": "Restart",
+    "result.home": "Home",
+    "explore.sub": "Tap a canton to discover its information.",
+    "vsmap.sub": "Tap a district to see its info.",
+
+    "home.footerCards": "Official questions of Switzerland & {c} · offline",
+
+    /* ---------- Divers ---------- */
+    "misc.chooseCommune": "Choose…",
+    "misc.swiss": "Switzerland",
+    "misc.districts": "districts",
+    "misc.dayUnit": "d",
+    "district.subVD": "of Vaud",
+    "district.subVS": "of Valais",
+    "lang.label": "Language",
+  },
+};
+
+/* Raccourci global (utilisé par app.js). */
+window.I18N_EN = window.I18N.en;
