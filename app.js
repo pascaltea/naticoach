@@ -956,6 +956,91 @@
   }
 
   /* ======================================================================
+   *  COMPRENDRE LA SUISSE (système politique · piliers · santé)
+   * ==================================================================== */
+  /* Institutions communales par canton (les noms diffèrent). */
+  const COMMUNE_INST = {
+    VD: { legis: "Conseil communal (ou Conseil général)", exec: "Municipalité", head: "syndic" },
+    GE: { legis: "Conseil municipal", exec: "Conseil administratif", head: "maire" },
+    NE: { legis: "Conseil général", exec: "Conseil communal", head: "président·e de commune" },
+    VS: { legis: "Conseil général (ou Assemblée primaire)", exec: "Conseil municipal", head: "président·e de commune" },
+  };
+
+  function polLevel(title, sub, rows) {
+    return `<div class="pol-level">
+        <div class="pol-head"><b>${title}</b>${sub ? `<span>${sub}</span>` : ""}</div>` +
+        rows.map((r) => `<div class="pol-row pol-${r.k}">
+            <span class="pol-ico">${r.ico}</span>
+            <div class="pol-txt"><span class="pol-power">${r.power}</span><b>${r.body}</b>${r.note ? `<small>${r.note}</small>` : ""}</div>
+          </div>`).join("") +
+      `</div>`;
+  }
+
+  function openPolitique() {
+    const ci = COMMUNE_INST[cantonOf()] || COMMUNE_INST.VD;
+    const cantonNm = CANTON_NAME[cantonOf()];
+    $("politiqueBody").innerHTML =
+      `<p class="cs-intro">La Suisse repose sur <b>3 niveaux</b> (Confédération · Canton · Commune) et sur la <b>séparation des 3 pouvoirs</b> : qui fait les lois, qui gouverne, qui juge.</p>` +
+      polLevel("Confédération", "niveau fédéral · Suisse", [
+        { k: "leg", ico: "📜", power: "Législatif — fait les lois", body: "Assemblée fédérale", note: "Conseil national (200 · élu par le peuple) + Conseil des États (46 · représente les cantons)" },
+        { k: "exe", ico: "🏛️", power: "Exécutif — gouverne", body: "Conseil fédéral (7 ministres)", note: "Présidence tournante 1 an : le·la Président·e de la Confédération" },
+        { k: "jud", ico: "⚖️", power: "Judiciaire — juge", body: "Tribunal fédéral", note: "à Lausanne" },
+      ]) +
+      polLevel("Canton de " + cantonNm, "niveau cantonal", [
+        { k: "leg", ico: "📜", power: "Législatif", body: "Grand Conseil", note: "le parlement cantonal" },
+        { k: "exe", ico: "🏛️", power: "Exécutif", body: "Conseil d'État", note: "le gouvernement cantonal" },
+        { k: "jud", ico: "⚖️", power: "Judiciaire", body: "Tribunal cantonal", note: "" },
+      ]) +
+      polLevel("Commune", "niveau communal · " + cantonNm, [
+        { k: "leg", ico: "📜", power: "Législatif", body: ci.legis, note: "" },
+        { k: "exe", ico: "🏛️", power: "Exécutif", body: ci.exec, note: "présidé·e par le·la " + ci.head },
+      ]) +
+      `<div class="cs-card cs-highlight">
+         <div class="cs-card-h">🗳️ Qui vote pour qui ?</div>
+         <ul class="cs-list">
+           <li>Le <b>peuple</b> (Suisses dès <b>18 ans</b>) élit les <b>parlements</b> et les <b>gouvernements</b> aux 3 niveaux.</li>
+           <li>C'est l'<b>Assemblée fédérale</b> qui élit le <b>Conseil fédéral</b> (pas le peuple directement).</li>
+           <li><b>Démocratie directe</b> : le peuple vote aussi les <b>initiatives populaires</b> et les <b>référendums</b> (les votations).</li>
+         </ul>
+       </div>`;
+    showScreen("screen-politique");
+  }
+
+  function openPiliers() {
+    const pillar = (n, color, name, sub, tag, sys, but) =>
+      `<div class="cs-pillar">
+         <div class="cs-pillar-top"><span class="cs-pillar-n" style="background:${color}">${n}</span>
+           <div><b>${name}</b><small>${sub}</small></div></div>
+         <span class="cs-tag" style="color:${color};border-color:${color}">${tag}</span>
+         <div class="cs-pillar-row"><span>Système</span><b>${sys}</b></div>
+         <div class="cs-pillar-row"><span>But</span><b>${but}</b></div>
+       </div>`;
+    $("piliersBody").innerHTML =
+      `<p class="cs-intro">La <b>prévoyance vieillesse</b> suisse repose sur <b>3 piliers</b>, pour garder son niveau de vie une fois à la retraite.</p>` +
+      pillar("1", "#C8442E", "AVS / AI", "Assurance-vieillesse, survivants et invalidité", "Obligatoire · État",
+             "Répartition : les personnes qui travaillent financent les retraité·es", "Couvrir les besoins vitaux (minimum)") +
+      pillar("2", "#3E7A4E", "LPP", "Prévoyance professionnelle (caisse de pension)", "Obligatoire dès ~22 050 CHF/an",
+             "Capitalisation : on épargne pour soi (employeur + employé cotisent)", "Maintenir le niveau de vie habituel") +
+      pillar("3", "#5B7DB1", "3ᵉ pilier", "Prévoyance privée — 3a (lié) · 3b (libre)", "Facultatif",
+             "Épargne individuelle (avantages fiscaux pour le 3a)", "Compléter les 1er et 2e piliers") +
+      `<p class="cs-note">Avec les 1er et 2e piliers réunis, on vise environ <b>60 %</b> du dernier salaire à la retraite.</p>`;
+    showScreen("screen-piliers");
+  }
+
+  function openSante() {
+    const card = (ico, title, body) =>
+      `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div><p>${body}</p></div>`;
+    $("santeBody").innerHTML =
+      `<p class="cs-intro">En Suisse, l'<b>assurance maladie de base est obligatoire</b> — mais fournie par des <b>caisses privées</b> que chacun choisit librement.</p>` +
+      card("🩺", "Assurance de base (LAMal)", "Obligatoire pour toute personne qui habite en Suisse (à souscrire dans les 3 mois). Les prestations de base sont les mêmes partout.") +
+      card("🔄", "Libre choix de la caisse", "On choisit librement sa caisse maladie (assureur), et on peut en changer chaque année. Les caisses ne peuvent pas refuser l'assurance de base.") +
+      card("💰", "Prime & participation", "Chacun paie une <b>prime</b> mensuelle par personne (indépendante du revenu). S'ajoutent une <b>franchise</b> annuelle et une <b>quote-part</b> (part des frais à sa charge).") +
+      card("🤝", "Subsides", "Les personnes et familles à revenu modeste reçoivent des <b>subsides</b> (réductions de primes) versés par le canton.") +
+      card("➕", "Assurances complémentaires", "Facultatives (LCA) : chambre privée à l'hôpital, soins dentaires, médecines alternatives… Les caisses peuvent y poser des conditions.");
+    showScreen("screen-sante");
+  }
+
+  /* ======================================================================
    *  QUIZ (entraînement + examen)
    * ==================================================================== */
   let quiz = null;          // { mode, items, i, correct, answered }
@@ -1332,6 +1417,12 @@
   $("btnQuitTimeline").addEventListener("click", () => showScreen("screen-home"));
   $("btnVsMap").addEventListener("click", openDistricts);
   $("btnQuitVsmap").addEventListener("click", () => showScreen("screen-home"));
+  $("btnPolitique").addEventListener("click", openPolitique);
+  $("btnQuitPolitique").addEventListener("click", () => showScreen("screen-home"));
+  $("btnPiliers").addEventListener("click", openPiliers);
+  $("btnQuitPiliers").addEventListener("click", () => showScreen("screen-home"));
+  $("btnSante").addEventListener("click", openSante);
+  $("btnQuitSante").addEventListener("click", () => showScreen("screen-home"));
   $("btnMistakes").addEventListener("click", startMistakes);
   $("btnStats").addEventListener("click", openStats);
   $("btnQuitStats").addEventListener("click", () => showScreen("screen-home"));
