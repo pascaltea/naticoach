@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=46" />
+  <link rel="stylesheet" href="styles.css?v=47" />
 </head>
 <body>
   <div id="app">
@@ -39,6 +39,11 @@
             <span class="canton-emoji">⛲</span>
             <span class="canton-name">Genève</span>
             <span class="canton-desc">Suisse · canton</span>
+          </button>
+          <button class="canton-card" data-canton="NE">
+            <span class="canton-emoji">⏱️</span>
+            <span class="canton-name">Neuchâtel</span>
+            <span class="canton-desc">Suisse · canton · fiches Q/R</span>
           </button>
         </div>
         <p class="setup-note setup-note-top">Tu pourras changer de canton à tout moment.</p>
@@ -79,7 +84,7 @@
 
       <button class="exam-cta" id="btnExam">
         <span class="exam-cta-txt">
-          <b>Simuler l'examen</b>
+          <b id="examTitle">Simuler l'examen</b>
           <small id="examSub">48 questions · 60 min · réussite 70 %</small>
         </span>
         <span class="exam-cta-arrow">›</span>
@@ -104,18 +109,20 @@
         <svg viewBox="0 0 80 40" class="spark-mini" id="sparkline" preserveAspectRatio="none"></svg>
       </div>
 
-      <div class="mode-group-label">Réviser</div>
-      <div class="mode-rows">
-        <button class="mode-row" id="btnStudy">
-          <span class="mode-ico">📖</span>
-          <span class="mode-row-txt"><b>Réviser les réponses</b><small>découverte ou quiz</small></span>
-          <span class="chev">›</span>
-        </button>
-        <button class="mode-row" id="btnMistakes" hidden>
-          <span class="mode-ico alert">🔁</span>
-          <span class="mode-row-txt"><b>Réviser mes erreurs</b><small class="hot"><span id="mistakesCount">0</span> question(s) à retravailler</small></span>
-          <span class="chev">›</span>
-        </button>
+      <div id="grpReviser">
+        <div class="mode-group-label">Réviser</div>
+        <div class="mode-rows">
+          <button class="mode-row" id="btnStudy">
+            <span class="mode-ico">📖</span>
+            <span class="mode-row-txt"><b>Réviser les réponses</b><small>découverte ou quiz</small></span>
+            <span class="chev">›</span>
+          </button>
+          <button class="mode-row" id="btnMistakes" hidden>
+            <span class="mode-ico alert">🔁</span>
+            <span class="mode-row-txt"><b>Réviser mes erreurs</b><small class="hot"><span id="mistakesCount">0</span> question(s) à retravailler</small></span>
+            <span class="chev">›</span>
+          </button>
+        </div>
       </div>
 
       <div class="mode-group-label">Découvrir</div>
@@ -124,10 +131,12 @@
         <button class="mode-tile" id="btnTimeline"><span class="mode-ico">🕰️</span><b>Frise chrono</b><small>CH · VD</small></button>
       </div>
 
-      <div class="mode-group-label">Suivre</div>
-      <div class="mode-grid">
-        <button class="mode-tile" id="btnStats"><span class="mode-ico">📊</span><b>Statistiques</b><small>par thème</small></button>
-        <button class="mode-tile" id="btnBadges"><span class="mode-ico">🏆</span><b>Succès</b><small><span id="badgeCount">0</span> badge(s)</small></button>
+      <div id="grpSuivre">
+        <div class="mode-group-label">Suivre</div>
+        <div class="mode-grid">
+          <button class="mode-tile" id="btnStats"><span class="mode-ico">📊</span><b>Statistiques</b><small>par thème</small></button>
+          <button class="mode-tile" id="btnBadges"><span class="mode-ico">🏆</span><b>Succès</b><small><span id="badgeCount">0</span> badge(s)</small></button>
+        </div>
       </div>
 
       <p class="footer-note"><img class="footer-flower" src="logo-edelweiss-red.svg" alt="" width="14" height="14" /> <span id="homeFooter">Questions officielles du Canton de Vaud · hors-ligne</span></p>
@@ -142,7 +151,7 @@
         </button>
         <span class="quiz-count" id="studyCount">1/1</span>
       </div>
-      <div class="study-modebar"><div class="seg toggle2" id="studyMode"></div></div>
+      <div class="study-modebar" id="studyModebar"><div class="seg toggle2" id="studyMode"></div></div>
       <div class="study-progress"><div class="study-progress-fill" id="studyProgressFill"></div></div>
       <div class="quiz-body">
         <span class="chip" id="studyChip"></span>
@@ -304,6 +313,7 @@
   <script src="timeline.js"></script>
   <script src="vd_official.js"></script>
   <script src="ge_official.js"></script>
-  <script src="app.js?v=46"></script>
+  <script src="ne_official.js"></script>
+  <script src="app.js?v=47"></script>
 </body>
 </html>

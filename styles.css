@@ -509,6 +509,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .savais-head.bad { color: var(--red); }
 .explain.savais .explain-text p { font-size: 13.5px; line-height: 1.55; color: var(--ink-soft); }
 .explain.savais .explain-illus { width: 100%; margin-top: 10px; }
+.reveal-btn { margin-top: 4px; }
 
 /* Feuille de sélection (bottom-sheet) */
 .sheet { position: fixed; inset: 0; z-index: 40; background: rgba(15,20,28,.4); display: flex; align-items: flex-end; animation: fade .2s ease; }

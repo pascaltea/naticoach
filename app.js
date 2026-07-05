@@ -14,12 +14,21 @@
   const EXAM_MINUTES = 60;
   const EXAM_PASS_PCT = 70;       // réussite officielle Vaud : 70 %
 
-  /* Configuration d'examen par canton (Vaud / Genève). */
+  /* Configuration d'examen par canton (QCM : Vaud / Genève). */
   const EXAM_CFG = {
     VD: { total: 48, passCorrect: 34, minutes: 60, passLabel: "70 % de bonnes réponses" },
     GE: { total: 45, passCorrect: 40, minutes: 45, passLabel: "40 bonnes réponses sur 45 (5 fautes maximum)" },
   };
-  const cantonOf = () => (state.canton === "GE" ? "GE" : "VD");
+  const cantonOf = () => (["VD", "GE", "NE", "VS"].indexOf(state.canton) >= 0 ? state.canton : "VD");
+  /* Format d'un canton : "mcq" (QCM Vaud/Genève) ou "cards" (fiches Q→R : Neuchâtel/Valais). */
+  const CANTON_FORMAT = { VD: "mcq", GE: "mcq", NE: "cards", VS: "cards" };
+  const isCards = () => CANTON_FORMAT[cantonOf()] === "cards";
+  const CANTON_NAME = { VD: "Vaud", GE: "Genève", NE: "Neuchâtel", VS: "Valais" };
+  function cardsData() {
+    if (state.canton === "NE" && typeof NE_DATA !== "undefined") return NE_DATA;
+    if (state.canton === "VS" && typeof VS_DATA !== "undefined") return VS_DATA;
+    return { questions: [] };
+  }
 
   /* ---------------- Persistance ---------------- */
   const defaultState = () => ({
@@ -136,6 +145,8 @@
   function levelOf(scope) {
     if (scope && scope.indexOf("Canton de Vaud") >= 0) return "Vaud";
     if (scope && scope.indexOf("Canton de Genève") >= 0) return "Genève";
+    if (scope && scope.indexOf("Canton de Neuchâtel") >= 0) return "Neuchâtel";
+    if (scope && scope.indexOf("Canton du Valais") >= 0 || scope && scope.indexOf("Canton de Valais") >= 0) return "Valais";
     if (scope && scope.indexOf("Commune") >= 0) return "Commune";
     return "Suisse";
   }
@@ -202,6 +213,18 @@
     };
   }
 
+  /* Deck de fiches (Neuchâtel / Valais) : {q, a, theme, scope}, scindé Suisse / canton. */
+  function cardsDeck() {
+    const src = cardsData().questions;
+    const cLabel = "Canton de " + CANTON_NAME[cantonOf()];
+    const mk = (q) => ({ q: q.q, a: q.a, theme: q.theme, scope: q.level === "Suisse" ? "Suisse" : cLabel });
+    return {
+      federal: src.filter((q) => q.level === "Suisse").map(mk),
+      cantonal: src.filter((q) => q.level !== "Suisse").map(mk),
+      commune: [],
+    };
+  }
+
   /* Deck du canton courant. */
   function currentDeck() { return cantonOf() === "GE" ? geDeck() : communeDeck(state.commune); }
   function allCurrentDeck() { const d = currentDeck(); return d.federal.concat(d.cantonal, d.commune); }
@@ -241,8 +264,9 @@
   }
 
   function pickCanton(canton) {
-    if (canton === "GE") {
-      state.canton = "GE"; state.commune = null; save();
+    if (canton !== "VD") {
+      // Genève, Neuchâtel, Valais : test cantonal, pas de commune.
+      state.canton = canton; state.commune = null; save();
       renderHome(); showScreen("screen-home");
     } else {
       $("setupCantonStep").hidden = true;
@@ -312,14 +336,30 @@
    *  ACCUEIL
    * ==================================================================== */
   function renderHome() {
-    const ge = cantonOf() === "GE";
+    const cn = cantonOf();
+    const cards = isCards();
     const c = VD_DATA.communes[state.commune];
-    $("homeCommune").textContent = ge ? "Genève" : (c ? c.name : "Choisir…");
-    const cfg = EXAM_CFG[cantonOf()];
-    $("examSub").textContent = ge
+    $("homeCommune").textContent = cn === "VD" ? (c ? c.name : "Choisir…") : CANTON_NAME[cn];
+
+    // Blocs à score (prépa, révision QCM, suivi) : uniquement pour les cantons QCM.
+    const pc = document.querySelector(".prep-card"); if (pc) pc.hidden = cards;
+    $("grpReviser").hidden = cards;
+    $("grpSuivre").hidden = cards;
+
+    if (cards) {
+      const n = cardsData().questions.length;
+      $("examTitle").textContent = "Réviser les fiches";
+      $("examSub").textContent = `${n} questions officielles · réponse à l'appui`;
+      $("homeFooter").textContent = `Questions officielles Suisse & Canton de ${CANTON_NAME[cn]} · hors-ligne`;
+      return;
+    }
+
+    const cfg = EXAM_CFG[cn];
+    $("examTitle").textContent = "Simuler l'examen";
+    $("examSub").textContent = cn === "GE"
       ? `${cfg.total} questions · max 5 fautes`
       : `${cfg.total} questions · ${cfg.minutes} min · réussite 70 %`;
-    $("homeFooter").textContent = ge
+    $("homeFooter").textContent = cn === "GE"
       ? "Questions officielles Suisse & Canton de Genève · hors-ligne"
       : "Questions officielles du Canton de Vaud · hors-ligne";
 
@@ -360,10 +400,11 @@
    * ==================================================================== */
   let study = null; // { scope, items, i, interactive }
   function studyScopes() {
-    if (cantonOf() === "GE") return [
+    const c = cantonOf();
+    if (c === "GE" || c === "NE" || c === "VS") return [
       { key: "all", label: "Tout", long: "Toutes les questions" },
       { key: "federal", label: "Suisse", long: "Suisse (fédéral)" },
-      { key: "cantonal", label: "Genève", long: "Canton de Genève" },
+      { key: "cantonal", label: CANTON_NAME[c], long: "Canton de " + CANTON_NAME[c] },
     ];
     return [
       { key: "all", label: "Tout", long: "Toutes les questions" },
@@ -380,8 +421,10 @@
   ];
 
   function openStudy() {
-    if (!study) study = { interactive: true, items: [], i: 0 }; // Quiz par défaut
-    renderStudyMode();
+    const cards = isCards();
+    $("studyModebar").hidden = cards;   // pas de toggle Découverte/Quiz pour les fiches
+    if (!study) study = { interactive: true, items: [], i: 0 }; // Quiz par défaut (QCM)
+    if (!cards) renderStudyMode();
     loadStudyScope("all");
     showScreen("screen-study");
   }
@@ -415,16 +458,51 @@
   function closeScopeSheet() { $("scopeSheet").hidden = true; }
 
   function loadStudyScope(scope) {
+    const sc = studyScopes().find((s) => s.key === scope);
+    if (isCards()) {
+      const d = cardsDeck();
+      const src = scope === "all" ? d.federal.concat(d.cantonal) : (d[scope] || []);
+      study = { scope, items: src.map((c) => Object.assign({}, c)), i: 0, cards: true };
+      $("studyScopeLabel").textContent = "Fiches · " + (sc ? sc.label : "Tout");
+      renderStudy(); return;
+    }
     const d = currentDeck();
     const src = scope === "all" ? d.federal.concat(d.cantonal, d.commune) : (d[scope] || []);
     const interactive = study ? study.interactive : true;
     study = { scope, items: src.map(buildQuestion), i: 0, interactive };
-    const sc = studyScopes().find((s) => s.key === scope);
     $("studyScopeLabel").textContent = "Révision · " + (sc ? sc.label : "Tout");
     renderStudy();
   }
 
+  /* Rendu d'une fiche (Neuchâtel / Valais) : question → réponse officielle révélée. */
+  function renderStudyCard() {
+    const cur = study.items[study.i];
+    $("studyChip").textContent = cur.scope + " · " + cur.theme;
+    $("studyCount").textContent = (study.i + 1) + "/" + study.items.length;
+    $("studyQuestion").textContent = cur.q;
+    $("studyProgressFill").style.width = ((study.i + 1) / study.items.length) * 100 + "%";
+    const box = $("studyOptions"); box.innerHTML = "";
+    if (!cur.revealed) {
+      const b = document.createElement("button");
+      b.className = "btn btn-outline reveal-btn";
+      b.textContent = "Voir la réponse officielle";
+      b.addEventListener("click", () => { cur.revealed = true; renderStudy(); });
+      box.appendChild(b);
+    }
+    $("studyExplain").hidden = !cur.revealed;
+    if (cur.revealed) {
+      const head = $("studyExplainHead");
+      head.textContent = "Réponse officielle";
+      head.className = "explain-head savais-head";
+      $("studyExplainText").textContent = cur.a;
+      $("studyIllus").innerHTML = "";
+    }
+    $("btnPrev").disabled = study.i === 0;
+    $("btnNextStudy").textContent = study.i + 1 < study.items.length ? "Suivant ›" : "Terminé ✓";
+  }
+
   function renderStudy() {
+    if (study.cards) { renderStudyCard(); return; }
     const cur = study.items[study.i];
     const answered = cur.chosen !== undefined && cur.chosen !== null;
     $("studyChip").textContent = cur.ref.scope + " · " + cur.ref.theme;
@@ -1155,7 +1233,7 @@
     el.addEventListener("click", () => pickCanton(el.dataset.canton)));
   $("btnChangeCommune").addEventListener("click", () => openSetup(true));
 
-  $("btnExam").addEventListener("click", startExam);
+  $("btnExam").addEventListener("click", () => { if (isCards()) openStudy(); else startExam(); });
   $("btnStudy").addEventListener("click", openStudy);
   $("btnExplore").addEventListener("click", openExplore);
   $("btnQuitExplore").addEventListener("click", () => showScreen("screen-home"));
@@ -1190,7 +1268,8 @@
 
   /* ---------------- Démarrage ---------------- */
   checkBadges();
-  const ready = state.canton === "GE" || (state.canton === "VD" && state.commune && VD_DATA.communes[state.commune]);
+  const ready = state.canton === "GE" || state.canton === "NE" || state.canton === "VS"
+    || (state.canton === "VD" && state.commune && VD_DATA.communes[state.commune]);
   if (ready) { renderHome(); showScreen("screen-home"); }
   else { openSetup(false); }
 })();
