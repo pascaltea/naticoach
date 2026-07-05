@@ -695,6 +695,19 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .cs-pillar-row { display: flex; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 13px; }
 .cs-pillar-row > span { color: var(--muted); flex: 0 0 62px; }
 .cs-pillar-row > b { font-weight: 600; color: var(--ink); }
+.cs-duty .cs-list li::before { background: var(--red); }
+.cs-right .cs-list li::before { background: var(--ok); }
+/* Fiche « Mon canton » */
+.mc-head { border-radius: 16px 16px 0 0; color: var(--on-red); padding: 18px 20px 16px; }
+.mc-head-top { display: flex; align-items: baseline; justify-content: space-between; }
+.mc-name { font-family: var(--font-serif); font-size: 26px; font-weight: 500; }
+.mc-code { font-weight: 800; font-size: 14px; letter-spacing: 1px; opacity: .75; }
+.mc-region { font-size: 11px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; opacity: .85; margin-top: 3px; }
+.mc-head + .cs-card { border-radius: 0 0 16px 16px; border-top: none; margin-top: -1px; }
+.mc-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); }
+.mc-row:first-child { border-top: none; }
+.mc-row > span { color: var(--muted); font-size: 13px; flex: 1; }
+.mc-row > b { font-size: 14px; text-align: right; }
 
 /* ---------- Sélecteur de canton (Vaud / Genève) ---------- */
 .canton-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 6px; }

@@ -1040,6 +1040,92 @@
     showScreen("screen-sante");
   }
 
+  function openDemocratie() {
+    const card = (ico, title, body) =>
+      `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div><p>${body}</p></div>`;
+    $("democratieBody").innerHTML =
+      `<p class="cs-intro">La <b>démocratie directe</b> permet au peuple de décider lui-même, en plus d'élire ses représentant·es. On vote environ <b>4 fois par an</b>.</p>` +
+      card("🗳️", "Les votations", "Aux 3 niveaux (fédéral, cantonal, communal), le peuple se prononce directement sur des objets — pas seulement sur des personnes.") +
+      card("📝", "Initiative populaire", "Proposer une modification de la <b>Constitution</b>. Au niveau fédéral : <b>100 000 signatures</b> en <b>18 mois</b>. Elle est ensuite soumise au vote du peuple.") +
+      card("🛑", "Référendum facultatif", "S'opposer à une <b>loi</b> votée par le Parlement. Il faut <b>50 000 signatures</b> (ou 8 cantons) en <b>100 jours</b> pour la soumettre au vote.") +
+      card("✅", "Référendum obligatoire", "Toute modification de la Constitution (et certaines adhésions internationales) est <b>automatiquement</b> soumise au vote.") +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h">⚖️ La double majorité</div><p>Pour modifier la Constitution, il faut la majorité du <b>peuple</b> <b>ET</b> la majorité des <b>cantons</b>.</p></div>` +
+      `<p class="cs-note">Droits politiques dès <b>18 ans</b> pour les Suisses. Dans quelques cantons (Glaris, Appenzell Rhodes-Intérieures), on vote encore à main levée : la <b>Landsgemeinde</b>.</p>`;
+    showScreen("screen-democratie");
+  }
+
+  function openDroits() {
+    const section = (cls, ico, title, items) =>
+      `<div class="cs-card cs-${cls}">
+         <div class="cs-card-h">${ico} ${title}</div>
+         <ul class="cs-list">${items.map((t) => `<li>${t}</li>`).join("")}</ul>
+       </div>`;
+    $("droitsBody").innerHTML =
+      `<p class="cs-intro">La citoyenneté, c'est un équilibre entre des <b>droits</b> et des <b>devoirs</b>.</p>` +
+      section("duty", "📋", "Mes devoirs", [
+        "Respecter la <b>Constitution</b> et les <b>lois</b>",
+        "Payer ses <b>impôts</b>",
+        "Envoyer ses enfants à l'école (<b>scolarité obligatoire</b>)",
+        "S'assurer (<b>assurance maladie</b> de base obligatoire)",
+        "<b>Service militaire ou civil</b> (hommes suisses) — sinon taxe d'exemption",
+      ]) +
+      section("right", "🗽", "Mes droits", [
+        "<b>Libertés fondamentales</b> : opinion & information, croyance & conscience, réunion & association, langue",
+        "<b>Droits politiques</b> dès 18 ans : voter, élire, être élu·e, signer initiatives & référendums",
+        "<b>Liberté d'établissement</b> : s'installer où l'on veut en Suisse",
+        "<b>Égalité</b> devant la loi ; interdiction de discrimination",
+        "<b>Protection consulaire</b> de la Suisse à l'étranger",
+      ]);
+    showScreen("screen-droits");
+  }
+
+  /* Fiche d'identité du canton de l'utilisateur. */
+  const CANTON_PROFILE = {
+    VD: { capital: "Lausanne", joined: "1803", langs: "Français", communes: "~300", districts: "10", pop: "~815 000", gc: 150, ce: 7, motto: "Liberté et patrie",
+      facts: ["Terrasses de Lavaux inscrites à l'UNESCO", "Lausanne, capitale olympique (siège du CIO)", "Bordé par le lac Léman ; le plus peuplé des cantons romands"] },
+    GE: { capital: "Genève", joined: "1815", langs: "Français", communes: "45", districts: "—", pop: "~510 000", gc: 100, ce: 7, motto: "Post Tenebras Lux — « Après les ténèbres, la lumière »",
+      facts: ["Genève internationale : ONU, CICR, OMS…", "Le jet d'eau et la rade", "L'Escalade (1602) ; ville de Calvin et de la Réforme"] },
+    NE: { capital: "Neuchâtel", joined: "1815 (république dès 1848)", langs: "Français", communes: "~27", districts: "— (abolis en 2018)", pop: "~176 000", gc: 100, ce: 5, motto: "",
+      facts: ["Berceau de l'horlogerie ; urbanisme horloger (La Chaux-de-Fonds / Le Locle) à l'UNESCO", "1er canton à accorder le droit de vote aux étrangers (niveau communal)", "République et Canton de Neuchâtel"] },
+    VS: { capital: "Sion", joined: "1815", langs: "Français et Allemand (canton bilingue)", communes: "~122", districts: "13", pop: "~355 000", gc: 130, ce: 5, motto: "",
+      facts: ["Le Cervin et la Pointe Dufour, plus haut sommet de Suisse", "Canton bilingue français / allemand", "Les 13 étoiles du drapeau = les 13 districts ; vignoble et grands barrages"] },
+  };
+  function openMonCanton() {
+    const cn = cantonOf();
+    const p = CANTON_PROFILE[cn];
+    const nm = CANTON_NAME[cn];
+    const col = (typeof REGION_COLORS !== "undefined") ? REGION_COLORS[cn === "VS" ? "multi" : "fr"] : "#C65D3B";
+    const regLong = cn === "VS" ? "Canton plurilingue" : "Suisse romande";
+    $("monCantonTitle").textContent = CANTON_SCOPE[cn];
+    const row = (label, val) => `<div class="mc-row"><span>${label}</span><b>${val}</b></div>`;
+    $("monCantonBody").innerHTML =
+      `<div class="mc-head" style="background:${col}">
+         <div class="mc-head-top"><span class="mc-name">${nm}</span><span class="mc-code">${cn}</span></div>
+         <div class="mc-region">${regLong}</div>
+       </div>
+       <div class="cs-card">
+         ${row("Chef-lieu", p.capital)}
+         ${row("Entrée dans la Confédération", p.joined)}
+         ${row("Langue(s)", p.langs)}
+         ${row("Communes", p.communes)}
+         ${row("Districts", p.districts)}
+         ${row("Population", p.pop + " hab.")}
+       </div>
+       <div class="cs-card">
+         <div class="cs-card-h">🏛️ Institutions cantonales</div>
+         ${row("Grand Conseil (législatif)", p.gc + " sièges")}
+         ${row("Conseil d'État (exécutif)", p.ce + " membres")}
+         ${row("Législature", "5 ans")}
+       </div>` +
+      (p.motto ? `<div class="cs-card"><div class="cs-card-h">🛡️ Devise</div><p><i>${p.motto}</i></p></div>` : "") +
+      `<div class="cs-card cs-highlight">
+         <div class="cs-card-h">✨ À savoir</div>
+         <ul class="cs-list">${p.facts.map((f) => `<li>${f}</li>`).join("")}</ul>
+       </div>
+       <p class="cs-note">Chiffres indicatifs (population et nombre de communes évoluent avec les fusions).</p>`;
+    showScreen("screen-moncanton");
+  }
+
   /* ======================================================================
    *  QUIZ (entraînement + examen)
    * ==================================================================== */
@@ -1419,6 +1505,12 @@
   $("btnQuitVsmap").addEventListener("click", () => showScreen("screen-home"));
   $("btnPolitique").addEventListener("click", openPolitique);
   $("btnQuitPolitique").addEventListener("click", () => showScreen("screen-home"));
+  $("btnDemocratie").addEventListener("click", openDemocratie);
+  $("btnQuitDemocratie").addEventListener("click", () => showScreen("screen-home"));
+  $("btnDroits").addEventListener("click", openDroits);
+  $("btnQuitDroits").addEventListener("click", () => showScreen("screen-home"));
+  $("btnMonCanton").addEventListener("click", openMonCanton);
+  $("btnQuitMonCanton").addEventListener("click", () => showScreen("screen-home"));
   $("btnPiliers").addEventListener("click", openPiliers);
   $("btnQuitPiliers").addEventListener("click", () => showScreen("screen-home"));
   $("btnSante").addEventListener("click", openSante);

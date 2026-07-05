@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=52" />
+  <link rel="stylesheet" href="styles.css?v=53" />
 </head>
 <body>
   <div id="app">
@@ -135,11 +135,14 @@
         <button class="mode-tile" id="btnExplore"><span class="mode-ico">🗺️</span><b>Explorer la Suisse</b><small>26 cantons</small></button>
         <button class="mode-tile" id="btnTimeline"><span class="mode-ico">🕰️</span><b>Frise chrono</b><small>CH · VD</small></button>
         <button class="mode-tile" id="btnVsMap" hidden><span class="mode-ico">📍</span><b id="districtTileTitle">Districts</b><small id="districtTileSub">du canton</small></button>
+        <button class="mode-tile" id="btnMonCanton"><span class="mode-ico">📌</span><b id="monCantonTile">Mon canton</b><small>fiche d'identité</small></button>
       </div>
 
       <div class="mode-group-label">Comprendre la Suisse</div>
       <div class="mode-grid">
         <button class="mode-tile" id="btnPolitique"><span class="mode-ico">🏛️</span><b>Système politique</b><small>qui fait quoi, qui élit qui</small></button>
+        <button class="mode-tile" id="btnDemocratie"><span class="mode-ico">🗳️</span><b>Démocratie directe</b><small>initiatives & référendums</small></button>
+        <button class="mode-tile" id="btnDroits"><span class="mode-ico">⚖️</span><b>Droits & devoirs</b><small>du citoyen</small></button>
         <button class="mode-tile" id="btnPiliers"><span class="mode-ico">🏦</span><b>Les 3 piliers</b><small>prévoyance / retraite</small></button>
         <button class="mode-tile" id="btnSante"><span class="mode-ico">🏥</span><b>Système de santé</b><small>assurance maladie</small></button>
       </div>
@@ -346,6 +349,36 @@
       <div id="santeBody"></div>
     </section>
 
+    <!-- ============ ÉCRAN : DÉMOCRATIE DIRECTE ============ -->
+    <section class="screen" id="screen-democratie">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitDemocratie" aria-label="Retour">←</button>
+        <h2 class="explore-title">La démocratie directe</h2>
+        <span></span>
+      </div>
+      <div id="democratieBody"></div>
+    </section>
+
+    <!-- ============ ÉCRAN : DROITS & DEVOIRS ============ -->
+    <section class="screen" id="screen-droits">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitDroits" aria-label="Retour">←</button>
+        <h2 class="explore-title">Droits &amp; devoirs</h2>
+        <span></span>
+      </div>
+      <div id="droitsBody"></div>
+    </section>
+
+    <!-- ============ ÉCRAN : MON CANTON ============ -->
+    <section class="screen" id="screen-moncanton">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitMonCanton" aria-label="Retour">←</button>
+        <h2 class="explore-title" id="monCantonTitle">Mon canton</h2>
+        <span></span>
+      </div>
+      <div id="monCantonBody"></div>
+    </section>
+
     <!-- ============ ÉCRAN : CORRECTION ============ -->
     <section class="screen" id="screen-review">
       <div class="quiz-top">
@@ -375,6 +408,6 @@
   <script src="ge_official.js"></script>
   <script src="ne_official.js"></script>
   <script src="vs_official.js"></script>
-  <script src="app.js?v=52"></script>
+  <script src="app.js?v=53"></script>
 </body>
 </html>
