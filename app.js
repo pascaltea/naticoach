@@ -360,11 +360,13 @@
       const n = cardsData().questions.length;
       $("examTitle").textContent = "S'entraîner";
       $("examSub").textContent = `${n} questions officielles · QCM & fiches`;
+      $("examZoneSub").textContent = "Le questionnaire officiel — c'est uniquement là-dessus que tu es évalué·e.";
       $("homeFooter").textContent = `Questions officielles Suisse & Canton de ${CANTON_NAME[cn]} · hors-ligne`;
       return;
     }
 
     const cfg = EXAM_CFG[cn];
+    $("examZoneSub").textContent = "Le questionnaire officiel et ton suivi — c'est uniquement là-dessus que tu es évalué·e.";
     $("examTitle").textContent = "Simuler l'examen";
     $("examSub").textContent = cn === "GE"
       ? `${cfg.total} questions · max 5 fautes`

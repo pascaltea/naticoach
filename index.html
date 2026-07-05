@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=58" />
+  <link rel="stylesheet" href="styles.css?v=60" />
 </head>
 <body>
   <div id="app">
@@ -87,6 +87,11 @@
         </div>
       </header>
 
+      <div class="zone-head">
+        <h2 class="zone-title">🎯 Pour l'examen</h2>
+        <p class="zone-sub" id="examZoneSub">Le questionnaire officiel et ton suivi — c'est uniquement là-dessus que tu es évalué·e.</p>
+      </div>
+
       <button class="exam-cta" id="btnExam">
         <span class="exam-cta-txt">
           <b id="examTitle">Simuler l'examen</b>
@@ -130,6 +135,19 @@
         </div>
       </div>
 
+      <div id="grpSuivre">
+        <div class="mode-group-label">Suivre</div>
+        <div class="mode-grid">
+          <button class="mode-tile" id="btnStats"><span class="mode-ico">📊</span><b>Statistiques</b><small>par thème</small></button>
+          <button class="mode-tile" id="btnBadges"><span class="mode-ico">🏆</span><b>Succès</b><small><span id="badgeCount">0</span> badge(s)</small></button>
+        </div>
+      </div>
+
+      <div class="zone-head zone-bonus">
+        <h2 class="zone-title">✨ Pour aller plus loin</h2>
+        <p class="zone-sub">Pour approfondir ta culture suisse. Utile mais non requis : tout ce qui est évalué est dans le questionnaire officiel.</p>
+      </div>
+
       <div class="mode-group-label">Découvrir</div>
       <div class="mode-grid">
         <button class="mode-tile" id="btnExplore"><span class="mode-ico">🗺️</span><b>Explorer la Suisse</b><small>26 cantons</small></button>
@@ -154,14 +172,6 @@
         <button class="mode-tile" id="btnNaturalisation"><span class="mode-ico">📖</span><b>La naturalisation</b><small>conditions & étapes</small></button>
         <button class="mode-tile" id="btnPiliers"><span class="mode-ico">🏦</span><b>Les 3 piliers</b><small>prévoyance / retraite</small></button>
         <button class="mode-tile" id="btnSante"><span class="mode-ico">🏥</span><b>Système de santé</b><small>assurance maladie</small></button>
-      </div>
-
-      <div id="grpSuivre">
-        <div class="mode-group-label">Suivre</div>
-        <div class="mode-grid">
-          <button class="mode-tile" id="btnStats"><span class="mode-ico">📊</span><b>Statistiques</b><small>par thème</small></button>
-          <button class="mode-tile" id="btnBadges"><span class="mode-ico">🏆</span><b>Succès</b><small><span id="badgeCount">0</span> badge(s)</small></button>
-        </div>
       </div>
 
       <p class="footer-note"><img class="footer-flower" src="logo-edelweiss-red.svg" alt="" width="14" height="14" /> <span id="homeFooter">Questions officielles du Canton de Vaud · hors-ligne</span></p>
@@ -468,6 +478,6 @@
   <script src="ge_official.js"></script>
   <script src="ne_official.js?v=56"></script>
   <script src="vs_official.js?v=56"></script>
-  <script src="app.js?v=58"></script>
+  <script src="app.js?v=60"></script>
 </body>
 </html>
