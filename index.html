@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=57" />
+  <link rel="stylesheet" href="styles.css?v=58" />
 </head>
 <body>
   <div id="app">
@@ -319,10 +319,11 @@
         <h2 class="explore-title" id="vsMapTitle">Districts</h2>
         <span></span>
       </div>
-      <p class="muted tiny explore-sub">Touche un district pour le repérer.</p>
+      <p class="muted tiny explore-sub">Touche un district pour voir ses infos.</p>
       <div class="vsmap-frame">
         <svg class="vsmap-svg" id="vsMapSvg" role="img" aria-label="Carte des 13 districts du Valais"></svg>
       </div>
+      <div class="vsd-info" id="vsdInfo" hidden></div>
       <div class="map-legend" id="vsMapLegend"></div>
       <div class="vsd-list" id="vsdList"></div>
       <p class="footer-note" style="margin-top:14px" id="vsMapNote"></p>
@@ -467,6 +468,6 @@
   <script src="ge_official.js"></script>
   <script src="ne_official.js?v=56"></script>
   <script src="vs_official.js?v=56"></script>
-  <script src="app.js?v=57"></script>
+  <script src="app.js?v=58"></script>
 </body>
 </html>

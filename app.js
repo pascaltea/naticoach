@@ -949,6 +949,50 @@
   };
   function districtMap() { return (typeof DISTRICTS_MAPS !== "undefined") ? DISTRICTS_MAPS[cantonOf()] : null; }
 
+  /* Fiche par district : chef-lieu + repère. Pour le Valais, la langue est déduite
+     de la région (Haut-Valais = allemand, Valais central & Bas-Valais = français). */
+  const DISTRICT_INFO = {
+    // Vaud
+    2221: { chef: "Aigle", note: "Chablais vaudois, vignobles ; Villars, Leysin, Bex." },
+    2222: { chef: "Payerne", note: "Broye ; abbatiale de Payerne, Avenches la romaine, lac de Morat." },
+    2223: { chef: "Échallens", note: "Le « grenier à blé » du canton, cœur agricole." },
+    2224: { chef: "Yverdon-les-Bains", note: "Nord vaudois ; Yverdon (thermes), Sainte-Croix, Vallorbe, Grandson." },
+    2225: { chef: "Lausanne", note: "Capitale du canton ; siège du CIO, cathédrale gothique." },
+    2226: { chef: "Bourg-en-Lavaux", note: "Terrasses viticoles de Lavaux (UNESCO), région d'Oron." },
+    2227: { chef: "Morges", note: "La Côte lémanique, vignobles, château de Morges." },
+    2228: { chef: "Nyon", note: "La Côte ; Nyon la romaine, Coppet, Rolle." },
+    2229: { chef: "Renens", note: "Agglomération lausannoise ; EPFL et UNIL à Ecublens." },
+    2230: { chef: "Vevey", note: "Riviera ; Montreux (jazz), Vevey (Nestlé, Chaplin), Château-d'Œx." },
+    // Valais
+    2301: { chef: "Brigue", note: "Château Stockalper, col et tunnel du Simplon." },
+    2302: { chef: "Conthey", note: "Coteaux et vignobles au-dessus de la plaine du Rhône." },
+    2303: { chef: "Sembrancher", note: "Verbier, val de Bagnes, col du Grand-Saint-Bernard." },
+    2304: { chef: "Münster", note: "Haute vallée du Rhône ; proche du glacier d'Aletsch (UNESCO)." },
+    2305: { chef: "Vex", note: "Val d'Hérens, Évolène ; célèbre pour les combats de reines." },
+    2306: { chef: "Loèche", note: "Loèche-les-Bains, plus grande station thermale des Alpes." },
+    2307: { chef: "Martigny", note: "Coude du Rhône ; amphithéâtre romain, Fondation Gianadda." },
+    2308: { chef: "Monthey", note: "Val d'Illiez, Champéry, domaine des Portes du Soleil." },
+    2309: { chef: "Rarogne", note: "Église dans le rocher ; tombe du poète Rilke." },
+    2310: { chef: "Saint-Maurice", note: "Abbaye fondée en 515, la plus ancienne d'Occident encore active." },
+    2311: { chef: "Sierre", note: "Crans-Montana, val d'Anniviers ; ville la plus ensoleillée." },
+    2312: { chef: "Sion", note: "Capitale du canton ; châteaux de Valère et Tourbillon." },
+    2313: { chef: "Viège", note: "Vallées de Zermatt (Cervin) et de Saas-Fee." },
+  };
+  const VS_LANG = { haut: "Allemand (Haut-Valais)", cen: "Français (Valais central)", bas: "Français (Bas-Valais)" };
+
+  function showDistrictInfo(d) {
+    const box = $("vsdInfo");
+    if (!box) return;
+    const info = DISTRICT_INFO[d.id];
+    const rows = [];
+    if (info && info.chef) rows.push(`<div class="vsd-row"><span>🏛️ Chef-lieu</span><b>${info.chef}</b></div>`);
+    if (cantonOf() === "VS" && d.region) rows.push(`<div class="vsd-row"><span>🗣️ Langue</span><b>${VS_LANG[d.region] || ""}</b></div>`);
+    box.innerHTML = `<div class="vsd-info-h"><span class="vsd-dot" style="background:${d.color}"></span>${d.name}</div>` +
+      rows.join("") + (info && info.note ? `<p class="vsd-note">${info.note}</p>` : "");
+    box.hidden = false;
+  }
+  function hideDistrictInfo() { const box = $("vsdInfo"); if (box) box.hidden = true; }
+
   function openDistricts() {
     const m = districtMap();
     if (!m) return;
@@ -958,26 +1002,36 @@
       ? "Les <b>13 étoiles</b> du drapeau valaisan représentent ces <b>13 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes)."
       : "Le canton de Vaud compte <b>10 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes).";
 
+    hideDistrictInfo();
+
     // (Re)construire la carte si le canton a changé.
     if (svg.dataset.canton !== cantonOf()) {
       svg.setAttribute("viewBox", m.viewBox);
       svg.innerHTML =
         m.districts.map((d) => `<path class="vsd-path" data-id="${d.id}" d="${d.d}" fill="${d.color}" fill-rule="evenodd"/>`).join("") +
         m.districts.map((d) => `<text class="vsd-label" data-id="${d.id}" x="${d.cx}" y="${d.cy}" text-anchor="middle">${d.name}</text>`).join("");
-      svg.querySelectorAll(".vsd-path").forEach((p) => p.addEventListener("click", () => {
-        const on = !p.classList.contains("sel");
-        svg.querySelectorAll(".vsd-path").forEach((x) => x.classList.remove("sel"));
-        document.querySelectorAll(".vsd-chip").forEach((x) => x.classList.remove("on"));
-        if (on) {
-          p.classList.add("sel"); svg.appendChild(p);
-          const lbl = svg.querySelector(`.vsd-label[data-id="${p.dataset.id}"]`);
-          if (lbl) svg.appendChild(lbl);
-          const chip = document.querySelector(`.vsd-chip[data-id="${p.dataset.id}"]`);
-          if (chip) chip.classList.add("on");
-        }
-      }));
       svg.dataset.canton = cantonOf();
     }
+
+    // Sélection partagée entre la carte et les puces de la liste.
+    function selectDistrict(id) {
+      const p = svg.querySelector(`.vsd-path[data-id="${id}"]`);
+      const on = p && !p.classList.contains("sel");
+      svg.querySelectorAll(".vsd-path").forEach((x) => x.classList.remove("sel"));
+      document.querySelectorAll(".vsd-chip").forEach((x) => x.classList.remove("on"));
+      if (on) {
+        p.classList.add("sel"); svg.appendChild(p);
+        const lbl = svg.querySelector(`.vsd-label[data-id="${id}"]`);
+        if (lbl) svg.appendChild(lbl);
+        const chip = document.querySelector(`.vsd-chip[data-id="${id}"]`);
+        if (chip) chip.classList.add("on");
+        const d = m.districts.find((x) => String(x.id) === String(id));
+        if (d) showDistrictInfo(d);
+      } else {
+        hideDistrictInfo();
+      }
+    }
+    svg.querySelectorAll(".vsd-path").forEach((p) => { p.onclick = () => selectDistrict(p.dataset.id); });
 
     // Légende (par région) + liste.
     if (m.hasRegions) {
@@ -998,6 +1052,7 @@
         m.districts.map((d) => `<span class="vsd-chip" data-id="${d.id}"><span class="vsd-dot" style="background:${d.color};display:inline-block;vertical-align:-1px;margin-right:6px"></span>${d.name}</span>`).join("") +
         `</div></div>`;
     }
+    document.querySelectorAll(".vsd-chip").forEach((c) => { c.onclick = () => selectDistrict(c.dataset.id); c.style.cursor = "pointer"; });
     showScreen("screen-vsmap");
   }
 
