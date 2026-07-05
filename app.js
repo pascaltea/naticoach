@@ -218,7 +218,7 @@
   function cardsDeck() {
     const src = cardsData().questions;
     const cLabel = CANTON_SCOPE[cantonOf()];
-    const mk = (q) => ({ q: q.q, a: q.a, theme: q.theme, scope: q.level === "Suisse" ? "Suisse" : cLabel });
+    const mk = (q) => ({ q: q.q, a: q.a, options: q.options, answer: q.answer, type: q.type || "card", theme: q.theme, scope: q.level === "Suisse" ? "Suisse" : cLabel });
     return {
       federal: src.filter((q) => q.level === "Suisse").map(mk),
       cantonal: src.filter((q) => q.level !== "Suisse").map(mk),
@@ -358,8 +358,8 @@
 
     if (cards) {
       const n = cardsData().questions.length;
-      $("examTitle").textContent = "Réviser les fiches";
-      $("examSub").textContent = `${n} questions officielles · réponse à l'appui`;
+      $("examTitle").textContent = "S'entraîner";
+      $("examSub").textContent = `${n} questions officielles · QCM & fiches`;
       $("homeFooter").textContent = `Questions officielles Suisse & Canton de ${CANTON_NAME[cn]} · hors-ligne`;
       return;
     }
@@ -473,7 +473,7 @@
       const d = cardsDeck();
       const src = scope === "all" ? d.federal.concat(d.cantonal) : (d[scope] || []);
       study = { scope, items: src.map((c) => Object.assign({}, c)), i: 0, cards: true };
-      $("studyScopeLabel").textContent = "Fiches · " + (sc ? sc.label : "Tout");
+      $("studyScopeLabel").textContent = "Révision · " + (sc ? sc.label : "Tout");
       renderStudy(); return;
     }
     const d = currentDeck();
@@ -497,18 +497,51 @@
     return { text: q, choices: null };
   }
 
-  /* Rendu d'une fiche (Neuchâtel / Valais) : question → réponse officielle révélée. */
+  /* Rendu d'un item NE/VS : QCM (choix + feedback) ou fiche (question → réponse). */
   function renderStudyCard() {
     const cur = study.items[study.i];
-    const parsed = splitChoices(cur.q);
     $("studyChip").textContent = cur.scope + " · " + cur.theme;
     $("studyCount").textContent = (study.i + 1) + "/" + study.items.length;
-    $("studyQuestion").textContent = parsed.text;
     $("studyProgressFill").style.width = ((study.i + 1) / study.items.length) * 100 + "%";
+    $("studyIllus").innerHTML = "";
     const box = $("studyOptions"); box.innerHTML = "";
+    $("btnPrev").disabled = study.i === 0;
+    $("btnNextStudy").textContent = study.i + 1 < study.items.length ? "Suivant ›" : "Terminé ✓";
+
+    if (cur.type === "mcq") {
+      $("studyQuestion").textContent = cur.q;
+      const answered = cur.chosen !== undefined && cur.chosen !== null;
+      cur.options.forEach((opt, i) => {
+        if (!answered) {
+          const b = document.createElement("button");
+          b.className = "option";
+          b.innerHTML = `<span class="mark">${LETTERS[i] || ""}</span><span>${esc(opt)}</span>`;
+          b.addEventListener("click", () => { cur.chosen = i; renderStudy(); });
+          box.appendChild(b);
+        } else {
+          const ok = i === cur.answer, wrong = i === cur.chosen && !ok;
+          const el = document.createElement("div");
+          el.className = "option " + (ok ? "correct" : (wrong ? "wrong" : "dim"));
+          el.innerHTML = `<span class="mark">${ok ? "✓" : (wrong ? "✕" : (LETTERS[i] || ""))}</span><span>${esc(opt)}</span>`;
+          box.appendChild(el);
+        }
+      });
+      $("studyExplain").hidden = !answered;
+      if (answered) {
+        const good = cur.chosen === cur.answer;
+        const head = $("studyExplainHead");
+        head.textContent = good ? "Bien vu !" : "Réponse officielle";
+        head.className = "explain-head savais-head " + (good ? "ok" : "bad");
+        $("studyExplainText").textContent = cur.options[cur.answer];
+      }
+      return;
+    }
+
+    // Fiche (question ouverte)
+    const parsed = splitChoices(cur.q);
+    $("studyQuestion").textContent = parsed.text;
     if (parsed.choices) {
-      const ul = document.createElement("ul");
-      ul.className = "card-choices";
+      const ul = document.createElement("ul"); ul.className = "card-choices";
       parsed.choices.forEach((ch) => { const li = document.createElement("li"); li.textContent = ch; ul.appendChild(li); });
       box.appendChild(ul);
     }
@@ -525,10 +558,7 @@
       head.textContent = "Réponse officielle";
       head.className = "explain-head savais-head";
       $("studyExplainText").textContent = cur.a;
-      $("studyIllus").innerHTML = "";
     }
-    $("btnPrev").disabled = study.i === 0;
-    $("btnNextStudy").textContent = study.i + 1 < study.items.length ? "Suivant ›" : "Terminé ✓";
   }
 
   function renderStudy() {
