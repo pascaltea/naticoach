@@ -686,13 +686,13 @@
   /* ======================================================================
    *  EXPLORER LA SUISSE (carte interactive des cantons)
    * ==================================================================== */
-  const EXPLORE_INTRO =
-    `<p class="cd-intro"><b>26 cantons</b>, 4 langues nationales, ~9 millions d'habitants.<br>` +
-    `Touche un canton sur la carte pour l'explorer.</p>`;
+  const exploreIntro = () =>
+    `<p class="cd-intro">${t("explore.intro", "<b>26 cantons</b>, 4 langues nationales, ~9 millions d'habitants.<br>Touche un canton sur la carte pour l'explorer.")}</p>`;
 
   const REGION_OF = {};
   CANTONS.forEach((c) => { REGION_OF[c.code] = c.region; });
   const REGION_LONG = { de: "Suisse alémanique", fr: "Suisse romande", it: "Suisse italienne", multi: "Canton plurilingue" };
+  const REGION_LONG_EN = { de: "German-speaking Switzerland", fr: "French-speaking Switzerland", it: "Italian-speaking Switzerland", multi: "Multilingual canton" };
 
   function openExplore() {
     const svg = $("cantonMap");
@@ -709,7 +709,7 @@
         g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
       });
       $("mapLegend").innerHTML = Object.keys(REGION_LABEL).map((k) =>
-        `<span class="legend-item" data-region="${k}"><span class="legend-dash" style="background:${REGION_COLORS[k]}"></span>${REGION_LABEL[k]}</span>`).join("");
+        `<span class="legend-item" data-region="${k}"><span class="legend-dash" style="background:${REGION_COLORS[k]}"></span>${(state.lang === "en" && typeof REGION_LABEL_EN !== "undefined" ? REGION_LABEL_EN : REGION_LABEL)[k]}</span>`).join("");
       setupMap();
       svg.dataset.filled = "1";
     }
@@ -782,25 +782,26 @@
       el.classList.toggle("on", !!(c && el.dataset.region === c.region)));
     if (!c) {
       box.classList.remove("as-card");
-      box.innerHTML = EXPLORE_INTRO;
+      box.innerHTML = exploreIntro();
       return;
     }
     const col = REGION_COLORS[c.region];
+    const en = state.lang === "en";
     const cta = (c.code === "VD" && cantonOf() === "VD")
-      ? `<div class="cid-cta-wrap"><button class="cid-cta" id="cantonQuizBtn" style="border-color:${col};color:${col}">5 questions sur le canton de Vaud →</button></div>`
+      ? `<div class="cid-cta-wrap"><button class="cid-cta" id="cantonQuizBtn" style="border-color:${col};color:${col}">${t("explore.cantonQuiz", "5 questions sur le canton de Vaud →")}</button></div>`
       : "";
     box.classList.add("as-card");
     box.innerHTML =
       `<div class="cid-head" style="background:${col}">
-         <div class="cid-head-top"><span class="cid-name">${c.name}</span><span class="cid-code">${c.code}</span></div>
-         <div class="cid-region">${REGION_LONG[c.region]}</div>
+         <div class="cid-head-top"><span class="cid-name">${en && c.nameEn ? c.nameEn : c.name}</span><span class="cid-code">${c.code}</span></div>
+         <div class="cid-region">${(en ? REGION_LONG_EN : REGION_LONG)[c.region]}</div>
        </div>
        <div class="cid-cols">
-         <div><div class="cid-val">${c.capital}</div><div class="cid-lab">Chef-lieu</div></div>
-         <div><div class="cid-val">${c.year}</div><div class="cid-lab">Confédération</div></div>
-         <div><div class="cid-val">${c.langs}</div><div class="cid-lab">Langue</div></div>
+         <div><div class="cid-val">${c.capital}</div><div class="cid-lab">${t("explore.capital", "Chef-lieu")}</div></div>
+         <div><div class="cid-val">${c.year}</div><div class="cid-lab">${t("explore.confed", "Confédération")}</div></div>
+         <div><div class="cid-val">${en && c.langsEn ? c.langsEn : c.langs}</div><div class="cid-lab">${t("explore.language", "Langue")}</div></div>
        </div>
-       <div class="cid-quote"><span class="cid-q" style="color:${col}">«</span><p>${c.fact}</p></div>
+       <div class="cid-quote"><span class="cid-q" style="color:${col}">«</span><p>${en && c.factEn ? c.factEn : c.fact}</p></div>
        ${cta}`;
     const qb = $("cantonQuizBtn");
     if (qb) qb.addEventListener("click", startCantonQuiz);

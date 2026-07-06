@@ -182,6 +182,9 @@ window.I18N = {
     "review.toReview": " to review", "review.total": " in total",
     "review.noErrors": "No mistakes — perfect! 🎉", "review.noAnswer": "Not answered (time up)",
     "explore.sub": "Tap a canton to discover its information.",
+    "explore.intro": "<b>26 cantons</b>, 4 national languages, ~9 million inhabitants.<br>Tap a canton on the map to explore it.",
+    "explore.cantonQuiz": "5 questions on the canton of Vaud →",
+    "explore.capital": "Capital", "explore.confed": "Joined", "explore.language": "Language",
     "vsmap.sub": "Tap a district to see its info.",
 
     /* ---------- Le fédéralisme ---------- */
