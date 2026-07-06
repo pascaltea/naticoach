@@ -16,8 +16,8 @@
 
   /* Configuration d'examen par canton (QCM : Vaud / Genève). */
   const EXAM_CFG = {
-    VD: { total: 48, passCorrect: 34, minutes: 60, passLabel: "70 % de bonnes réponses" },
-    GE: { total: 45, passCorrect: 40, minutes: 45, passLabel: "40 bonnes réponses sur 45 (5 fautes maximum)" },
+    VD: { total: 48, passCorrect: 34, minutes: 60, passLabel: "70 % de bonnes réponses", passLabelEn: "70% correct answers" },
+    GE: { total: 45, passCorrect: 40, minutes: 45, passLabel: "40 bonnes réponses sur 45 (5 fautes maximum)", passLabelEn: "40 correct answers out of 45 (5 mistakes max)" },
   };
   const cantonOf = () => (["VD", "GE", "NE", "VS"].indexOf(state.canton) >= 0 ? state.canton : "VD");
   /* Format d'un canton : "mcq" (QCM Vaud/Genève) ou "cards" (fiches Q→R : Neuchâtel/Valais). */
@@ -30,6 +30,16 @@
   const cnName = (cn) => (state.lang === "en" ? CANTON_NAME_EN : CANTON_NAME)[cn || cantonOf()];
   const cScope = (cn) => (state.lang === "en" ? CANTON_SCOPE_EN : CANTON_SCOPE)[cn || cantonOf()];
   const fmt = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => (o[k] != null ? o[k] : ""));
+  const THEME_EN = { "Géographie": "Geography", "Histoire": "History", "Politique": "Politics", "Social": "Society" };
+  const trTheme = (th) => (state.lang === "en" ? (THEME_EN[th] || th) : th);
+  function trScope(s) {
+    if (state.lang !== "en" || !s) return s;
+    if (s === "Suisse") return "Switzerland";
+    const m = { "Canton de Vaud": "Canton of Vaud", "Canton de Genève": "Canton of Geneva", "Canton de Neuchâtel": "Canton of Neuchâtel", "Canton du Valais": "Canton of Valais" };
+    if (m[s]) return m[s];
+    if (s.indexOf("Commune de ") === 0) return "Municipality of " + s.slice(11);
+    return s;
+  }
   function cardsData() {
     if (state.canton === "NE" && typeof NE_DATA !== "undefined") return NE_DATA;
     if (state.canton === "VS" && typeof VS_DATA !== "undefined") return VS_DATA;
@@ -185,7 +195,7 @@
     if (state.badges[id]) return;
     state.badges[id] = true; save();
     const a = ACHIEVEMENTS.find((x) => x.id === id);
-    if (a) toast(a.ico, `Succès débloqué : <b>${a.title}</b>`);
+    if (a) toast(a.ico, fmt(t("badges.toast", "Succès débloqué : <b>{x}</b>"), { x: t("badge." + a.id + ".title", a.title) }));
   }
   function checkBadges() {
     if (state.sessions >= 1) unlock("first");
@@ -466,23 +476,23 @@
   let study = null; // { scope, items, i, interactive }
   function studyScopes() {
     const c = cantonOf();
+    const all = { key: "all", label: t("scope.all", "Tout"), long: t("scope.allLong", "Toutes les questions") };
+    const fed = { key: "federal", label: t("misc.swiss", "Suisse"), long: t("scope.fedLong", "Suisse (fédéral)") };
     if (c === "GE" || c === "NE" || c === "VS") return [
-      { key: "all", label: "Tout", long: "Toutes les questions" },
-      { key: "federal", label: "Suisse", long: "Suisse (fédéral)" },
-      { key: "cantonal", label: CANTON_NAME[c], long: CANTON_SCOPE[c] },
+      all, fed,
+      { key: "cantonal", label: cnName(c), long: cScope(c) },
     ];
     return [
-      { key: "all", label: "Tout", long: "Toutes les questions" },
-      { key: "federal", label: "Suisse", long: "Suisse (fédéral)" },
-      { key: "cantonal", label: "Vaud", long: "Canton de Vaud" },
-      { key: "commune", label: "Commune", long: "Ma commune" },
+      all, fed,
+      { key: "cantonal", label: cnName("VD"), long: cScope("VD") },
+      { key: "commune", label: t("scope.commune", "Commune"), long: t("scope.communeLong", "Ma commune") },
     ];
   }
 
   // Ordre d'affichage : Découverte puis Quiz. Quiz reste le mode par défaut.
   const STUDY_MODES = [
-    { key: "reveal", label: "Découverte" },
-    { key: "quiz", label: "Quiz" },
+    { key: "reveal", i18n: "study.discovery", fr: "Découverte" },
+    { key: "quiz", i18n: "study.quiz", fr: "Quiz" },
   ];
 
   function openStudy() {
@@ -498,7 +508,7 @@
     const cur = (study && study.interactive) ? "quiz" : "reveal";
     const seg = $("studyMode");
     seg.innerHTML = STUDY_MODES.map((m) =>
-      `<button data-m="${m.key}" class="${m.key === cur ? "active" : ""}">${m.label}</button>`).join("");
+      `<button data-m="${m.key}" class="${m.key === cur ? "active" : ""}">${t(m.i18n, m.fr)}</button>`).join("");
     seg.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
       const wantQuiz = b.dataset.m === "quiz";
       if (study) study.interactive = wantQuiz;
@@ -528,14 +538,14 @@
       const d = cardsDeck();
       const src = scope === "all" ? d.federal.concat(d.cantonal) : (d[scope] || []);
       study = { scope, items: src.map((c) => Object.assign({}, c)), i: 0, cards: true };
-      $("studyScopeLabel").textContent = "Révision · " + (sc ? sc.label : "Tout");
+      $("studyScopeLabel").textContent = t("study.label", "Révision") + " · " + (sc ? sc.label : t("scope.all", "Tout"));
       renderStudy(); return;
     }
     const d = currentDeck();
     const src = scope === "all" ? d.federal.concat(d.cantonal, d.commune) : (d[scope] || []);
     const interactive = study ? study.interactive : true;
     study = { scope, items: src.map(buildQuestion), i: 0, interactive };
-    $("studyScopeLabel").textContent = "Révision · " + (sc ? sc.label : "Tout");
+    $("studyScopeLabel").textContent = t("study.label", "Révision") + " · " + (sc ? sc.label : t("scope.all", "Tout"));
     renderStudy();
   }
 
@@ -555,13 +565,13 @@
   /* Rendu d'un item NE/VS : QCM (choix + feedback) ou fiche (question → réponse). */
   function renderStudyCard() {
     const cur = study.items[study.i];
-    $("studyChip").textContent = cur.scope + " · " + cur.theme;
+    $("studyChip").textContent = trScope(cur.scope) + " · " + trTheme(cur.theme);
     $("studyCount").textContent = (study.i + 1) + "/" + study.items.length;
     $("studyProgressFill").style.width = ((study.i + 1) / study.items.length) * 100 + "%";
     $("studyIllus").innerHTML = "";
     const box = $("studyOptions"); box.innerHTML = "";
     $("btnPrev").disabled = study.i === 0;
-    $("btnNextStudy").textContent = study.i + 1 < study.items.length ? "Suivant ›" : "Terminé ✓";
+    $("btnNextStudy").textContent = study.i + 1 < study.items.length ? t("study.next", "Suivant ›") : t("study.done", "Terminé ✓");
 
     if (cur.type === "mcq") {
       $("studyQuestion").textContent = cur.q;
@@ -585,7 +595,7 @@
       if (answered) {
         const good = cur.chosen === cur.answer;
         const head = $("studyExplainHead");
-        head.textContent = good ? "Bien vu !" : "Réponse officielle";
+        head.textContent = good ? t("study.wellSeen", "Bien vu !") : t("study.officialAnswer", "Réponse officielle");
         head.className = "explain-head savais-head " + (good ? "ok" : "bad");
         $("studyExplainText").textContent = cur.options[cur.answer];
       }
@@ -603,14 +613,14 @@
     if (!cur.revealed) {
       const b = document.createElement("button");
       b.className = "btn btn-outline reveal-btn";
-      b.textContent = "Voir la réponse officielle";
+      b.textContent = t("study.reveal", "Voir la réponse officielle");
       b.addEventListener("click", () => { cur.revealed = true; renderStudy(); });
       box.appendChild(b);
     }
     $("studyExplain").hidden = !cur.revealed;
     if (cur.revealed) {
       const head = $("studyExplainHead");
-      head.textContent = "Réponse officielle";
+      head.textContent = t("study.officialAnswer", "Réponse officielle");
       head.className = "explain-head savais-head";
       $("studyExplainText").textContent = cur.a;
     }
@@ -620,7 +630,7 @@
     if (study.cards) { renderStudyCard(); return; }
     const cur = study.items[study.i];
     const answered = cur.chosen !== undefined && cur.chosen !== null;
-    $("studyChip").textContent = cur.ref.scope + " · " + cur.ref.theme;
+    $("studyChip").textContent = trScope(cur.ref.scope) + " · " + trTheme(cur.ref.theme);
     $("studyCount").textContent = (study.i + 1) + "/" + study.items.length;
     $("studyQuestion").textContent = cur.ref.q;
     $("studyProgressFill").style.width = ((study.i + 1) / study.items.length) * 100 + "%";
@@ -649,22 +659,22 @@
       const head = $("studyExplainHead");
       if (study.interactive) {
         const good = cur.chosen === cur.answer;
-        head.textContent = good ? "Bien vu !" : "À retenir";
+        head.textContent = good ? t("study.wellSeen", "Bien vu !") : t("study.remember", "À retenir");
         head.className = "explain-head savais-head " + (good ? "ok" : "bad");
       } else {
-        head.textContent = "Le savais-tu ?";
+        head.textContent = t("study.savais", "Le savais-tu ?");
         head.className = "explain-head savais-head";
       }
       const exp = (cur.ref.explanation && cur.ref.explanation.trim())
         ? cur.ref.explanation
-        : "Réponse correcte : " + cur.options[cur.answer];
+        : t("study.correctAnswer", "Réponse correcte : ") + cur.options[cur.answer];
       $("studyExplainText").textContent = exp;
       const ik = cur.ref.illustration;
       $("studyIllus").innerHTML = (ik && typeof ILLUSTRATIONS !== "undefined" && ILLUSTRATIONS[ik]) ? ILLUSTRATIONS[ik] : "";
     }
 
     $("btnPrev").disabled = study.i === 0;
-    $("btnNextStudy").textContent = study.i + 1 < study.items.length ? "Suivant ›" : "Terminé ✓";
+    $("btnNextStudy").textContent = study.i + 1 < study.items.length ? t("study.next", "Suivant ›") : t("study.done", "Terminé ✓");
   }
 
   function studyNext() {
@@ -810,12 +820,16 @@
    * ==================================================================== */
   const STAT_THEMES = ["Géographie", "Histoire", "Politique", "Social"];
   const statLevels = () => (cantonOf() === "GE" ? ["Suisse", "Genève"] : ["Suisse", "Vaud", "Commune"]);
-  const levelLabel = (l) => ({ Suisse: "Suisse", Vaud: "Canton de Vaud", "Genève": "Canton de Genève", Commune: "Ma commune" }[l] || l);
+  const levelLabel = (l) => {
+    const fr = { Suisse: "Suisse", Vaud: "Canton de Vaud", "Genève": "Canton de Genève", Commune: "Ma commune" };
+    const en = { Suisse: "Switzerland", Vaud: "Canton of Vaud", "Genève": "Canton of Geneva", Commune: "My municipality" };
+    return (state.lang === "en" ? en : fr)[l] || l;
+  };
 
   /* Palier de couleur d'une barre (seuil examen à 60 %). */
   function barColor(pct) { return pct < 30 ? "#C8442E" : pct < 45 ? "#D8836F" : pct < 60 ? "#C08A2E" : "#3E7A4E"; }
   const THEME_ART = { "Géographie": "la Géographie", "Histoire": "l'Histoire", "Politique": "la Politique", "Social": "le Social" };
-  const elle = (t) => THEME_ART[t] || t;
+  const elle = (th) => (state.lang === "en" ? trTheme(th) : (THEME_ART[th] || th));
 
   function openStats() {
     const box = $("statsBody");
@@ -823,7 +837,7 @@
     Object.values(state.stats).forEach((s) => { tot.a += s.a; tot.c += s.c; });
 
     if (!tot.a) {
-      box.innerHTML = `<p class="stats-empty">Réponds à quelques questions (examen ou révision en mode Quiz) pour voir ton bilan apparaître ici. 📊</p>`;
+      box.innerHTML = `<p class="stats-empty">${t("stats.empty", "Réponds à quelques questions (examen ou révision en mode Quiz) pour voir ton bilan apparaître ici. 📊")}</p>`;
       showScreen("screen-stats"); return;
     }
 
@@ -835,7 +849,7 @@
 
     // Thèmes avec données, triés du plus faible au plus fort.
     const themeStats = STAT_THEMES
-      .map((t) => Object.assign({ theme: t }, agg((k) => k.split("|")[1] === t)))
+      .map((th) => Object.assign({ theme: th }, agg((k) => k.split("|")[1] === th)))
       .filter((r) => r.a > 0)
       .sort((x, y) => x.pct - y.pct);
 
@@ -854,28 +868,28 @@
       const toReview = w.a - w.c;
       hero =
         `<div class="stats-hero">
-           <div class="stats-hero-sur">Concentre-toi sur</div>
+           <div class="stats-hero-sur">${t("stats.focusOn", "Concentre-toi sur")}</div>
            <div class="stats-hero-theme">${elle(w.theme)}</div>
-           <p class="stats-hero-msg">C'est ton thème le plus fragile : ${w.pct}% de réussite, soit ${toReview} question${toReview > 1 ? "s" : ""} à retravailler.</p>
-           <button class="btn btn-primary stats-hero-cta" id="statsHeroCta" data-theme="${w.theme}">Réviser ${elle(w.theme)}</button>
+           <p class="stats-hero-msg">${fmt(t("stats.weakMsg", "C'est ton thème le plus fragile : {p}% de réussite, soit {n} question{s} à retravailler."), { p: w.pct, n: toReview, s: toReview > 1 ? "s" : "" })}</p>
+           <button class="btn btn-primary stats-hero-cta" id="statsHeroCta" data-theme="${w.theme}">${fmt(t("stats.reviseX", "Réviser {x}"), { x: elle(w.theme) })}</button>
          </div>`;
     }
 
     box.innerHTML =
       hero +
       `<div class="stats-card">
-         <div class="stats-card-head"><span class="stats-card-title">Tous les thèmes</span><span class="stats-thresh">┃ seuil examen 60%</span></div>
+         <div class="stats-card-head"><span class="stats-card-title">${t("stats.allThemes", "Tous les thèmes")}</span><span class="stats-thresh">${t("stats.threshExam", "┃ seuil examen 60%")}</span></div>
          <div class="sbar-list">` +
-           themeStats.map((r, i) => sbar({ label: r.theme, pct: r.pct, weak: i === 0 }, 60)).join("") +
+           themeStats.map((r, i) => sbar({ label: trTheme(r.theme), pct: r.pct, weak: i === 0 }, 60)).join("") +
          `</div>
        </div>` +
       `<div class="stats-tiles">
-         <div class="stats-tile"><div class="stats-tile-val">${overallPct}%</div><div class="stats-tile-lab">Global</div></div>
-         <div class="stats-tile"><div class="stats-tile-val">${tot.a}</div><div class="stats-tile-lab">Répondues</div></div>
-         <div class="stats-tile"><div class="stats-tile-val">${state.mistakes.length}</div><div class="stats-tile-lab">À revoir</div></div>
+         <div class="stats-tile"><div class="stats-tile-val">${overallPct}%</div><div class="stats-tile-lab">${t("stats.global", "Global")}</div></div>
+         <div class="stats-tile"><div class="stats-tile-val">${tot.a}</div><div class="stats-tile-lab">${t("stats.answered", "Répondues")}</div></div>
+         <div class="stats-tile"><div class="stats-tile-val">${state.mistakes.length}</div><div class="stats-tile-lab">${t("stats.toReview", "À revoir")}</div></div>
        </div>` +
       `<div class="stats-card">
-         <div class="stats-card-head"><span class="stats-card-title">Par niveau</span></div>
+         <div class="stats-card-head"><span class="stats-card-title">${t("stats.byLevel", "Par niveau")}</span></div>
          <div class="sbar-list">` +
            statLevels().map((l) => {
              const r = agg((k) => k.split("|")[0] === l);
@@ -885,12 +899,12 @@
            }).join("") +
          `</div>
        </div>` +
-      `<button class="btn btn-reset" id="btnResetStats">Réinitialiser mes statistiques et erreurs</button>`;
+      `<button class="btn btn-reset" id="btnResetStats">${t("stats.reset", "Réinitialiser mes statistiques et erreurs")}</button>`;
 
     const hc = $("statsHeroCta");
     if (hc) hc.addEventListener("click", () => startThemeReview(hc.dataset.theme));
     $("btnResetStats").addEventListener("click", () => {
-      if (confirm("Réinitialiser toutes tes statistiques et ta liste d'erreurs ?")) {
+      if (confirm(t("stats.resetConfirm", "Réinitialiser toutes tes statistiques et ta liste d'erreurs ?"))) {
         state.stats = {}; state.mistakes = []; save(); openStats();
       }
     });
@@ -931,10 +945,10 @@
   }
   function eraOf(yearStr) {
     const y = yearVal(yearStr);
-    if (y < 500) return "Antiquité";
-    if (y < 1500) return "Moyen Âge";
-    if (y < 1798) return "Époque moderne";
-    return "Époque contemporaine";
+    if (y < 500) return t("tl.eraAntiquity", "Antiquité");
+    if (y < 1500) return t("tl.eraMiddleAges", "Moyen Âge");
+    if (y < 1798) return t("tl.eraModern", "Époque moderne");
+    return t("tl.eraContemporary", "Époque contemporaine");
   }
 
   /* Événements affichés = Suisse (fédéral) + canton courant. */
@@ -949,22 +963,24 @@
       .filter((t) => timelineFilter === "all" || t.scope === timelineFilter)
       .slice().sort((a, b) => yearVal(a.year) - yearVal(b.year));
     let html = "", currentEra = null, open = false;
-    items.forEach((t) => {
-      const era = eraOf(t.year);
+    items.forEach((ev) => {
+      const era = eraOf(ev.year);
       if (era !== currentEra) {
         if (open) html += `</div>`;
         html += `<div class="tl-era"><span></span>${era}<span></span></div><div class="tl-rail">`;
         currentEra = era; open = true;
       }
-      const isCanton = t.scope !== "ch";
-      const key = TL_KEY_YEARS[t.year] || /rejoint la Confédération/i.test(t.title);
-      const tag = isCanton ? ` <em>${CANTON_NAME[cn].toUpperCase()}</em>` : "";
+      const isCanton = ev.scope !== "ch";
+      const key = TL_KEY_YEARS[ev.year] || /rejoint la Confédération/i.test(ev.title);
+      const tag = isCanton ? ` <em>${cnName(cn).toUpperCase()}</em>` : "";
+      const title = (state.lang === "en" && ev.titleEn) ? ev.titleEn : ev.title;
+      const desc = (state.lang === "en" && ev.descEn) ? ev.descEn : ev.desc;
       html += `<div class="tl-node ${isCanton ? "vd" : "ch"}">
           <span class="tl-pin"></span>
-          <div class="tl-year">${t.year}${tag}</div>
+          <div class="tl-year">${ev.year}${tag}</div>
           <div class="tl-card${key ? " key" : ""}">
-            <b>${t.title}</b>
-            <p>${t.desc}${key ? ` <i>À retenir pour l'examen.</i>` : ""}</p>
+            <b>${title}</b>
+            <p>${desc}${key ? ` <i>${t("tl.keyNote", "À retenir pour l'examen.")}</i>` : ""}</p>
           </div>
         </div>`;
     });
@@ -978,9 +994,9 @@
     if (timelineFilter !== "all" && timelineFilter !== "ch" && timelineFilter !== cn) timelineFilter = "all";
     const base = timelineBase();
     const filters = [
-      { key: "all", label: "Tout", dot: null },
-      { key: "ch", label: "Suisse", dot: "var(--red)" },
-      { key: cn, label: CANTON_NAME[cn], dot: "var(--ok)" },
+      { key: "all", label: t("scope.all", "Tout"), dot: null },
+      { key: "ch", label: t("misc.swiss", "Suisse"), dot: "var(--red)" },
+      { key: cn, label: cnName(cn), dot: "var(--ok)" },
     ];
     const bar = $("timelineFilter");
     bar.innerHTML = filters.map((f) => {
@@ -998,52 +1014,55 @@
 
   /* ---------------- Carte des districts (Vaud / Valais) ---------------- */
   const VS_REGION = {
-    bas:  { color: "#3E7A4E", label: "Bas-Valais" },
-    cen:  { color: "#C8442E", label: "Valais central" },
-    haut: { color: "#5B7DB1", label: "Haut-Valais" },
+    bas:  { color: "#3E7A4E", label: "Bas-Valais", labelEn: "Lower Valais" },
+    cen:  { color: "#C8442E", label: "Valais central", labelEn: "Central Valais" },
+    haut: { color: "#5B7DB1", label: "Haut-Valais", labelEn: "Upper Valais" },
   };
+  const regionLabel = (k) => (state.lang === "en" && VS_REGION[k].labelEn) ? VS_REGION[k].labelEn : VS_REGION[k].label;
   function districtMap() { return (typeof DISTRICTS_MAPS !== "undefined") ? DISTRICTS_MAPS[cantonOf()] : null; }
 
   /* Fiche par district : chef-lieu + repère. Pour le Valais, la langue est déduite
      de la région (Haut-Valais = allemand, Valais central & Bas-Valais = français). */
   const DISTRICT_INFO = {
     // Vaud
-    2221: { chef: "Aigle", note: "Chablais vaudois, vignobles ; Villars, Leysin, Bex." },
-    2222: { chef: "Payerne", note: "Broye ; abbatiale de Payerne, Avenches la romaine, lac de Morat." },
-    2223: { chef: "Échallens", note: "Le « grenier à blé » du canton, cœur agricole." },
-    2224: { chef: "Yverdon-les-Bains", note: "Nord vaudois ; Yverdon (thermes), Sainte-Croix, Vallorbe, Grandson." },
-    2225: { chef: "Lausanne", note: "Capitale du canton ; siège du CIO, cathédrale gothique." },
-    2226: { chef: "Bourg-en-Lavaux", note: "Terrasses viticoles de Lavaux (UNESCO), région d'Oron." },
-    2227: { chef: "Morges", note: "La Côte lémanique, vignobles, château de Morges." },
-    2228: { chef: "Nyon", note: "La Côte ; Nyon la romaine, Coppet, Rolle." },
-    2229: { chef: "Renens", note: "Agglomération lausannoise ; EPFL et UNIL à Ecublens." },
-    2230: { chef: "Vevey", note: "Riviera ; Montreux (jazz), Vevey (Nestlé, Chaplin), Château-d'Œx." },
+    2221: { chef: "Aigle", note: "Chablais vaudois, vignobles ; Villars, Leysin, Bex.", en: "Vaud Chablais, vineyards; Villars, Leysin, Bex." },
+    2222: { chef: "Payerne", note: "Broye ; abbatiale de Payerne, Avenches la romaine, lac de Morat.", en: "Broye; Payerne abbey, Roman Avenches, Lake Morat." },
+    2223: { chef: "Échallens", note: "Le « grenier à blé » du canton, cœur agricole.", en: "The canton's « breadbasket », farming heartland." },
+    2224: { chef: "Yverdon-les-Bains", note: "Nord vaudois ; Yverdon (thermes), Sainte-Croix, Vallorbe, Grandson.", en: "Northern Vaud; Yverdon (thermal baths), Sainte-Croix, Vallorbe, Grandson." },
+    2225: { chef: "Lausanne", note: "Capitale du canton ; siège du CIO, cathédrale gothique.", en: "Cantonal capital; seat of the IOC, Gothic cathedral." },
+    2226: { chef: "Bourg-en-Lavaux", note: "Terrasses viticoles de Lavaux (UNESCO), région d'Oron.", en: "Lavaux vineyard terraces (UNESCO), Oron region." },
+    2227: { chef: "Morges", note: "La Côte lémanique, vignobles, château de Morges.", en: "La Côte lakeshore, vineyards, Morges castle." },
+    2228: { chef: "Nyon", note: "La Côte ; Nyon la romaine, Coppet, Rolle.", en: "La Côte; Roman Nyon, Coppet, Rolle." },
+    2229: { chef: "Renens", note: "Agglomération lausannoise ; EPFL et UNIL à Ecublens.", en: "Lausanne agglomeration; EPFL and UNIL in Ecublens." },
+    2230: { chef: "Vevey", note: "Riviera ; Montreux (jazz), Vevey (Nestlé, Chaplin), Château-d'Œx.", en: "Riviera; Montreux (jazz), Vevey (Nestlé, Chaplin), Château-d'Œx." },
     // Valais
-    2301: { chef: "Brigue", note: "Château Stockalper, col et tunnel du Simplon." },
-    2302: { chef: "Conthey", note: "Coteaux et vignobles au-dessus de la plaine du Rhône." },
-    2303: { chef: "Sembrancher", note: "Verbier, val de Bagnes, col du Grand-Saint-Bernard." },
-    2304: { chef: "Münster", note: "Haute vallée du Rhône ; proche du glacier d'Aletsch (UNESCO)." },
-    2305: { chef: "Vex", note: "Val d'Hérens, Évolène ; célèbre pour les combats de reines." },
-    2306: { chef: "Loèche", note: "Loèche-les-Bains, plus grande station thermale des Alpes." },
-    2307: { chef: "Martigny", note: "Coude du Rhône ; amphithéâtre romain, Fondation Gianadda." },
-    2308: { chef: "Monthey", note: "Val d'Illiez, Champéry, domaine des Portes du Soleil." },
-    2309: { chef: "Rarogne", note: "Église dans le rocher ; tombe du poète Rilke." },
-    2310: { chef: "Saint-Maurice", note: "Abbaye fondée en 515, la plus ancienne d'Occident encore active." },
-    2311: { chef: "Sierre", note: "Crans-Montana, val d'Anniviers ; ville la plus ensoleillée." },
-    2312: { chef: "Sion", note: "Capitale du canton ; châteaux de Valère et Tourbillon." },
-    2313: { chef: "Viège", note: "Vallées de Zermatt (Cervin) et de Saas-Fee." },
+    2301: { chef: "Brigue", note: "Château Stockalper, col et tunnel du Simplon.", en: "Stockalper Castle, Simplon pass and tunnel." },
+    2302: { chef: "Conthey", note: "Coteaux et vignobles au-dessus de la plaine du Rhône.", en: "Slopes and vineyards above the Rhône plain." },
+    2303: { chef: "Sembrancher", note: "Verbier, val de Bagnes, col du Grand-Saint-Bernard.", en: "Verbier, Bagnes valley, Great St Bernard pass." },
+    2304: { chef: "Münster", note: "Haute vallée du Rhône ; proche du glacier d'Aletsch (UNESCO).", en: "Upper Rhône valley; near the Aletsch Glacier (UNESCO)." },
+    2305: { chef: "Vex", note: "Val d'Hérens, Évolène ; célèbre pour les combats de reines.", en: "Hérens valley, Évolène; famous for the cow fights (combats de reines)." },
+    2306: { chef: "Loèche", note: "Loèche-les-Bains, plus grande station thermale des Alpes.", en: "Leukerbad, the largest thermal resort in the Alps." },
+    2307: { chef: "Martigny", note: "Coude du Rhône ; amphithéâtre romain, Fondation Gianadda.", en: "Bend of the Rhône; Roman amphitheatre, Gianadda Foundation." },
+    2308: { chef: "Monthey", note: "Val d'Illiez, Champéry, domaine des Portes du Soleil.", en: "Illiez valley, Champéry, Portes du Soleil ski area." },
+    2309: { chef: "Rarogne", note: "Église dans le rocher ; tombe du poète Rilke.", en: "Church carved into the rock; grave of the poet Rilke." },
+    2310: { chef: "Saint-Maurice", note: "Abbaye fondée en 515, la plus ancienne d'Occident encore active.", en: "Abbey founded in 515, the oldest still active in the West." },
+    2311: { chef: "Sierre", note: "Crans-Montana, val d'Anniviers ; ville la plus ensoleillée.", en: "Crans-Montana, Anniviers valley; the sunniest town." },
+    2312: { chef: "Sion", note: "Capitale du canton ; châteaux de Valère et Tourbillon.", en: "Cantonal capital; Valère and Tourbillon castles." },
+    2313: { chef: "Viège", note: "Vallées de Zermatt (Cervin) et de Saas-Fee.", en: "Valleys of Zermatt (Matterhorn) and Saas-Fee." },
   };
   const VS_LANG = { haut: "Allemand (Haut-Valais)", cen: "Français (Valais central)", bas: "Français (Bas-Valais)" };
+  const VS_LANG_EN = { haut: "German (Upper Valais)", cen: "French (Central Valais)", bas: "French (Lower Valais)" };
 
   function showDistrictInfo(d) {
     const box = $("vsdInfo");
     if (!box) return;
     const info = DISTRICT_INFO[d.id];
     const rows = [];
-    if (info && info.chef) rows.push(`<div class="vsd-row"><span>🏛️ Chef-lieu</span><b>${info.chef}</b></div>`);
-    if (cantonOf() === "VS" && d.region) rows.push(`<div class="vsd-row"><span>🗣️ Langue</span><b>${VS_LANG[d.region] || ""}</b></div>`);
+    if (info && info.chef) rows.push(`<div class="vsd-row"><span>🏛️ ${t("district.chef", "Chef-lieu")}</span><b>${info.chef}</b></div>`);
+    if (cantonOf() === "VS" && d.region) rows.push(`<div class="vsd-row"><span>🗣️ ${t("district.lang", "Langue")}</span><b>${(state.lang === "en" ? VS_LANG_EN : VS_LANG)[d.region] || ""}</b></div>`);
+    const note = info ? ((state.lang === "en" && info.en) ? info.en : info.note) : "";
     box.innerHTML = `<div class="vsd-info-h"><span class="vsd-dot" style="background:${d.color}"></span>${d.name}</div>` +
-      rows.join("") + (info && info.note ? `<p class="vsd-note">${info.note}</p>` : "");
+      rows.join("") + (note ? `<p class="vsd-note">${note}</p>` : "");
     box.hidden = false;
   }
   function hideDistrictInfo() { const box = $("vsdInfo"); if (box) box.hidden = true; }
@@ -1052,10 +1071,10 @@
     const m = districtMap();
     if (!m) return;
     const svg = $("vsMapSvg");
-    $("vsMapTitle").textContent = `Les ${m.districts.length} districts ${cantonOf() === "VS" ? "du Valais" : "vaudois"}`;
+    $("vsMapTitle").textContent = fmt(t(cantonOf() === "VS" ? "district.titleVS" : "district.titleVD", "Les {n} districts " + (cantonOf() === "VS" ? "du Valais" : "vaudois")), { n: m.districts.length });
     $("vsMapNote").innerHTML = cantonOf() === "VS"
-      ? "Les <b>13 étoiles</b> du drapeau valaisan représentent ces <b>13 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes)."
-      : "Le canton de Vaud compte <b>10 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes).";
+      ? t("district.noteVS", "Les <b>13 étoiles</b> du drapeau valaisan représentent ces <b>13 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes).")
+      : t("district.noteVD", "Le canton de Vaud compte <b>10 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes).");
 
     hideDistrictInfo();
 
@@ -1091,12 +1110,12 @@
     // Légende (par région) + liste.
     if (m.hasRegions) {
       $("vsMapLegend").innerHTML = Object.keys(VS_REGION).map((k) =>
-        `<span class="legend-item"><span class="legend-dot" style="background:${VS_REGION[k].color}"></span>${VS_REGION[k].label}</span>`).join("");
+        `<span class="legend-item"><span class="legend-dot" style="background:${VS_REGION[k].color}"></span>${regionLabel(k)}</span>`).join("");
       const byReg = { bas: [], cen: [], haut: [] };
       m.districts.forEach((d) => byReg[d.region].push(d));
       $("vsdList").innerHTML = Object.keys(VS_REGION).map((k) =>
         `<div class="vsd-group">
-           <div class="vsd-region"><span class="vsd-dot" style="background:${VS_REGION[k].color}"></span>${VS_REGION[k].label}</div>
+           <div class="vsd-region"><span class="vsd-dot" style="background:${VS_REGION[k].color}"></span>${regionLabel(k)}</div>
            <div class="vsd-items">` +
            byReg[k].map((d) => `<span class="vsd-chip" data-id="${d.id}">${d.name}</span>`).join("") +
            `</div></div>`).join("");
@@ -1486,7 +1505,7 @@
   function renderQuestion() {
     const cur = quiz.items[quiz.i];
     quiz.answered = false;
-    $("quizCat").textContent = cur.ref.scope + (quiz.mode === "exam" ? "" : " · " + cur.ref.theme);
+    $("quizCat").textContent = trScope(cur.ref.scope) + (quiz.mode === "exam" ? "" : " · " + trTheme(cur.ref.theme));
     $("quizCount").textContent = (quiz.i + 1) + "/" + quiz.items.length;
     $("quizProgressFill").style.width = ((quiz.i) / quiz.items.length) * 100 + "%";
     $("questionText").textContent = cur.ref.q;
@@ -1525,11 +1544,11 @@
         else { b.classList.add("dim"); }
       });
       const head = $("explainHead");
-      head.textContent = correct ? "Bonne réponse" : "À retenir";
+      head.textContent = correct ? t("quiz.correct", "Bonne réponse") : t("study.remember", "À retenir");
       head.className = "explain-head " + (correct ? "ok" : "bad");
       const exp = (cur.ref.explanation && cur.ref.explanation.trim())
         ? cur.ref.explanation
-        : "Réponse correcte : " + cur.options[cur.answer];
+        : t("study.correctAnswer", "Réponse correcte : ") + cur.options[cur.answer];
       $("explainText").textContent = exp;
       const ik = cur.ref.illustration;
       $("explainIllus").innerHTML = (ik && typeof ILLUSTRATIONS !== "undefined" && ILLUSTRATIONS[ik]) ? ILLUSTRATIONS[ik] : "";
@@ -1538,7 +1557,7 @@
 
     $("quizProgressFill").style.width = ((quiz.i + 1) / quiz.items.length) * 100 + "%";
     const nb = $("btnNext");
-    nb.textContent = quiz.i + 1 < quiz.items.length ? "Continuer" : (quiz.mode === "exam" ? "Terminer l'examen" : "Voir mon résultat");
+    nb.textContent = quiz.i + 1 < quiz.items.length ? t("quiz.continue", "Continuer") : (quiz.mode === "exam" ? t("quiz.finishExam", "Terminer l'examen") : t("quiz.seeResult", "Voir mon résultat"));
     nb.hidden = false;
   }
 
@@ -1552,19 +1571,19 @@
 
   /* Carte « Ton bilan par thème » (résultat d'examen échoué), triée du plus faible au plus fort. */
   function themeBilan() {
-    const rows = THEMES.map((t) => {
-      const its = quiz.items.filter((it) => it.ref.theme === t);
+    const rows = THEMES.map((th) => {
+      const its = quiz.items.filter((it) => it.ref.theme === th);
       const c = its.filter((it) => it.chosen === it.answer).length;
       const a = its.length;
-      return { theme: t, a, c, pct: a ? Math.round((c / a) * 100) : 0 };
+      return { theme: th, a, c, pct: a ? Math.round((c / a) * 100) : 0 };
     }).filter((r) => r.a > 0).sort((x, y) => x.pct - y.pct);
 
     return `<div class="result-card">
-        <div class="stats-card-head"><span class="stats-card-title">Ton bilan par thème</span><span class="stats-thresh">┃ 70%</span></div>
+        <div class="stats-card-head"><span class="stats-card-title">${t("result.bilanTitle", "Ton bilan par thème")}</span><span class="stats-thresh">┃ 70%</span></div>
         <div class="sbar-list">` +
         rows.map((r) => `
           <div class="sbar-row">
-            <div class="sbar-head"><b>${r.theme}</b><span class="${r.pct < 70 ? "weak" : "good"}">${r.c}/${r.a}</span></div>
+            <div class="sbar-head"><b>${trTheme(r.theme)}</b><span class="${r.pct < 70 ? "weak" : "good"}">${r.c}/${r.a}</span></div>
             <div class="sbar"><i style="width:${r.pct}%;background:${barColorExam(r.pct)}"></i><u style="left:70%"></u></div>
           </div>`).join("") +
         `</div></div>`;
@@ -1576,9 +1595,9 @@
     let prog = "—";
     if (prevPct !== null) { const d = pct - prevPct; prog = (d >= 0 ? "▲ +" : "▼ ") + Math.abs(d); }
     return `<div class="recap-tiles">
-        <div class="recap-tile"><div class="recap-val">${state.sessions}</div><div class="recap-lab">Sessions</div></div>
-        <div class="recap-tile"><div class="recap-val">${prog}</div><div class="recap-lab">Progression</div></div>
-        <div class="recap-tile"><div class="recap-val">${state.streak} j</div><div class="recap-lab">Série</div></div>
+        <div class="recap-tile"><div class="recap-val">${state.sessions}</div><div class="recap-lab">${t("recap.sessions", "Sessions")}</div></div>
+        <div class="recap-tile"><div class="recap-val">${prog}</div><div class="recap-lab">${t("recap.progress", "Progression")}</div></div>
+        <div class="recap-tile"><div class="recap-val">${state.streak} ${t("misc.dayUnit", "j")}</div><div class="recap-lab">${t("recap.streak", "Série")}</div></div>
       </div>`;
   }
 
@@ -1592,11 +1611,11 @@
     state.best = Math.max(state.best, pct);
     state.history.push({ date: todayISO(), pct });
     if (state.history.length > 60) state.history = state.history.slice(-60);
-    const t = todayISO();
-    if (state.lastPlayed !== t) {
+    const today = todayISO();
+    if (state.lastPlayed !== today) {
       const y = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
       state.streak = state.lastPlayed === y ? state.streak + 1 : 1;
-      state.lastPlayed = t;
+      state.lastPlayed = today;
     }
     save();
 
@@ -1626,22 +1645,23 @@
     if (quiz.mode === "exam") {
       badge.hidden = false;
       badge.className = "result-badge " + (pass ? "pass" : "fail");
-      badge.textContent = pass ? "✓ Examen réussi" : "✕ Pas encore réussi";
+      badge.textContent = pass ? t("result.examPass", "✓ Examen réussi") : t("result.examFail", "✕ Pas encore réussi");
       if (pass) {
-        titleHTML = "Félicitations,<br><i>tu es prêt·e.</i>";
-        const rec = pct >= state.best ? " Ton meilleur score à ce jour." : "";
-        msg = `${quiz.correct}/${total} bonnes réponses (${pct}%) — au-dessus du seuil requis.${rec}`;
+        titleHTML = t("result.congrats", "Félicitations,<br><i>tu es prêt·e.</i>");
+        const rec = pct >= state.best ? t("result.bestYet", " Ton meilleur score à ce jour.") : "";
+        msg = fmt(t("result.passMsg", "{c}/{n} bonnes réponses ({p}%) — au-dessus du seuil requis.{r}"), { c: quiz.correct, n: total, p: pct, r: rec });
       } else {
-        titleHTML = "Continue, tu avances.";
-        msg = `Réussite : ${quiz.passLabel || "70 % de bonnes réponses"}. Chaque session compte.`;
+        titleHTML = t("result.keepGoing", "Continue, tu avances.");
+        const pl = (state.lang === "en" && EXAM_CFG[cantonOf()]) ? EXAM_CFG[cantonOf()].passLabelEn : (quiz.passLabel || t("result.passDefault", "70 % de bonnes réponses"));
+        msg = fmt(t("result.failMsg", "Réussite : {l}. Chaque session compte."), { l: pl });
       }
       $("resultBilan").innerHTML = pass ? recapTiles(prevPct) : themeBilan();
     } else {
       badge.hidden = true;
       $("resultBilan").innerHTML = "";
-      if (pct >= 80) { titleHTML = "Bravo ! 🎉"; msg = "Excellent. Passe en simulation d'examen pour te tester en conditions réelles."; }
-      else if (pct >= 60) { titleHTML = "Bien joué 👍"; msg = "Tu progresses. Un tour de révision et ça rentre."; }
-      else { titleHTML = "Continue 💪"; msg = "Utilise le mode révision pour apprendre les bonnes réponses."; }
+      if (pct >= 80) { titleHTML = t("result.t80", "Bravo ! 🎉"); msg = t("result.m80", "Excellent. Passe en simulation d'examen pour te tester en conditions réelles."); }
+      else if (pct >= 60) { titleHTML = t("result.t60", "Bien joué 👍"); msg = t("result.m60", "Tu progresses. Un tour de révision et ça rentre."); }
+      else { titleHTML = t("result.t0", "Continue 💪"); msg = t("result.m0", "Utilise le mode révision pour apprendre les bonnes réponses."); }
     }
     $("resultTitle").innerHTML = titleHTML;
     $("resultMsg").textContent = msg;
@@ -1650,39 +1670,39 @@
     const rv = $("btnReview"), rt = $("btnRetry"), sh = $("btnShare"), hm = $("btnHome");
     hm.hidden = false; hm.style.order = 4;
     if (quiz.mode === "exam" && pass) {
-      sh.hidden = false; sh.className = "btn btn-primary big"; sh.textContent = "📲 Partager mon score"; sh.style.order = 1;
-      rv.hidden = false; rv.className = "btn btn-outline"; rv.textContent = "Revoir mes réponses"; rv.style.order = 2;
+      sh.hidden = false; sh.className = "btn btn-primary big"; sh.textContent = t("result.share", "📲 Partager mon score"); sh.style.order = 1;
+      rv.hidden = false; rv.className = "btn btn-outline"; rv.textContent = t("result.reviewAnswers", "Revoir mes réponses"); rv.style.order = 2;
       rt.hidden = true;
     } else if (quiz.mode === "exam") {
-      rv.hidden = false; rv.className = "btn btn-primary big"; rv.textContent = `🔎 Revoir mes ${errs} erreur${errs > 1 ? "s" : ""}`; rv.style.order = 1;
-      rt.hidden = false; rt.className = "btn btn-outline"; rt.textContent = "Recommencer l'examen"; rt.style.order = 2;
+      rv.hidden = false; rv.className = "btn btn-primary big"; rv.textContent = fmt(t("result.reviewErrs", "🔎 Revoir mes {n} erreur{s}"), { n: errs, s: errs > 1 ? "s" : "" }); rv.style.order = 1;
+      rt.hidden = false; rt.className = "btn btn-outline"; rt.textContent = t("result.retryExam", "Recommencer l'examen"); rt.style.order = 2;
       sh.hidden = true;
     } else {
-      rv.hidden = false; rv.className = "btn btn-primary big"; rv.textContent = "🔎 Revoir mes réponses"; rv.style.order = 1;
+      rv.hidden = false; rv.className = "btn btn-primary big"; rv.textContent = t("result.review", "🔎 Revoir mes réponses"); rv.style.order = 1;
       const canRetry = quiz.isMistakes && state.mistakes.length;
-      rt.hidden = !canRetry; rt.className = "btn btn-outline"; rt.textContent = "Recommencer"; rt.style.order = 2;
+      rt.hidden = !canRetry; rt.className = "btn btn-outline"; rt.textContent = t("result.retry", "Recommencer"); rt.style.order = 2;
       sh.hidden = true;
     }
 
     // Message de partage (WhatsApp & co.).
     let lieu = "";
-    if (cantonOf() === "GE") lieu = " (canton de Genève)";
-    else { const commune = VD_DATA.communes[state.commune]; if (commune) lieu = " (commune de " + commune.name + ")"; }
+    if (cantonOf() === "GE") lieu = state.lang === "en" ? " (Canton of Geneva)" : " (canton de Genève)";
+    else { const commune = VD_DATA.communes[state.commune]; if (commune) lieu = (state.lang === "en" ? " (municipality of " : " (commune de ") + commune.name + ")"; }
     if (quiz.mode === "exam") {
       lastShareText =
-        `NatiCoach — Simulation du test de naturalisation${lieu}\n` +
-        `Mon score : ${quiz.correct}/${total} (${pct}%) — ${pass ? "réussi ✅" : "pas encore 💪"}`;
+        fmt(t("share.examLine1", "NatiCoach — Simulation du test de naturalisation{l}"), { l: lieu }) + "\n" +
+        fmt(t("share.examLine2", "Mon score : {c}/{n} ({p}%) — {r}"), { c: quiz.correct, n: total, p: pct, r: pass ? t("share.passed", "réussi ✅") : t("share.notYet", "pas encore 💪") });
     } else {
       lastShareText =
-        `NatiCoach — Entraînement au test de naturalisation${lieu}\n` +
-        `Mon score : ${quiz.correct}/${total} (${pct}%). À toi de jouer !`;
+        fmt(t("share.trainLine1", "NatiCoach — Entraînement au test de naturalisation{l}"), { l: lieu }) + "\n" +
+        fmt(t("share.trainLine2", "Mon score : {c}/{n} ({p}%). À toi de jouer !"), { c: quiz.correct, n: total, p: pct });
     }
 
     showScreen("screen-result");
   }
 
   function shareResult() {
-    const text = lastShareText || "NatiCoach — je m'entraîne au test de naturalisation suisse !";
+    const text = lastShareText || t("share.fallback", "NatiCoach — je m'entraîne au test de naturalisation suisse !");
     if (navigator.share) {
       navigator.share({ title: "NatiCoach", text: text }).catch(function () {});
     } else {
@@ -1696,12 +1716,12 @@
   function badgeProgress(id) {
     const b = state.best, s = state.sessions, k = state.streak, m = state.mistakes.length;
     switch (id) {
-      case "first":    return { pct: Math.min(100, s * 100), hint: s + " / 1 session" };
-      case "marathon": return { pct: Math.min(100, s / 10 * 100), hint: s + " sur 10" };
-      case "streak3":  return { pct: Math.min(100, k / 3 * 100), hint: k + " / 3 jours" };
-      case "exam":     return { pct: Math.min(100, b / 70 * 100), hint: "meilleur : " + b + "%" };
-      case "perfect":  return { pct: Math.min(100, b), hint: "meilleur : " + b + "%" };
-      case "cleaner":  return { pct: m ? Math.max(8, 100 - Math.min(90, m * 6)) : 100, hint: m ? "plus que " + m + " à vider" : "prêt à débloquer" };
+      case "first":    return { pct: Math.min(100, s * 100), hint: s + " / 1 " + t("badges.session", "session") };
+      case "marathon": return { pct: Math.min(100, s / 10 * 100), hint: fmt(t("badges.outOf10", "{n} sur 10"), { n: s }) };
+      case "streak3":  return { pct: Math.min(100, k / 3 * 100), hint: k + " / 3 " + t("badges.days", "jours") };
+      case "exam":     return { pct: Math.min(100, b / 70 * 100), hint: t("badges.best", "meilleur : ") + b + "%" };
+      case "perfect":  return { pct: Math.min(100, b), hint: t("badges.best", "meilleur : ") + b + "%" };
+      case "cleaner":  return { pct: m ? Math.max(8, 100 - Math.min(90, m * 6)) : 100, hint: m ? fmt(t("badges.clearLeft", "plus que {n} à vider"), { n: m }) : t("badges.readyUnlock", "prêt à débloquer") };
       default:         return { pct: 0, hint: "" };
     }
   }
@@ -1710,25 +1730,26 @@
     const b = state.badges || {};
     const n = ACHIEVEMENTS.filter((a) => b[a.id]).length;
     const N = ACHIEVEMENTS.length;
-    const half = n >= N ? "tous débloqués !" : (n >= N / 2 ? "à mi-chemin !" : "en bonne voie !");
+    const half = n >= N ? t("badges.all", "tous débloqués !") : (n >= N / 2 ? t("badges.half", "à mi-chemin !") : t("badges.onway", "en bonne voie !"));
     $("badgeHero").innerHTML =
       `<div class="badge-count"><span>${n}</span><em> / ${N}</em></div>
-       <p class="badge-sub">succès débloqués — ${half}</p>
+       <p class="badge-sub">${t("badges.unlockedSub", "succès débloqués")} — ${half}</p>
        <div class="badge-segs">` +
         ACHIEVEMENTS.map((a) => `<span class="${b[a.id] ? "on" : ""}"></span>`).join("") +
        `</div>`;
     $("badgeGrid").innerHTML = ACHIEVEMENTS.map((a) => {
+      const title = t("badge." + a.id + ".title", a.title), desc = t("badge." + a.id + ".desc", a.desc);
       if (b[a.id]) {
         return `<div class="badge-card on">
            <div class="badge-medal">${a.ico}</div>
-           <b>${a.title}</b><small>${a.desc}</small>
-           <span class="badge-done">✓ Débloqué</span>
+           <b>${title}</b><small>${desc}</small>
+           <span class="badge-done">${t("badges.unlocked", "✓ Débloqué")}</span>
          </div>`;
       }
       const p = badgeProgress(a.id);
       return `<div class="badge-card locked">
          <div class="badge-medal">${a.ico}</div>
-         <b>${a.title}</b><small>${a.desc}</small>
+         <b>${title}</b><small>${desc}</small>
          <div class="badge-bar"><i style="width:${p.pct}%"></i></div>
          <span class="badge-hint">${p.hint}</span>
        </div>`;
@@ -1743,8 +1764,8 @@
     const errs = quiz.items.filter((it) => it.chosen !== it.answer).length;
     const seg = $("reviewFilter");
     seg.innerHTML =
-      `<button data-f="errors" class="active">Mes erreurs (${errs})</button>` +
-      `<button data-f="all">Toutes (${quiz.items.length})</button>`;
+      `<button data-f="errors" class="active">${fmt(t("review.errors", "Mes erreurs ({n})"), { n: errs })}</button>` +
+      `<button data-f="all">${fmt(t("review.all", "Toutes ({n})"), { n: quiz.items.length })}</button>`;
     seg.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
       seg.querySelectorAll("button").forEach((x) => x.classList.remove("active"));
       b.classList.add("active"); reviewMode = b.dataset.f; renderReview();
@@ -1754,9 +1775,9 @@
 
   function renderReview() {
     const items = reviewMode === "errors" ? quiz.items.filter((it) => it.chosen !== it.answer) : quiz.items;
-    $("reviewCount").textContent = items.length + (reviewMode === "errors" ? " à revoir" : " au total");
+    $("reviewCount").textContent = items.length + (reviewMode === "errors" ? t("review.toReview", " à revoir") : t("review.total", " au total"));
     const box = $("reviewList");
-    if (!items.length) { box.innerHTML = `<p class="results-empty">Aucune erreur — parfait ! 🎉</p>`; return; }
+    if (!items.length) { box.innerHTML = `<p class="results-empty">${t("review.noErrors", "Aucune erreur — parfait ! 🎉")}</p>`; return; }
     box.innerHTML = items.map((it) => {
       const answered = it.chosen !== undefined && it.chosen !== null;
       const ok = it.chosen === it.answer;
@@ -1769,16 +1790,16 @@
         return `<div class="${cls}"><span class="mark">${mark}</span><span>${esc(o)}</span></div>`;
       }).join("");
       const exp = (it.ref.explanation && it.ref.explanation.trim())
-        ? esc(it.ref.explanation) : "Réponse correcte : " + esc(it.options[it.answer]);
+        ? esc(it.ref.explanation) : t("study.correctAnswer", "Réponse correcte : ") + esc(it.options[it.answer]);
       const ik = it.ref.illustration;
       const ill = (ik && typeof ILLUSTRATIONS !== "undefined" && ILLUSTRATIONS[ik])
         ? `<div class="review-illus">${ILLUSTRATIONS[ik]}</div>` : "";
       return `<div class="review-card">
-        <div class="review-head"><span class="chip">${esc(it.ref.scope)} · ${esc(it.ref.theme)}</span>
+        <div class="review-head"><span class="chip">${esc(trScope(it.ref.scope))} · ${esc(trTheme(it.ref.theme))}</span>
           <span class="review-flag ${ok ? "ok" : "bad"}">${ok ? "✓" : "✕"}</span></div>
         <h3 class="review-qtext">${esc(it.ref.q)}</h3>
         <div class="options">${opts}</div>
-        ${answered ? "" : `<p class="review-noans">Non répondu (temps écoulé)</p>`}
+        ${answered ? "" : `<p class="review-noans">${t("review.noAnswer", "Non répondu (temps écoulé)")}</p>`}
         <div class="review-exp">${ill}<span>${exp}</span></div>
       </div>`;
     }).join("");
