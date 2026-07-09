@@ -107,7 +107,7 @@ window.I18N = {
     "title.privacy": "Privacy",
     "about.cgu": "Terms & conditions",
     "about.privacy": "Privacy policy",
-    "legal.draft": "Draft to be reviewed by a lawyer before publication. The items [in brackets] must be completed by the publisher.",
+    "legal.draft": "Draft to be reviewed by a lawyer before publication.",
     "legal.cguIntro": "General Terms of Use and Sale — NatiCoach · Version 1.0",
     "legal.privIntro": "Privacy Policy — NatiCoach · Version 1.0",
 

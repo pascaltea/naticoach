@@ -1416,12 +1416,12 @@
   /* ---------------- Mentions légales (CGU + confidentialité) ---------------- */
   /* Modèles rédactionnels — à faire valider par un·e avocat·e. Zones [entre crochets] à compléter. */
   const legalSec = (n, title, body) => `<div class="legal-sec"><h3>${n}. ${title}</h3><p>${body}</p></div>`;
-  const legalDraftNote = () => `<p class="legal-draft">${t("legal.draft", "Modèle à faire valider par un·e avocat·e avant publication. Les mentions [entre crochets] sont à compléter par l'éditeur.")}</p>`;
+  const legalDraftNote = () => `<p class="legal-draft">${t("legal.draft", "Modèle à faire valider par un·e avocat·e avant publication.")}</p>`;
 
   function openCgu() {
     $("cguBody").innerHTML = legalDraftNote() +
       `<p class="legal-meta">${t("legal.cguIntro", "Conditions Générales d'Utilisation et de Vente — NatiCoach · Version 1.0")}</p>` +
-      legalSec(1, "Éditeur", "L'application <b>NatiCoach</b> (« l'Application ») est éditée par <b>[Prénom Nom]</b>, personne physique exerçant en <b>raison individuelle</b>, <b>[adresse]</b>, Suisse (« l'Éditeur »). Contact : <b>[email]</b>.") +
+      legalSec(1, "Éditeur", "L'application <b>NatiCoach</b> (« l'Application ») est éditée par <b>Pascal Tea</b>, personne physique exerçant en <b>raison individuelle</b>, <b>Route d'Arnex 9, 1262 Eysins</b>, Suisse (« l'Éditeur »). Contact : <b>contact@naticoach.ch</b>.") +
       legalSec(2, "Objet", "Les présentes conditions régissent l'accès et l'utilisation de l'Application, un <b>outil d'entraînement pédagogique</b> à la préparation du test de connaissances de la naturalisation suisse. En utilisant l'Application, l'utilisateur·rice les accepte.") +
       legalSec(3, "Absence de caractère officiel", "NatiCoach est un outil <b>indépendant</b>, <b>non affilié</b> et non approuvé par les autorités (Confédération, cantons, communes). Les questions s'inspirent de questionnaires officiels rendus publics ; l'Éditeur ne garantit ni leur exactitude ni leur mise à jour. Seule fait foi l'information de l'autorité compétente.") +
       legalSec(4, "Absence de garantie de résultat", "L'Application est fournie « en l'état » et <b>ne garantit pas la réussite</b> au test ni l'obtention de la nationalité. Les explications et propositions de réponses sont à visée pédagogique ; seule la bonne réponse reflète le contenu officiel.") +
@@ -1431,20 +1431,20 @@
       legalSec(8, "Données personnelles", "L'Application fonctionne <b>hors-ligne</b> ; la progression est stockée <b>localement</b> sur l'appareil. Voir la <b>Politique de confidentialité</b>.") +
       legalSec(9, "Responsabilité", "Dans les limites de la loi, l'Éditeur décline toute responsabilité pour les dommages indirects, les décisions prises sur la base du contenu, ou l'inexactitude des questions. La responsabilité est limitée au montant payé pour l'accès premium.") +
       legalSec(10, "Modifications", "L'Éditeur peut modifier l'Application et les présentes conditions ; la version applicable est celle en vigueur lors de l'utilisation.") +
-      legalSec(11, "Droit applicable et for", "Droit <b>suisse</b>. For au domicile de l'Éditeur à <b>[canton]</b>, sous réserve des dispositions impératives protégeant les consommateurs.");
+      legalSec(11, "Droit applicable et for", "Droit <b>suisse</b>. For au domicile de l'Éditeur, canton de <b>Vaud</b>, sous réserve des dispositions impératives protégeant les consommateurs.");
     showScreen("screen-cgu");
   }
 
   function openPrivacy() {
     $("privacyBody").innerHTML = legalDraftNote() +
       `<p class="legal-meta">${t("legal.privIntro", "Politique de confidentialité — NatiCoach · Version 1.0")}</p>` +
-      legalSec(1, "Responsable", "<b>[Prénom Nom]</b>, <b>[adresse]</b>, Suisse. Contact : <b>[email]</b>.") +
+      legalSec(1, "Responsable", "<b>Pascal Tea</b>, <b>Route d'Arnex 9, 1262 Eysins</b>, Suisse. Contact : <b>contact@naticoach.ch</b>.") +
       legalSec(2, "Principe : hors-ligne", "NatiCoach est conçue pour fonctionner <b>hors-ligne</b>. Ta progression (scores, statistiques, réglages) est enregistrée <b>uniquement sur ton appareil</b> et <b>n'est pas transmise</b> à l'Éditeur ni à des tiers.") +
       legalSec(3, "Aucun compte, aucun traceur", "L'Application ne demande <b>aucun compte</b>, n'utilise <b>ni cookie ni outil d'analyse tiers</b>, et ne collecte aucune donnée de localisation.") +
       legalSec(4, "Achats", "Les achats sont gérés par <b>Apple</b> ou <b>Google</b>, qui traitent le paiement selon leurs propres politiques. L'Éditeur ne reçoit <b>jamais</b> tes moyens de paiement, uniquement des données de vente agrégées.") +
       legalSec(5, "Tes droits (nLPD)", "Conformément à la loi suisse sur la protection des données, tu disposes de droits d'accès, de rectification et d'effacement. Tes données étant <b>locales</b>, tu peux les effacer à tout moment en réinitialisant ou désinstallant l'Application.") +
       legalSec(6, "Conservation", "Les données restent sur ton appareil tant que l'Application est installée.") +
-      legalSec(7, "Contact & modifications", "Pour toute question : <b>[email]</b>. La présente politique peut être mise à jour ; la version applicable est celle en vigueur dans l'Application. Droit applicable : <b>suisse</b>.");
+      legalSec(7, "Contact & modifications", "Pour toute question : <b>contact@naticoach.ch</b>. La présente politique peut être mise à jour ; la version applicable est celle en vigueur dans l'Application. Droit applicable : <b>suisse</b>.");
     showScreen("screen-privacy");
   }
 
