@@ -36,6 +36,14 @@
   const cnName = (cn) => { cn = cn || cantonOf(); const m = CANTON_NAME_L[state.lang]; return (m && m[cn]) || CANTON_NAME[cn]; };
   const cScope = (cn) => { cn = cn || cantonOf(); const m = CANTON_SCOPE_L[state.lang]; return (m && m[cn]) || CANTON_SCOPE[cn]; };
   const fmt = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => (o[k] != null ? o[k] : ""));
+  /* Accès à un champ traduit suffixé par langue : pf(obj,"title") → obj.titlePt / obj.titleEn / obj.title. */
+  const LSUF = { en: "En", pt: "Pt" };
+  function pf(obj, base) {
+    if (!obj) return "";
+    const suf = LSUF[state.lang];
+    const v = suf && obj[base + suf];
+    return (v != null) ? v : obj[base];
+  }
   const THEME_L = {
     en: { "Géographie": "Geography", "Histoire": "History", "Politique": "Politics", "Social": "Society" },
     pt: { "Géographie": "Geografia", "Histoire": "História", "Politique": "Política", "Social": "Sociedade" },
@@ -750,7 +758,16 @@
   const REGION_OF = {};
   CANTONS.forEach((c) => { REGION_OF[c.code] = c.region; });
   const REGION_LONG = { de: "Suisse alémanique", fr: "Suisse romande", it: "Suisse italienne", multi: "Canton plurilingue" };
-  const REGION_LONG_EN = { de: "German-speaking Switzerland", fr: "French-speaking Switzerland", it: "Italian-speaking Switzerland", multi: "Multilingual canton" };
+  const REGION_LONG_L = {
+    en: { de: "German-speaking Switzerland", fr: "French-speaking Switzerland", it: "Italian-speaking Switzerland", multi: "Multilingual canton" },
+    pt: { de: "Suíça alemã", fr: "Suíça francófona", it: "Suíça italiana", multi: "Cantão multilingue" },
+  };
+  const regionLong = (r) => { const m = REGION_LONG_L[state.lang]; return (m && m[r]) || REGION_LONG[r]; };
+  const REGION_LABEL_L = {
+    en: (typeof REGION_LABEL_EN !== "undefined") ? REGION_LABEL_EN : null,
+    pt: { de: "Alemão", fr: "Francês", it: "Italiano", multi: "Multilíngue" },
+  };
+  const regionLabelMap = () => (REGION_LABEL_L[state.lang]) || (typeof REGION_LABEL !== "undefined" ? REGION_LABEL : {});
 
   function openExplore() {
     const svg = $("cantonMap");
@@ -767,7 +784,7 @@
         g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
       });
       $("mapLegend").innerHTML = Object.keys(REGION_LABEL).map((k) =>
-        `<span class="legend-item" data-region="${k}"><span class="legend-dash" style="background:${REGION_COLORS[k]}"></span>${(state.lang === "en" && typeof REGION_LABEL_EN !== "undefined" ? REGION_LABEL_EN : REGION_LABEL)[k]}</span>`).join("");
+        `<span class="legend-item" data-region="${k}"><span class="legend-dash" style="background:${REGION_COLORS[k]}"></span>${regionLabelMap()[k]}</span>`).join("");
       setupMap();
       svg.dataset.filled = "1";
     }
@@ -844,22 +861,21 @@
       return;
     }
     const col = REGION_COLORS[c.region];
-    const en = state.lang === "en";
     const cta = (c.code === "VD" && cantonOf() === "VD")
       ? `<div class="cid-cta-wrap"><button class="cid-cta" id="cantonQuizBtn" style="border-color:${col};color:${col}">${t("explore.cantonQuiz", "5 questions sur le canton de Vaud →")}</button></div>`
       : "";
     box.classList.add("as-card");
     box.innerHTML =
       `<div class="cid-head" style="background:${col}">
-         <div class="cid-head-top"><span class="cid-name">${en && c.nameEn ? c.nameEn : c.name}</span><span class="cid-code">${c.code}</span></div>
-         <div class="cid-region">${(en ? REGION_LONG_EN : REGION_LONG)[c.region]}</div>
+         <div class="cid-head-top"><span class="cid-name">${pf(c, "name")}</span><span class="cid-code">${c.code}</span></div>
+         <div class="cid-region">${regionLong(c.region)}</div>
        </div>
        <div class="cid-cols">
          <div><div class="cid-val">${c.capital}</div><div class="cid-lab">${t("explore.capital", "Chef-lieu")}</div></div>
          <div><div class="cid-val">${c.year}</div><div class="cid-lab">${t("explore.confed", "Confédération")}</div></div>
-         <div><div class="cid-val">${en && c.langsEn ? c.langsEn : c.langs}</div><div class="cid-lab">${t("explore.language", "Langue")}</div></div>
+         <div><div class="cid-val">${pf(c, "langs")}</div><div class="cid-lab">${t("explore.language", "Langue")}</div></div>
        </div>
-       <div class="cid-quote"><span class="cid-q" style="color:${col}">«</span><p>${en && c.factEn ? c.factEn : c.fact}</p></div>
+       <div class="cid-quote"><span class="cid-q" style="color:${col}">«</span><p>${pf(c, "fact")}</p></div>
        ${cta}`;
     const qb = $("cantonQuizBtn");
     if (qb) qb.addEventListener("click", startCantonQuiz);
@@ -1033,8 +1049,8 @@
       const isCanton = ev.scope !== "ch";
       const key = TL_KEY_YEARS[ev.year] || /rejoint la Confédération/i.test(ev.title);
       const tag = isCanton ? ` <em>${cnName(cn).toUpperCase()}</em>` : "";
-      const title = (state.lang === "en" && ev.titleEn) ? ev.titleEn : ev.title;
-      const desc = (state.lang === "en" && ev.descEn) ? ev.descEn : ev.desc;
+      const title = pf(ev, "title");
+      const desc = pf(ev, "desc");
       html += `<div class="tl-node ${isCanton ? "vd" : "ch"}">
           <span class="tl-pin"></span>
           <div class="tl-year">${ev.year}${tag}</div>
@@ -1074,44 +1090,48 @@
 
   /* ---------------- Carte des districts (Vaud / Valais) ---------------- */
   const VS_REGION = {
-    bas:  { color: "#3E7A4E", label: "Bas-Valais", labelEn: "Lower Valais" },
-    cen:  { color: "#C8442E", label: "Valais central", labelEn: "Central Valais" },
-    haut: { color: "#5B7DB1", label: "Haut-Valais", labelEn: "Upper Valais" },
+    bas:  { color: "#3E7A4E", label: "Bas-Valais", labelEn: "Lower Valais", labelPt: "Baixo Valais" },
+    cen:  { color: "#C8442E", label: "Valais central", labelEn: "Central Valais", labelPt: "Valais central" },
+    haut: { color: "#5B7DB1", label: "Haut-Valais", labelEn: "Upper Valais", labelPt: "Alto Valais" },
   };
-  const regionLabel = (k) => (state.lang === "en" && VS_REGION[k].labelEn) ? VS_REGION[k].labelEn : VS_REGION[k].label;
+  const regionLabel = (k) => pf(VS_REGION[k], "label");
   function districtMap() { return (typeof DISTRICTS_MAPS !== "undefined") ? DISTRICTS_MAPS[cantonOf()] : null; }
 
   /* Fiche par district : chef-lieu + repère. Pour le Valais, la langue est déduite
      de la région (Haut-Valais = allemand, Valais central & Bas-Valais = français). */
   const DISTRICT_INFO = {
     // Vaud
-    2221: { chef: "Aigle", note: "Chablais vaudois, vignobles ; Villars, Leysin, Bex.", en: "Vaud Chablais, vineyards; Villars, Leysin, Bex." },
-    2222: { chef: "Payerne", note: "Broye ; abbatiale de Payerne, Avenches la romaine, lac de Morat.", en: "Broye; Payerne abbey, Roman Avenches, Lake Morat." },
-    2223: { chef: "Échallens", note: "Le « grenier à blé » du canton, cœur agricole.", en: "The canton's « breadbasket », farming heartland." },
-    2224: { chef: "Yverdon-les-Bains", note: "Nord vaudois ; Yverdon (thermes), Sainte-Croix, Vallorbe, Grandson.", en: "Northern Vaud; Yverdon (thermal baths), Sainte-Croix, Vallorbe, Grandson." },
-    2225: { chef: "Lausanne", note: "Capitale du canton ; siège du CIO, cathédrale gothique.", en: "Cantonal capital; seat of the IOC, Gothic cathedral." },
-    2226: { chef: "Bourg-en-Lavaux", note: "Terrasses viticoles de Lavaux (UNESCO), région d'Oron.", en: "Lavaux vineyard terraces (UNESCO), Oron region." },
-    2227: { chef: "Morges", note: "La Côte lémanique, vignobles, château de Morges.", en: "La Côte lakeshore, vineyards, Morges castle." },
-    2228: { chef: "Nyon", note: "La Côte ; Nyon la romaine, Coppet, Rolle.", en: "La Côte; Roman Nyon, Coppet, Rolle." },
-    2229: { chef: "Renens", note: "Agglomération lausannoise ; EPFL et UNIL à Ecublens.", en: "Lausanne agglomeration; EPFL and UNIL in Ecublens." },
-    2230: { chef: "Vevey", note: "Riviera ; Montreux (jazz), Vevey (Nestlé, Chaplin), Château-d'Œx.", en: "Riviera; Montreux (jazz), Vevey (Nestlé, Chaplin), Château-d'Œx." },
+    2221: { chef: "Aigle", note: "Chablais vaudois, vignobles ; Villars, Leysin, Bex.", en: "Vaud Chablais, vineyards; Villars, Leysin, Bex.", pt: "Chablais de Vaud, vinhedos; Villars, Leysin, Bex." },
+    2222: { chef: "Payerne", note: "Broye ; abbatiale de Payerne, Avenches la romaine, lac de Morat.", en: "Broye; Payerne abbey, Roman Avenches, Lake Morat.", pt: "Broye; abadia de Payerne, Avenches romana, lago de Morat." },
+    2223: { chef: "Échallens", note: "Le « grenier à blé » du canton, cœur agricole.", en: "The canton's « breadbasket », farming heartland.", pt: "O « celeiro » do cantão, coração agrícola." },
+    2224: { chef: "Yverdon-les-Bains", note: "Nord vaudois ; Yverdon (thermes), Sainte-Croix, Vallorbe, Grandson.", en: "Northern Vaud; Yverdon (thermal baths), Sainte-Croix, Vallorbe, Grandson.", pt: "Norte de Vaud; Yverdon (termas), Sainte-Croix, Vallorbe, Grandson." },
+    2225: { chef: "Lausanne", note: "Capitale du canton ; siège du CIO, cathédrale gothique.", en: "Cantonal capital; seat of the IOC, Gothic cathedral.", pt: "Capital do cantão; sede do COI, catedral gótica." },
+    2226: { chef: "Bourg-en-Lavaux", note: "Terrasses viticoles de Lavaux (UNESCO), région d'Oron.", en: "Lavaux vineyard terraces (UNESCO), Oron region.", pt: "Terraços vinícolas de Lavaux (UNESCO), região de Oron." },
+    2227: { chef: "Morges", note: "La Côte lémanique, vignobles, château de Morges.", en: "La Côte lakeshore, vineyards, Morges castle.", pt: "A Côte lemânica, vinhedos, castelo de Morges." },
+    2228: { chef: "Nyon", note: "La Côte ; Nyon la romaine, Coppet, Rolle.", en: "La Côte; Roman Nyon, Coppet, Rolle.", pt: "A Côte; Nyon romana, Coppet, Rolle." },
+    2229: { chef: "Renens", note: "Agglomération lausannoise ; EPFL et UNIL à Ecublens.", en: "Lausanne agglomeration; EPFL and UNIL in Ecublens.", pt: "Aglomeração de Lausanne; EPFL e UNIL em Ecublens." },
+    2230: { chef: "Vevey", note: "Riviera ; Montreux (jazz), Vevey (Nestlé, Chaplin), Château-d'Œx.", en: "Riviera; Montreux (jazz), Vevey (Nestlé, Chaplin), Château-d'Œx.", pt: "Riviera; Montreux (jazz), Vevey (Nestlé, Chaplin), Château-d'Œx." },
     // Valais
-    2301: { chef: "Brigue", note: "Château Stockalper, col et tunnel du Simplon.", en: "Stockalper Castle, Simplon pass and tunnel." },
-    2302: { chef: "Conthey", note: "Coteaux et vignobles au-dessus de la plaine du Rhône.", en: "Slopes and vineyards above the Rhône plain." },
-    2303: { chef: "Sembrancher", note: "Verbier, val de Bagnes, col du Grand-Saint-Bernard.", en: "Verbier, Bagnes valley, Great St Bernard pass." },
-    2304: { chef: "Münster", note: "Haute vallée du Rhône ; proche du glacier d'Aletsch (UNESCO).", en: "Upper Rhône valley; near the Aletsch Glacier (UNESCO)." },
-    2305: { chef: "Vex", note: "Val d'Hérens, Évolène ; célèbre pour les combats de reines.", en: "Hérens valley, Évolène; famous for the cow fights (combats de reines)." },
-    2306: { chef: "Loèche", note: "Loèche-les-Bains, plus grande station thermale des Alpes.", en: "Leukerbad, the largest thermal resort in the Alps." },
-    2307: { chef: "Martigny", note: "Coude du Rhône ; amphithéâtre romain, Fondation Gianadda.", en: "Bend of the Rhône; Roman amphitheatre, Gianadda Foundation." },
-    2308: { chef: "Monthey", note: "Val d'Illiez, Champéry, domaine des Portes du Soleil.", en: "Illiez valley, Champéry, Portes du Soleil ski area." },
-    2309: { chef: "Rarogne", note: "Église dans le rocher ; tombe du poète Rilke.", en: "Church carved into the rock; grave of the poet Rilke." },
-    2310: { chef: "Saint-Maurice", note: "Abbaye fondée en 515, la plus ancienne d'Occident encore active.", en: "Abbey founded in 515, the oldest still active in the West." },
-    2311: { chef: "Sierre", note: "Crans-Montana, val d'Anniviers ; ville la plus ensoleillée.", en: "Crans-Montana, Anniviers valley; the sunniest town." },
-    2312: { chef: "Sion", note: "Capitale du canton ; châteaux de Valère et Tourbillon.", en: "Cantonal capital; Valère and Tourbillon castles." },
-    2313: { chef: "Viège", note: "Vallées de Zermatt (Cervin) et de Saas-Fee.", en: "Valleys of Zermatt (Matterhorn) and Saas-Fee." },
+    2301: { chef: "Brigue", note: "Château Stockalper, col et tunnel du Simplon.", en: "Stockalper Castle, Simplon pass and tunnel.", pt: "Castelo Stockalper, colo e túnel do Simplon." },
+    2302: { chef: "Conthey", note: "Coteaux et vignobles au-dessus de la plaine du Rhône.", en: "Slopes and vineyards above the Rhône plain.", pt: "Encostas e vinhedos acima da planície do Ródano." },
+    2303: { chef: "Sembrancher", note: "Verbier, val de Bagnes, col du Grand-Saint-Bernard.", en: "Verbier, Bagnes valley, Great St Bernard pass.", pt: "Verbier, vale de Bagnes, colo do Grande São Bernardo." },
+    2304: { chef: "Münster", note: "Haute vallée du Rhône ; proche du glacier d'Aletsch (UNESCO).", en: "Upper Rhône valley; near the Aletsch Glacier (UNESCO).", pt: "Alto vale do Ródano; perto do glaciar de Aletsch (UNESCO)." },
+    2305: { chef: "Vex", note: "Val d'Hérens, Évolène ; célèbre pour les combats de reines.", en: "Hérens valley, Évolène; famous for the cow fights (combats de reines).", pt: "Vale de Hérens, Évolène; famoso pelos combates de vacas (reines)." },
+    2306: { chef: "Loèche", note: "Loèche-les-Bains, plus grande station thermale des Alpes.", en: "Leukerbad, the largest thermal resort in the Alps.", pt: "Loèche-les-Bains, a maior estância termal dos Alpes." },
+    2307: { chef: "Martigny", note: "Coude du Rhône ; amphithéâtre romain, Fondation Gianadda.", en: "Bend of the Rhône; Roman amphitheatre, Gianadda Foundation.", pt: "Cotovelo do Ródano; anfiteatro romano, Fundação Gianadda." },
+    2308: { chef: "Monthey", note: "Val d'Illiez, Champéry, domaine des Portes du Soleil.", en: "Illiez valley, Champéry, Portes du Soleil ski area.", pt: "Vale de Illiez, Champéry, domínio das Portes du Soleil." },
+    2309: { chef: "Rarogne", note: "Église dans le rocher ; tombe du poète Rilke.", en: "Church carved into the rock; grave of the poet Rilke.", pt: "Igreja escavada na rocha; túmulo do poeta Rilke." },
+    2310: { chef: "Saint-Maurice", note: "Abbaye fondée en 515, la plus ancienne d'Occident encore active.", en: "Abbey founded in 515, the oldest still active in the West.", pt: "Abadia fundada em 515, a mais antiga do Ocidente ainda ativa." },
+    2311: { chef: "Sierre", note: "Crans-Montana, val d'Anniviers ; ville la plus ensoleillée.", en: "Crans-Montana, Anniviers valley; the sunniest town.", pt: "Crans-Montana, vale de Anniviers; a cidade mais soalheira." },
+    2312: { chef: "Sion", note: "Capitale du canton ; châteaux de Valère et Tourbillon.", en: "Cantonal capital; Valère and Tourbillon castles.", pt: "Capital do cantão; castelos de Valère e Tourbillon." },
+    2313: { chef: "Viège", note: "Vallées de Zermatt (Cervin) et de Saas-Fee.", en: "Valleys of Zermatt (Matterhorn) and Saas-Fee.", pt: "Vales de Zermatt (Matterhorn) e de Saas-Fee." },
   };
   const VS_LANG = { haut: "Allemand (Haut-Valais)", cen: "Français (Valais central)", bas: "Français (Bas-Valais)" };
-  const VS_LANG_EN = { haut: "German (Upper Valais)", cen: "French (Central Valais)", bas: "French (Lower Valais)" };
+  const VS_LANG_L = {
+    en: { haut: "German (Upper Valais)", cen: "French (Central Valais)", bas: "French (Lower Valais)" },
+    pt: { haut: "Alemão (Alto Valais)", cen: "Francês (Valais central)", bas: "Francês (Baixo Valais)" },
+  };
+  const vsLang = (r) => { const m = VS_LANG_L[state.lang]; return (m && m[r]) || VS_LANG[r] || ""; };
 
   function showDistrictInfo(d) {
     const box = $("vsdInfo");
@@ -1119,8 +1139,8 @@
     const info = DISTRICT_INFO[d.id];
     const rows = [];
     if (info && info.chef) rows.push(`<div class="vsd-row"><span>🏛️ ${t("district.chef", "Chef-lieu")}</span><b>${info.chef}</b></div>`);
-    if (cantonOf() === "VS" && d.region) rows.push(`<div class="vsd-row"><span>🗣️ ${t("district.lang", "Langue")}</span><b>${(state.lang === "en" ? VS_LANG_EN : VS_LANG)[d.region] || ""}</b></div>`);
-    const note = info ? ((state.lang === "en" && info.en) ? info.en : info.note) : "";
+    if (cantonOf() === "VS" && d.region) rows.push(`<div class="vsd-row"><span>🗣️ ${t("district.lang", "Langue")}</span><b>${vsLang(d.region)}</b></div>`);
+    const note = info ? (state.lang === "fr" ? info.note : (info[state.lang] || info.note)) : "";
     box.innerHTML = `<div class="vsd-info-h"><span class="vsd-dot" style="background:${d.color}"></span>${d.name}</div>` +
       rows.join("") + (note ? `<p class="vsd-note">${note}</p>` : "");
     box.hidden = false;
@@ -1524,25 +1544,33 @@
     VD: { capital: "Lausanne", joined: "1803", langs: "Français", communes: "~300", districts: "10", pop: "~815 000", gc: 150, ce: 7, motto: "Liberté et patrie",
       facts: ["Terrasses de Lavaux inscrites à l'UNESCO", "Lausanne, capitale olympique (siège du CIO)", "Bordé par le lac Léman ; le plus peuplé des cantons romands"],
       en: { langs: "French", motto: "Liberté et patrie — « Liberty and homeland »",
-        facts: ["Lavaux terraces listed by UNESCO", "Lausanne, Olympic Capital (seat of the IOC)", "Bordered by Lake Geneva; the most populous French-speaking canton"] } },
+        facts: ["Lavaux terraces listed by UNESCO", "Lausanne, Olympic Capital (seat of the IOC)", "Bordered by Lake Geneva; the most populous French-speaking canton"] },
+      pt: { langs: "Francês", motto: "Liberté et patrie — « Liberdade e pátria »",
+        facts: ["Terraços de Lavaux inscritos na UNESCO", "Lausanne, capital olímpica (sede do COI)", "Junto ao lago Léman; o mais populoso dos cantões francófonos"] } },
     GE: { capital: "Genève", joined: "1815", langs: "Français", communes: "45", districts: "—", pop: "~510 000", gc: 100, ce: 7, motto: "Post Tenebras Lux — « Après les ténèbres, la lumière »",
       facts: ["Genève internationale : ONU, CICR, OMS…", "Le jet d'eau et la rade", "L'Escalade (1602) ; ville de Calvin et de la Réforme"],
       en: { langs: "French", motto: "Post Tenebras Lux — « After darkness, light »",
-        facts: ["International Geneva: UN, ICRC, WHO…", "The Jet d'Eau and the harbour", "The Escalade (1602); city of Calvin and the Reformation"] } },
+        facts: ["International Geneva: UN, ICRC, WHO…", "The Jet d'Eau and the harbour", "The Escalade (1602); city of Calvin and the Reformation"] },
+      pt: { langs: "Francês", motto: "Post Tenebras Lux — « Depois das trevas, a luz »",
+        facts: ["Genebra internacional: ONU, CICV, OMS…", "O jato de água e a baía", "A Escalada (1602); cidade de Calvino e da Reforma"] } },
     NE: { capital: "Neuchâtel", joined: "1815 (république dès 1848)", langs: "Français", communes: "~27", districts: "— (abolis en 2018)", pop: "~176 000", gc: 100, ce: 5, motto: "",
       facts: ["Berceau de l'horlogerie ; urbanisme horloger (La Chaux-de-Fonds / Le Locle) à l'UNESCO", "1er canton à accorder le droit de vote aux étrangers (niveau communal)", "République et Canton de Neuchâtel"],
       en: { langs: "French", joined: "1815 (republic from 1848)", districts: "— (abolished in 2018)",
-        facts: ["Cradle of watchmaking; watchmaking urban planning (La Chaux-de-Fonds / Le Locle) at UNESCO", "First canton to grant foreigners the right to vote (communal level)", "Republic and Canton of Neuchâtel"] } },
+        facts: ["Cradle of watchmaking; watchmaking urban planning (La Chaux-de-Fonds / Le Locle) at UNESCO", "First canton to grant foreigners the right to vote (communal level)", "Republic and Canton of Neuchâtel"] },
+      pt: { langs: "Francês", joined: "1815 (república desde 1848)", districts: "— (abolidos em 2018)",
+        facts: ["Berço da relojoaria; urbanismo relojoeiro (La Chaux-de-Fonds / Le Locle) na UNESCO", "1.º cantão a conceder o direito de voto aos estrangeiros (nível municipal)", "República e Cantão de Neuchâtel"] } },
     VS: { capital: "Sion", joined: "1815", langs: "Français et Allemand (canton bilingue)", communes: "~122", districts: "13", pop: "~355 000", gc: 130, ce: 5, motto: "",
       facts: ["Le Cervin et la Pointe Dufour, plus haut sommet de Suisse", "Canton bilingue français / allemand", "Les 13 étoiles du drapeau = les 13 districts ; vignoble et grands barrages"],
       en: { langs: "French and German (bilingual canton)",
-        facts: ["The Matterhorn and Dufourspitze, Switzerland's highest peak", "Bilingual French / German canton", "The 13 stars of the flag = the 13 districts; vineyards and large dams"] } },
+        facts: ["The Matterhorn and Dufourspitze, Switzerland's highest peak", "Bilingual French / German canton", "The 13 stars of the flag = the 13 districts; vineyards and large dams"] },
+      pt: { langs: "Francês e Alemão (cantão bilingue)",
+        facts: ["O Matterhorn (Cervin) e a Pointe Dufour, ponto mais alto da Suíça", "Cantão bilingue francês / alemão", "As 13 estrelas da bandeira = os 13 distritos; vinhedos e grandes barragens"] } },
   };
   function openMonCanton() {
     const cn = cantonOf();
     const p = CANTON_PROFILE[cn];
-    const en = state.lang === "en" ? (p.en || {}) : {};
-    const pv = (k) => (en[k] != null ? en[k] : p[k]);
+    const loc = state.lang !== "fr" ? (p[state.lang] || {}) : {};
+    const pv = (k) => (loc[k] != null ? loc[k] : p[k]);
     const nm = cnName(cn);
     const col = (typeof REGION_COLORS !== "undefined") ? REGION_COLORS[cn === "VS" ? "multi" : "fr"] : "#C65D3B";
     const regLong = cn === "VS" ? t("mc.region.multi", "Canton plurilingue") : t("mc.region.fr", "Suisse romande");
