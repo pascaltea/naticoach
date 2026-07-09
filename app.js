@@ -1322,12 +1322,12 @@
     $("aboutBody").innerHTML =
       `<div class="cs-card cs-highlight about-disclaimer">
          <div class="cs-card-h">⚠️ ${t("about.discH", "Application non officielle")}</div>
-         <p>${t("about.disc", "NatiCoach est un outil d'entraînement <b>indépendant</b>, sans but lucratif. Les questions proviennent des <b>questionnaires officiels</b> publiés par les cantons sur leurs sites, mais <b>ce n'est pas une application officielle</b> et nous <b>ne pouvons pas garantir</b> qu'il s'agit de la version la plus récente. Les questionnaires peuvent évoluer : vérifie toujours les informations à jour auprès de ta <b>commune</b> ou de ton <b>canton</b>.")}</p>
+         <p>${t("about.disc", "NatiCoach est un outil d'entraînement <b>indépendant</b>, <b>non affilié aux autorités cantonales</b> et sans lien officiel avec elles. Les questions proviennent des <b>questionnaires officiels</b> publiés par les cantons sur leurs sites, mais <b>ce n'est pas une application officielle</b> et nous <b>ne pouvons pas garantir</b> qu'il s'agit de la version la plus récente. Les questionnaires peuvent évoluer : vérifie toujours les informations à jour auprès de ta <b>commune</b> ou de ton <b>canton</b>.")}</p>
        </div>` +
       `<h3 class="cs-h">📚 ${t("about.sourcesH", "Sources des questions")}</h3>` +
       `<div class="cs-card src-list">${order.map(srcRow).join("")}</div>` +
       csCard("✅", t("about.answersH", "Réponses & propositions"), t("about.answers", "Seule la <b>bonne réponse</b> est officielle. Pour Neuchâtel et le Valais, les <b>fausses propositions</b> des QCM sont générées par l'app pour aider à mémoriser — elles ne proviennent pas des questionnaires officiels.")) +
-      `<p class="cs-note">${t("about.offline", "NatiCoach fonctionne hors-ligne ; aucune donnée ne quitte ton téléphone. Usage personnel et familial.")}</p>`;
+      `<p class="cs-note">${t("about.offline", "NatiCoach fonctionne hors-ligne ; aucune donnée ne quitte ton téléphone.")}</p>`;
     showScreen("screen-about");
   }
 
