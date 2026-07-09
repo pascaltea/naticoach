@@ -16,8 +16,8 @@
 
   /* Configuration d'examen par canton (QCM : Vaud / Genève). */
   const EXAM_CFG = {
-    VD: { total: 48, passCorrect: 34, minutes: 60, passLabel: "70 % de bonnes réponses", passLabelEn: "70% correct answers" },
-    GE: { total: 45, passCorrect: 40, minutes: 45, passLabel: "40 bonnes réponses sur 45 (5 fautes maximum)", passLabelEn: "40 correct answers out of 45 (5 mistakes max)" },
+    VD: { total: 48, passCorrect: 34, minutes: 60, passLabel: "70 % de bonnes réponses", passLabelEn: "70% correct answers", passLabelPt: "70% de respostas corretas" },
+    GE: { total: 45, passCorrect: 40, minutes: 45, passLabel: "40 bonnes réponses sur 45 (5 fautes maximum)", passLabelEn: "40 correct answers out of 45 (5 mistakes max)", passLabelPt: "40 respostas corretas em 45 (máx. 5 erros)" },
   };
   const cantonOf = () => (["VD", "GE", "NE", "VS"].indexOf(state.canton) >= 0 ? state.canton : "VD");
   /* Format d'un canton : "mcq" (QCM Vaud/Genève) ou "cards" (fiches Q→R : Neuchâtel/Valais). */
@@ -25,19 +25,31 @@
   const isCards = () => CANTON_FORMAT[cantonOf()] === "cards";
   const CANTON_NAME = { VD: "Vaud", GE: "Genève", NE: "Neuchâtel", VS: "Valais" };
   const CANTON_SCOPE = { VD: "Canton de Vaud", GE: "Canton de Genève", NE: "Canton de Neuchâtel", VS: "Canton du Valais" };
-  const CANTON_NAME_EN = { VD: "Vaud", GE: "Geneva", NE: "Neuchâtel", VS: "Valais" };
-  const CANTON_SCOPE_EN = { VD: "Canton of Vaud", GE: "Canton of Geneva", NE: "Canton of Neuchâtel", VS: "Canton of Valais" };
-  const cnName = (cn) => (state.lang === "en" ? CANTON_NAME_EN : CANTON_NAME)[cn || cantonOf()];
-  const cScope = (cn) => (state.lang === "en" ? CANTON_SCOPE_EN : CANTON_SCOPE)[cn || cantonOf()];
+  const CANTON_NAME_L = {
+    en: { VD: "Vaud", GE: "Geneva", NE: "Neuchâtel", VS: "Valais" },
+    pt: { VD: "Vaud", GE: "Genebra", NE: "Neuchâtel", VS: "Valais" },
+  };
+  const CANTON_SCOPE_L = {
+    en: { VD: "Canton of Vaud", GE: "Canton of Geneva", NE: "Canton of Neuchâtel", VS: "Canton of Valais" },
+    pt: { VD: "Cantão de Vaud", GE: "Cantão de Genebra", NE: "Cantão de Neuchâtel", VS: "Cantão do Valais" },
+  };
+  const cnName = (cn) => { cn = cn || cantonOf(); const m = CANTON_NAME_L[state.lang]; return (m && m[cn]) || CANTON_NAME[cn]; };
+  const cScope = (cn) => { cn = cn || cantonOf(); const m = CANTON_SCOPE_L[state.lang]; return (m && m[cn]) || CANTON_SCOPE[cn]; };
   const fmt = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => (o[k] != null ? o[k] : ""));
-  const THEME_EN = { "Géographie": "Geography", "Histoire": "History", "Politique": "Politics", "Social": "Society" };
-  const trTheme = (th) => (state.lang === "en" ? (THEME_EN[th] || th) : th);
+  const THEME_L = {
+    en: { "Géographie": "Geography", "Histoire": "History", "Politique": "Politics", "Social": "Society" },
+    pt: { "Géographie": "Geografia", "Histoire": "História", "Politique": "Política", "Social": "Sociedade" },
+  };
+  const trTheme = (th) => { const m = THEME_L[state.lang]; return (m && m[th]) || th; };
+  const SCOPE_L = {
+    en: { "Suisse": "Switzerland", "Canton de Vaud": "Canton of Vaud", "Canton de Genève": "Canton of Geneva", "Canton de Neuchâtel": "Canton of Neuchâtel", "Canton du Valais": "Canton of Valais", commune: "Municipality of " },
+    pt: { "Suisse": "Suíça", "Canton de Vaud": "Cantão de Vaud", "Canton de Genève": "Cantão de Genebra", "Canton de Neuchâtel": "Cantão de Neuchâtel", "Canton du Valais": "Cantão do Valais", commune: "Município de " },
+  };
   function trScope(s) {
-    if (state.lang !== "en" || !s) return s;
-    if (s === "Suisse") return "Switzerland";
-    const m = { "Canton de Vaud": "Canton of Vaud", "Canton de Genève": "Canton of Geneva", "Canton de Neuchâtel": "Canton of Neuchâtel", "Canton du Valais": "Canton of Valais" };
+    const m = SCOPE_L[state.lang];
+    if (!m || !s) return s;
     if (m[s]) return m[s];
-    if (s.indexOf("Commune de ") === 0) return "Municipality of " + s.slice(11);
+    if (s.indexOf("Commune de ") === 0) return m.commune + s.slice(11);
     return s;
   }
   function cardsData() {
@@ -87,10 +99,11 @@
   }
 
   /* ---------------- i18n (français source, anglais en surcouche) ---------------- */
-  const EN = () => (window.I18N && window.I18N.en) || {};
-  /* t("clé", "repli fr") : renvoie l'anglais si lang=en et la clé existe, sinon le français. */
+  const LANGS = ["fr", "en", "pt"];   // langues disponibles (fr = source)
+  const DICT = () => (window.I18N && window.I18N[state.lang]) || {};
+  /* t("clé", "repli fr") : renvoie la traduction de la langue courante si la clé existe, sinon le français. */
   function t(key, fr) {
-    if (state.lang === "en") { const d = EN(); if (d[key] != null) return d[key]; }
+    if (state.lang !== "fr") { const d = DICT(); if (d[key] != null) return d[key]; }
     return fr != null ? fr : key;
   }
   /* ---------------- Freemium (aperçu gratuit → premium) ---------------- */
@@ -100,23 +113,24 @@
 
   const _frSnap = {};   // texte français d'origine, capturé une fois, pour restaurer
   function applyStaticI18n() {
-    const d = EN();
+    const d = DICT();
+    const tr = state.lang !== "fr";
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const k = el.getAttribute("data-i18n");
       if (!(k in _frSnap)) _frSnap[k] = el.innerHTML;
-      el.innerHTML = (state.lang === "en" && d[k] != null) ? d[k] : _frSnap[k];
+      el.innerHTML = (tr && d[k] != null) ? d[k] : _frSnap[k];
     });
     document.querySelectorAll("[data-i18n-ph]").forEach((el) => {
       const k = el.getAttribute("data-i18n-ph");
       if (!(k in _frSnap)) _frSnap[k] = el.getAttribute("placeholder") || "";
-      el.setAttribute("placeholder", (state.lang === "en" && d[k] != null) ? d[k] : _frSnap[k]);
+      el.setAttribute("placeholder", (tr && d[k] != null) ? d[k] : _frSnap[k]);
     });
     document.documentElement.lang = state.lang;
     document.querySelectorAll(".lang-btn").forEach((b) =>
       b.classList.toggle("on", b.dataset.lang === state.lang));
   }
   function setLang(lang) {
-    if (lang !== "fr" && lang !== "en") return;
+    if (LANGS.indexOf(lang) < 0) return;
     state.lang = lang; save();
     applyStaticI18n();
     rerenderActive();
@@ -848,16 +862,17 @@
    * ==================================================================== */
   const STAT_THEMES = ["Géographie", "Histoire", "Politique", "Social"];
   const statLevels = () => (cantonOf() === "GE" ? ["Suisse", "Genève"] : ["Suisse", "Vaud", "Commune"]);
-  const levelLabel = (l) => {
-    const fr = { Suisse: "Suisse", Vaud: "Canton de Vaud", "Genève": "Canton de Genève", Commune: "Ma commune" };
-    const en = { Suisse: "Switzerland", Vaud: "Canton of Vaud", "Genève": "Canton of Geneva", Commune: "My municipality" };
-    return (state.lang === "en" ? en : fr)[l] || l;
+  const LEVEL_L = {
+    fr: { Suisse: "Suisse", Vaud: "Canton de Vaud", "Genève": "Canton de Genève", Commune: "Ma commune" },
+    en: { Suisse: "Switzerland", Vaud: "Canton of Vaud", "Genève": "Canton of Geneva", Commune: "My municipality" },
+    pt: { Suisse: "Suíça", Vaud: "Cantão de Vaud", "Genève": "Cantão de Genebra", Commune: "Meu município" },
   };
+  const levelLabel = (l) => (LEVEL_L[state.lang] || LEVEL_L.fr)[l] || (LEVEL_L.fr[l] || l);
 
   /* Palier de couleur d'une barre (seuil examen à 60 %). */
   function barColor(pct) { return pct < 30 ? "#C8442E" : pct < 45 ? "#D8836F" : pct < 60 ? "#C08A2E" : "#3E7A4E"; }
   const THEME_ART = { "Géographie": "la Géographie", "Histoire": "l'Histoire", "Politique": "la Politique", "Social": "le Social" };
-  const elle = (th) => (state.lang === "en" ? trTheme(th) : (THEME_ART[th] || th));
+  const elle = (th) => (state.lang === "fr" ? (THEME_ART[th] || th) : trTheme(th));
 
   function openStats() {
     const box = $("statsBody");
@@ -1176,7 +1191,7 @@
     NE: { gc: 100, ce: 5, tCant: 4, tCom: 4 },
     VS: { gc: 130, ce: 5, tCant: 4, tCom: 4 },
   };
-  const termLabel = (yrs) => state.lang === "en" ? (yrs + "-year term") : ("mandat " + yrs + " ans");
+  const termLabel = (yrs) => state.lang === "en" ? (yrs + "-year term") : (state.lang === "pt" ? ("mandato de " + yrs + " anos") : ("mandat " + yrs + " ans"));
 
   function qeCard(kind, role, name, meta, by, byKind) {
     return `<div class="qe-card qe-${kind}">
@@ -1209,7 +1224,7 @@
     const head = t("commune.head." + cn, ci.head);
     const cantonTitle = fmt(t("pol.cantonT", "Canton de {c}"), { c: cantonNm });
     const gc = t("pol.gc", "Grand Conseil"), ce = t("pol.ce", "Conseil d'État");
-    const chairedBy = state.lang === "en" ? ("chaired by the " + head) : ("présidé·e par le·la " + head);
+    const chairedBy = state.lang === "en" ? ("chaired by the " + head) : (state.lang === "pt" ? ("presidido por " + head) : ("présidé·e par le·la " + head));
     $("politiqueBody").innerHTML =
       `<p class="cs-intro">${t("pol.intro", "La Suisse repose sur <b>3 niveaux</b> (Confédération · Canton · Commune) et sur la <b>séparation des 3 pouvoirs</b> : qui fait les lois, qui gouverne, qui juge.")}</p>` +
       polLevel(t("pol.confedT", "Confédération"), t("pol.confedSub", "niveau fédéral · Suisse"), [
@@ -1824,7 +1839,8 @@
         msg = fmt(t("result.passMsg", "{c}/{n} bonnes réponses ({p}%) — au-dessus du seuil requis.{r}"), { c: quiz.correct, n: total, p: pct, r: rec });
       } else {
         titleHTML = t("result.keepGoing", "Continue, tu avances.");
-        const pl = (state.lang === "en" && EXAM_CFG[cantonOf()]) ? EXAM_CFG[cantonOf()].passLabelEn : (quiz.passLabel || t("result.passDefault", "70 % de bonnes réponses"));
+        const cfgL = EXAM_CFG[cantonOf()];
+        const pl = (state.lang !== "fr" && cfgL) ? (cfgL["passLabel" + state.lang.charAt(0).toUpperCase() + state.lang.slice(1)] || quiz.passLabel) : (quiz.passLabel || t("result.passDefault", "70 % de bonnes réponses"));
         msg = fmt(t("result.failMsg", "Réussite : {l}. Chaque session compte."), { l: pl });
       }
       $("resultBilan").innerHTML = pass ? recapTiles(prevPct) : themeBilan();
@@ -1863,8 +1879,8 @@
 
     // Message de partage (WhatsApp & co.).
     let lieu = "";
-    if (cantonOf() === "GE") lieu = state.lang === "en" ? " (Canton of Geneva)" : " (canton de Genève)";
-    else { const commune = VD_DATA.communes[state.commune]; if (commune) lieu = (state.lang === "en" ? " (municipality of " : " (commune de ") + commune.name + ")"; }
+    if (cantonOf() === "GE") lieu = " (" + cScope("GE") + ")";
+    else { const commune = VD_DATA.communes[state.commune]; if (commune) lieu = " (" + trScope("Commune de " + commune.name) + ")"; }
     if (quiz.mode === "exam") {
       lastShareText =
         fmt(t("share.examLine1", "NatiCoach — Simulation du test de naturalisation{l}"), { l: lieu }) + "\n" +
