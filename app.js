@@ -1297,10 +1297,10 @@
 
   /* Sources officielles des banques de questions, par canton (+ dates connues). */
   const SOURCES = {
-    VD: { auth: "État de Vaud", srcFr: "Outil officiel d'entraînement au test de connaissances", srcEn: "Official knowledge-test practice tool", url: "https://www.vd.ch/prestations/naturalisation", host: "vd.ch", dateFr: "version en ligne, 2026", dateEn: "online version, 2026" },
-    GE: { auth: "République et canton de Genève", srcFr: "E-learning officiel « Connaître la Suisse et Genève »", srcEn: "Official e-learning « Getting to know Switzerland and Geneva »", url: "https://outils.ge.ch/e-learning/connaitre-suisse/", host: "outils.ge.ch", dateFr: "version en ligne, 2026", dateEn: "online version, 2026" },
+    VD: { auth: "État de Vaud", srcFr: "Outil officiel d'entraînement au test de connaissances", srcEn: "Official knowledge-test practice tool", url: "https://www.vd.ch/prestations/naturalisation", host: "vd.ch", dateFr: "consulté en juillet 2026", dateEn: "accessed July 2026" },
+    GE: { auth: "République et canton de Genève", srcFr: "E-learning officiel « Connaître la Suisse et Genève »", srcEn: "Official e-learning « Getting to know Switzerland and Geneva »", url: "https://outils.ge.ch/e-learning/connaitre-suisse/", host: "outils.ge.ch", dateFr: "consulté en juillet 2026", dateEn: "accessed July 2026" },
     NE: { auth: "République et canton de Neuchâtel", srcFr: "Questionnaire officiel avec réponses", srcEn: "Official questionnaire with answers", url: "https://www.ne.ch", host: "ne.ch", dateFr: "édition janvier 2026", dateEn: "January 2026 edition" },
-    VS: { auth: "Canton du Valais", srcFr: "Questionnaire officiel (questions et réponses)", srcEn: "Official questionnaire (questions and answers)", url: "https://www.vs.ch", host: "vs.ch", dateFr: "questions 2021 · réponses 2022", dateEn: "questions 2021 · answers 2022" },
+    VS: { auth: "Canton du Valais", srcFr: "Questionnaire officiel (questions et réponses)", srcEn: "Official questionnaire (questions and answers)", url: "https://www.vs.ch", host: "vs.ch", dateFr: "questions : novembre 2021 · réponses : août 2022", dateEn: "questions: November 2021 · answers: August 2022" },
   };
 
   function openAbout() {
