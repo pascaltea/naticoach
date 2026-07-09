@@ -50,6 +50,7 @@
   const defaultState = () => ({
     history: [], sessions: 0, best: 0, streak: 0, lastPlayed: null,
     lang: "fr",     // "fr" (source) | "en"
+    premium: false, // déblocage « premium » (achat unique) — branché sur RevenueCat plus tard
     canton: null,   // "VD" | "GE"
     commune: null,  // (Vaud uniquement)
     mistakes: [],   // [{q, options, answer, theme, scope}]
@@ -92,6 +93,11 @@
     if (state.lang === "en") { const d = EN(); if (d[key] != null) return d[key]; }
     return fr != null ? fr : key;
   }
+  /* ---------------- Freemium (aperçu gratuit → premium) ---------------- */
+  const isPremium = () => state.premium === true;
+  const FREE_STUDY = 20;   // questions accessibles gratuitement en révision (aperçu)
+  const FREE_EXAM = 12;    // questions de l'« examen d'essai » gratuit
+
   const _frSnap = {};   // texte français d'origine, capturé une fois, pour restaurer
   function applyStaticI18n() {
     const d = EN();
@@ -126,7 +132,7 @@
       "screen-federalisme": openFederalisme, "screen-langues": openLangues, "screen-neutralite": openNeutralite,
       "screen-symboles": openSymboles, "screen-timeline": openTimeline, "screen-vsmap": openDistricts,
       "screen-explore": openExplore, "screen-stats": openStats, "screen-badges": openBadges,
-      "screen-about": openAbout,
+      "screen-about": openAbout, "screen-premium": openPremium,
     };
     if (map[id]) { try { map[id](); } catch (e) {} }
   }
@@ -401,6 +407,15 @@
   function renderHome() {
     const cn = cantonOf();
     const cards = isCards();
+    const pb = $("premiumBanner");
+    if (pb) {
+      pb.hidden = isPremium();
+      if (!isPremium()) {
+        $("premiumBannerTitle").textContent = t("premium.bannerTitle", "Débloquer tout");
+        $("premiumBannerSub").textContent = t("premium.bannerSub", "Accès complet · achat unique");
+        $("premiumBannerPrice").textContent = PREMIUM_PRICE;
+      }
+    }
     const c = VD_DATA.communes[state.commune];
     $("homeCommune").textContent = cn === "VD" ? (c ? c.name : t("misc.chooseCommune", "Choisir…")) : cnName(cn);
     $("friseTileSub").textContent = t("misc.swiss", "Suisse") + " · " + cnName(cn);
@@ -538,14 +553,18 @@
     if (isCards()) {
       const d = cardsDeck();
       const src = scope === "all" ? d.federal.concat(d.cantonal) : (d[scope] || []);
-      study = { scope, items: src.map((c) => Object.assign({}, c)), i: 0, cards: true };
+      const full = src.map((c) => Object.assign({}, c));
+      const locked = isPremium() ? 0 : Math.max(0, full.length - FREE_STUDY);
+      study = { scope, items: locked ? full.slice(0, FREE_STUDY) : full, i: 0, cards: true, lockedCount: locked };
       $("studyScopeLabel").textContent = t("study.label", "Révision") + " · " + (sc ? sc.label : t("scope.all", "Tout"));
       renderStudy(); return;
     }
     const d = currentDeck();
     const src = scope === "all" ? d.federal.concat(d.cantonal, d.commune) : (d[scope] || []);
     const interactive = study ? study.interactive : true;
-    study = { scope, items: src.map(buildQuestion), i: 0, interactive };
+    const full = src.map(buildQuestion);
+    const locked = isPremium() ? 0 : Math.max(0, full.length - FREE_STUDY);
+    study = { scope, items: locked ? full.slice(0, FREE_STUDY) : full, i: 0, interactive, lockedCount: locked };
     $("studyScopeLabel").textContent = t("study.label", "Révision") + " · " + (sc ? sc.label : t("scope.all", "Tout"));
     renderStudy();
   }
@@ -627,7 +646,14 @@
     }
   }
 
+  function updateStudyLock() {
+    const el = $("studyLock"); if (!el) return;
+    const n = study && study.lockedCount;
+    if (n > 0) { el.hidden = false; el.innerHTML = `🔒 ${fmt(t("premium.studyLock", "Aperçu gratuit · {n} questions verrouillées"), { n: n })} — <b>${t("premium.unlock", "Débloquer")}</b>`; }
+    else el.hidden = true;
+  }
   function renderStudy() {
+    updateStudyLock();
     if (study.cards) { renderStudyCard(); return; }
     const cur = study.items[study.i];
     const answered = cur.chosen !== undefined && cur.chosen !== null;
@@ -1331,6 +1357,56 @@
     showScreen("screen-about");
   }
 
+  /* ---------------- Premium (achat unique) ---------------- */
+  const PREMIUM_PRICE = "CHF 14.90";
+
+  function openPremium() {
+    if (isPremium()) {
+      $("premiumBody").innerHTML =
+        `<div class="pr-hero pr-owned"><div class="pr-badge">✓</div>
+           <h3>${t("premium.ownedTitle", "Tu as la version premium")}</h3>
+           <p>${t("premium.ownedMsg", "Merci ! Tout est débloqué. Bonne préparation. 🌼")}</p></div>`;
+      showScreen("screen-premium"); return;
+    }
+    const feat = (ico, txt) => `<li><span class="pr-ico">${ico}</span>${txt}</li>`;
+    $("premiumBody").innerHTML =
+      `<div class="pr-hero">
+         <img class="pr-flower" src="logo-edelweiss-red.svg" alt="" width="40" height="40" />
+         <h3>${t("premium.title", "Débloque toute ta préparation")}</h3>
+         <p>${t("premium.sub", "Un seul achat, à vie. Aucun abonnement.")}</p>
+       </div>
+       <ul class="pr-feats">
+         ${feat("📚", t("premium.f1", "<b>Toutes les questions</b> officielles de ton canton"))}
+         ${feat("🎯", t("premium.f2", "La <b>simulation d'examen complète</b> (conditions réelles, minuteur)"))}
+         ${feat("📊", t("premium.f3", "<b>Statistiques</b> et suivi de progression"))}
+         ${feat("🔁", t("premium.f4", "Révision de <b>toutes tes erreurs</b>"))}
+         ${feat("🌍", t("premium.f5", "Les futures <b>langues et mises à jour</b>, sans repayer"))}
+       </ul>
+       <div class="pr-cta-wrap">
+         <button class="btn btn-primary big" id="btnPremiumBuy">${fmt(t("premium.buy", "Débloquer · {p}"), { p: PREMIUM_PRICE })}</button>
+         <button class="btn btn-ghost" id="btnPremiumRestore">${t("premium.restore", "Restaurer mon achat")}</button>
+         <p class="pr-note">${t("premium.note", "Paiement unique via l'App Store / Google Play. Débloqué à vie sur cet appareil.")}</p>
+       </div>`;
+    const buy = $("btnPremiumBuy"); if (buy) buy.addEventListener("click", purchasePremium);
+    const res = $("btnPremiumRestore"); if (res) res.addEventListener("click", restorePurchase);
+    showScreen("screen-premium");
+  }
+
+  /* Achat premium. TODO : brancher RevenueCat (Purchases.purchasePackage) une fois l'app emballée en Capacitor.
+     Pour l'instant (app web / test) : déblocage local après confirmation. */
+  function purchasePremium() {
+    if (typeof window.NatiPurchase === "function") { window.NatiPurchase(); return; } // point d'ancrage IAP natif
+    if (confirm(t("premium.testConfirm", "(Version de test) Débloquer NatiCoach Premium sans paiement ?"))) {
+      state.premium = true; save();
+      toast("🌼", t("premium.unlocked", "Premium débloqué — merci !"));
+      renderHome(); showScreen("screen-home");
+    }
+  }
+  function restorePurchase() {
+    if (typeof window.NatiRestore === "function") { window.NatiRestore(); return; }
+    alert(t("premium.restoreTodo", "La restauration d'achat sera disponible dans la version publiée sur les stores."));
+  }
+
   function openDemocratie() {
     const card = (ico, title, body) =>
       `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div><p>${body}</p></div>`;
@@ -1511,6 +1587,7 @@
   }
 
   function startExam() {
+    if (!isPremium()) { startTrialExam(); return; }   // gratuit → examen d'essai
     const cfg = EXAM_CFG[cantonOf()];
     let items;
     if (cantonOf() === "GE") {
@@ -1525,6 +1602,19 @@
       endAt: Date.now() + cfg.minutes * 60000,
     };
     showScreen("screen-quiz"); renderQuestion(); startExamTimer();
+  }
+
+  /* Examen d'essai gratuit : court échantillon, correction immédiate, sans minuteur ni score enregistré. */
+  function startTrialExam() {
+    let bank;
+    if (isCards()) { const d = cardsDeck(); bank = d.federal.concat(d.cantonal).filter((q) => q.type === "mcq"); }
+    else if (cantonOf() === "GE") { const d = geDeck(); bank = d.federal.concat(d.cantonal); }
+    else { const d = communeDeck(state.commune); bank = d.federal.concat(d.cantonal); }
+    let out = [];
+    THEMES.forEach((th) => { out = out.concat(shuffle(bank.filter((q) => q.theme === th)).slice(0, 3)); });
+    const items = shuffle(out).slice(0, FREE_EXAM).map(buildQuestion);
+    quiz = { mode: "practice", items: items, i: 0, correct: 0, answered: false, trial: true };
+    showScreen("screen-quiz"); renderQuestion();
   }
 
   function startExamTimer() {
@@ -1645,17 +1735,20 @@
     const total = quiz.mode === "exam" ? (quiz.total || EXAM_TOTAL) : quiz.items.length;
     const pct = Math.round((quiz.correct / total) * 100);
 
-    state.sessions++;
-    state.best = Math.max(state.best, pct);
-    state.history.push({ date: todayISO(), pct });
-    if (state.history.length > 60) state.history = state.history.slice(-60);
-    const today = todayISO();
-    if (state.lastPlayed !== today) {
-      const y = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
-      state.streak = state.lastPlayed === y ? state.streak + 1 : 1;
-      state.lastPlayed = today;
+    // L'examen d'essai gratuit ne compte pas dans les stats (pas de session enregistrée).
+    if (!quiz.trial) {
+      state.sessions++;
+      state.best = Math.max(state.best, pct);
+      state.history.push({ date: todayISO(), pct });
+      if (state.history.length > 60) state.history = state.history.slice(-60);
+      const today = todayISO();
+      if (state.lastPlayed !== today) {
+        const y = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+        state.streak = state.lastPlayed === y ? state.streak + 1 : 1;
+        state.lastPlayed = today;
+      }
+      save();
     }
-    save();
 
     const prevPct = state.history.length >= 2 ? state.history[state.history.length - 2].pct : null;
 
@@ -1694,6 +1787,11 @@
         msg = fmt(t("result.failMsg", "Réussite : {l}. Chaque session compte."), { l: pl });
       }
       $("resultBilan").innerHTML = pass ? recapTiles(prevPct) : themeBilan();
+    } else if (quiz.trial) {
+      badge.hidden = true;
+      titleHTML = t("premium.trialDone", "Aperçu terminé 🎬");
+      msg = fmt(t("premium.trialMsg", "Tu viens de tester {n} questions. Débloque la simulation d'examen complète et toutes les questions."), { n: total });
+      $("resultBilan").innerHTML = `<button class="btn btn-primary big pr-result-cta" id="resultPremiumCta">🔓 ${fmt(t("premium.buy", "Débloquer · {p}"), { p: PREMIUM_PRICE })}</button>`;
     } else {
       badge.hidden = true;
       $("resultBilan").innerHTML = "";
@@ -1737,6 +1835,7 @@
     }
 
     showScreen("screen-result");
+    const rpc = $("resultPremiumCta"); if (rpc) rpc.addEventListener("click", openPremium);
   }
 
   function shareResult() {
@@ -1900,6 +1999,9 @@
   $("btnQuitAssurances").addEventListener("click", () => showScreen("screen-home"));
   $("btnAbout").addEventListener("click", openAbout);
   $("btnQuitAbout").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitPremium").addEventListener("click", () => showScreen("screen-home"));
+  $("studyLock").addEventListener("click", openPremium);
+  $("premiumBanner").addEventListener("click", openPremium);
   $("btnMistakes").addEventListener("click", startMistakes);
   $("btnStats").addEventListener("click", openStats);
   $("btnQuitStats").addEventListener("click", () => showScreen("screen-home"));

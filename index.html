@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=71" />
+  <link rel="stylesheet" href="styles.css?v=72" />
 </head>
 <body>
   <div id="app">
@@ -109,6 +109,12 @@
         <span class="exam-cta-arrow">›</span>
       </button>
 
+      <button class="premium-banner" id="premiumBanner" hidden>
+        <span class="pb-ico">🔓</span>
+        <span class="pb-txt"><b id="premiumBannerTitle">Débloquer tout</b><small id="premiumBannerSub">Accès complet · achat unique</small></span>
+        <span class="pb-price" id="premiumBannerPrice">CHF 14.90</span>
+      </button>
+
       <div class="prep-card">
         <div class="prep-ring">
           <svg viewBox="0 0 120 120" class="ring">
@@ -197,6 +203,7 @@
         <span class="quiz-count" id="studyCount">1/1</span>
       </div>
       <div class="study-modebar" id="studyModebar"><div class="seg toggle2" id="studyMode"></div></div>
+      <button class="study-lock" id="studyLock" hidden></button>
       <div class="study-progress"><div class="study-progress-fill" id="studyProgressFill"></div></div>
       <div class="quiz-body">
         <span class="chip" id="studyChip"></span>
@@ -489,6 +496,16 @@
       <div id="aboutBody"></div>
     </section>
 
+    <!-- ============ ÉCRAN : PREMIUM ============ -->
+    <section class="screen" id="screen-premium">
+      <div class="quiz-top">
+        <button class="icon-btn" id="btnQuitPremium" aria-label="Retour">←</button>
+        <h2 class="explore-title" data-i18n="title.premium">NatiCoach Premium</h2>
+        <span></span>
+      </div>
+      <div id="premiumBody"></div>
+    </section>
+
     <!-- Lightbox illustrations -->
     <div id="lightbox" class="lightbox" hidden><div class="lightbox-inner" id="lightboxInner"></div></div>
     <!-- Notification succès -->
@@ -508,7 +525,7 @@
   <script src="ge_official.js"></script>
   <script src="ne_official.js?v=56"></script>
   <script src="vs_official.js?v=56"></script>
-  <script src="i18n.js?v=71"></script>
-  <script src="app.js?v=71"></script>
+  <script src="i18n.js?v=72"></script>
+  <script src="app.js?v=72"></script>
 </body>
 </html>
