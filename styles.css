@@ -490,6 +490,14 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .spark-mini .line { fill: none; stroke: var(--red); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 .spark-mini circle { fill: var(--red); }
 
+/* Mentions légales (CGU / confidentialité) */
+.legal-body { font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; }
+.legal-draft { background: #F6EDD8; color: var(--red-dark); border-radius: 10px; padding: 9px 12px; font-size: 12.5px; margin-bottom: 12px; }
+.legal-meta { font-family: var(--font-serif); font-size: 14px; color: var(--ink); margin-bottom: 10px; }
+.legal-sec { margin-bottom: 14px; }
+.legal-sec h3 { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.legal-links { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.legal-link { text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-family: inherit; font-size: 14px; color: var(--red); font-weight: 600; cursor: pointer; box-shadow: var(--shadow-sm); }
 /* Freemium : bannière accueil, verrou révision, écran premium */
 .premium-banner { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; cursor: pointer;
   background: var(--card); border: 1.5px solid var(--gold); border-radius: 16px; padding: 12px 15px; margin-bottom: 16px; box-shadow: var(--shadow-sm); font-family: inherit; }

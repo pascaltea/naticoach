@@ -1353,7 +1353,13 @@
       `<h3 class="cs-h">📚 ${t("about.sourcesH", "Sources des questions")}</h3>` +
       `<div class="cs-card src-list">${order.map(srcRow).join("")}</div>` +
       csCard("✅", t("about.answersH", "Réponses & propositions"), t("about.answers", "Seule la <b>bonne réponse</b> est officielle. Pour Neuchâtel et le Valais, les <b>fausses propositions</b> des QCM sont générées par l'app pour aider à mémoriser — elles ne proviennent pas des questionnaires officiels.")) +
-      `<p class="cs-note">${t("about.offline", "NatiCoach fonctionne hors-ligne ; aucune donnée ne quitte ton téléphone.")}</p>`;
+      `<p class="cs-note">${t("about.offline", "NatiCoach fonctionne hors-ligne ; aucune donnée ne quitte ton téléphone.")}</p>` +
+      `<div class="legal-links">
+         <button class="legal-link" id="btnCgu">${t("about.cgu", "Conditions générales")} ›</button>
+         <button class="legal-link" id="btnPrivacy">${t("about.privacy", "Politique de confidentialité")} ›</button>
+       </div>`;
+    const bc = $("btnCgu"); if (bc) bc.addEventListener("click", openCgu);
+    const bp = $("btnPrivacy"); if (bp) bp.addEventListener("click", openPrivacy);
     showScreen("screen-about");
   }
 
@@ -1405,6 +1411,41 @@
   function restorePurchase() {
     if (typeof window.NatiRestore === "function") { window.NatiRestore(); return; }
     alert(t("premium.restoreTodo", "La restauration d'achat sera disponible dans la version publiée sur les stores."));
+  }
+
+  /* ---------------- Mentions légales (CGU + confidentialité) ---------------- */
+  /* Modèles rédactionnels — à faire valider par un·e avocat·e. Zones [entre crochets] à compléter. */
+  const legalSec = (n, title, body) => `<div class="legal-sec"><h3>${n}. ${title}</h3><p>${body}</p></div>`;
+  const legalDraftNote = () => `<p class="legal-draft">${t("legal.draft", "Modèle à faire valider par un·e avocat·e avant publication. Les mentions [entre crochets] sont à compléter par l'éditeur.")}</p>`;
+
+  function openCgu() {
+    $("cguBody").innerHTML = legalDraftNote() +
+      `<p class="legal-meta">${t("legal.cguIntro", "Conditions Générales d'Utilisation et de Vente — NatiCoach · Version 1.0")}</p>` +
+      legalSec(1, "Éditeur", "L'application <b>NatiCoach</b> (« l'Application ») est éditée par <b>[Prénom Nom]</b>, personne physique exerçant en <b>raison individuelle</b>, <b>[adresse]</b>, Suisse (« l'Éditeur »). Contact : <b>[email]</b>.") +
+      legalSec(2, "Objet", "Les présentes conditions régissent l'accès et l'utilisation de l'Application, un <b>outil d'entraînement pédagogique</b> à la préparation du test de connaissances de la naturalisation suisse. En utilisant l'Application, l'utilisateur·rice les accepte.") +
+      legalSec(3, "Absence de caractère officiel", "NatiCoach est un outil <b>indépendant</b>, <b>non affilié</b> et non approuvé par les autorités (Confédération, cantons, communes). Les questions s'inspirent de questionnaires officiels rendus publics ; l'Éditeur ne garantit ni leur exactitude ni leur mise à jour. Seule fait foi l'information de l'autorité compétente.") +
+      legalSec(4, "Absence de garantie de résultat", "L'Application est fournie « en l'état » et <b>ne garantit pas la réussite</b> au test ni l'obtention de la nationalité. Les explications et propositions de réponses sont à visée pédagogique ; seule la bonne réponse reflète le contenu officiel.") +
+      legalSec(5, "Version gratuite et premium", "L'Application propose un accès gratuit limité et un accès complet « premium » par <b>achat unique</b>. L'achat s'effectue exclusivement via <b>l'App Store</b> ou <b>Google Play</b>. Le déblocage est définitif : aucune somme supplémentaire n'est due pour les mises à jour futures.") +
+      legalSec(6, "Prix, facturation, remboursement", "Le prix est indiqué en CHF. La facturation, l'encaissement et les demandes de <b>remboursement</b> relèvent des politiques d'<b>Apple / Google</b> ; l'Éditeur n'a pas accès aux moyens de paiement.") +
+      legalSec(7, "Propriété intellectuelle", "L'Application, son code, son design, la marque « NatiCoach », les textes explicatifs et illustrations sont protégés et demeurent la propriété de l'Éditeur. L'utilisateur·rice bénéficie d'un droit d'usage <b>personnel</b>. Toute revente, extraction ou rediffusion non autorisée est interdite.") +
+      legalSec(8, "Données personnelles", "L'Application fonctionne <b>hors-ligne</b> ; la progression est stockée <b>localement</b> sur l'appareil. Voir la <b>Politique de confidentialité</b>.") +
+      legalSec(9, "Responsabilité", "Dans les limites de la loi, l'Éditeur décline toute responsabilité pour les dommages indirects, les décisions prises sur la base du contenu, ou l'inexactitude des questions. La responsabilité est limitée au montant payé pour l'accès premium.") +
+      legalSec(10, "Modifications", "L'Éditeur peut modifier l'Application et les présentes conditions ; la version applicable est celle en vigueur lors de l'utilisation.") +
+      legalSec(11, "Droit applicable et for", "Droit <b>suisse</b>. For au domicile de l'Éditeur à <b>[canton]</b>, sous réserve des dispositions impératives protégeant les consommateurs.");
+    showScreen("screen-cgu");
+  }
+
+  function openPrivacy() {
+    $("privacyBody").innerHTML = legalDraftNote() +
+      `<p class="legal-meta">${t("legal.privIntro", "Politique de confidentialité — NatiCoach · Version 1.0")}</p>` +
+      legalSec(1, "Responsable", "<b>[Prénom Nom]</b>, <b>[adresse]</b>, Suisse. Contact : <b>[email]</b>.") +
+      legalSec(2, "Principe : hors-ligne", "NatiCoach est conçue pour fonctionner <b>hors-ligne</b>. Ta progression (scores, statistiques, réglages) est enregistrée <b>uniquement sur ton appareil</b> et <b>n'est pas transmise</b> à l'Éditeur ni à des tiers.") +
+      legalSec(3, "Aucun compte, aucun traceur", "L'Application ne demande <b>aucun compte</b>, n'utilise <b>ni cookie ni outil d'analyse tiers</b>, et ne collecte aucune donnée de localisation.") +
+      legalSec(4, "Achats", "Les achats sont gérés par <b>Apple</b> ou <b>Google</b>, qui traitent le paiement selon leurs propres politiques. L'Éditeur ne reçoit <b>jamais</b> tes moyens de paiement, uniquement des données de vente agrégées.") +
+      legalSec(5, "Tes droits (nLPD)", "Conformément à la loi suisse sur la protection des données, tu disposes de droits d'accès, de rectification et d'effacement. Tes données étant <b>locales</b>, tu peux les effacer à tout moment en réinitialisant ou désinstallant l'Application.") +
+      legalSec(6, "Conservation", "Les données restent sur ton appareil tant que l'Application est installée.") +
+      legalSec(7, "Contact & modifications", "Pour toute question : <b>[email]</b>. La présente politique peut être mise à jour ; la version applicable est celle en vigueur dans l'Application. Droit applicable : <b>suisse</b>.");
+    showScreen("screen-privacy");
   }
 
   function openDemocratie() {
@@ -2000,6 +2041,8 @@
   $("btnAbout").addEventListener("click", openAbout);
   $("btnQuitAbout").addEventListener("click", () => showScreen("screen-home"));
   $("btnQuitPremium").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitCgu").addEventListener("click", () => showScreen("screen-about"));
+  $("btnQuitPrivacy").addEventListener("click", () => showScreen("screen-about"));
   $("studyLock").addEventListener("click", openPremium);
   $("premiumBanner").addEventListener("click", openPremium);
   $("btnMistakes").addEventListener("click", startMistakes);

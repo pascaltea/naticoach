@@ -103,6 +103,13 @@ window.I18N = {
     "title.symboles": "Symbols & traditions",
     "title.about": "About & sources",
     "title.premium": "NatiCoach Premium",
+    "title.cgu": "Terms & conditions",
+    "title.privacy": "Privacy",
+    "about.cgu": "Terms & conditions",
+    "about.privacy": "Privacy policy",
+    "legal.draft": "Draft to be reviewed by a lawyer before publication. The items [in brackets] must be completed by the publisher.",
+    "legal.cguIntro": "General Terms of Use and Sale — NatiCoach · Version 1.0",
+    "legal.privIntro": "Privacy Policy — NatiCoach · Version 1.0",
 
     /* ---------- Premium ---------- */
     "premium.title": "Unlock your full preparation",
