@@ -52,6 +52,11 @@
     if (s.indexOf("Commune de ") === 0) return m.commune + s.slice(11);
     return s;
   }
+  /* Traduction optionnelle d'une question (window.QUESTION_TR). Null si absente. */
+  function qTrans(frQ) {
+    const d = (typeof window.QUESTION_TR !== "undefined") && window.QUESTION_TR[state.lang];
+    return (d && d[frQ]) || null;
+  }
   function cardsData() {
     if (state.canton === "NE" && typeof NE_DATA !== "undefined") return NE_DATA;
     if (state.canton === "VS" && typeof VS_DATA !== "undefined") return VS_DATA;
@@ -61,8 +66,9 @@
   /* ---------------- Persistance ---------------- */
   const defaultState = () => ({
     history: [], sessions: 0, best: 0, streak: 0, lastPlayed: null,
-    lang: "fr",     // "fr" (source) | "en"
+    lang: "fr",     // "fr" (source) | "en" | "pt"
     premium: false, // déblocage « premium » (achat unique) — branché sur RevenueCat plus tard
+    examNoticeAck: null, // langue pour laquelle l'avertissement « examen en français » a été vu
     canton: null,   // "VD" | "GE"
     commune: null,  // (Vaud uniquement)
     mistakes: [],   // [{q, options, answer, theme, scope}]
@@ -110,6 +116,17 @@
   const isPremium = () => state.premium === true;
   const FREE_STUDY = 20;   // questions accessibles gratuitement en révision (aperçu)
   const FREE_EXAM = 12;    // questions de l'« examen d'essai » gratuit
+
+  /* Avertit (dans la langue de l'interface) que les questions restent en français, puis exécute proceed. */
+  let _noticeCb = null;
+  function frenchNotice(proceed) {
+    if (state.lang === "fr" || state.examNoticeAck === state.lang) { proceed(); return; }
+    _noticeCb = proceed;
+    $("examNoticeTitle").textContent = t("examNotice.title", "L'examen officiel est en français");
+    $("examNoticeText").textContent = t("examNotice.body", "Le test officiel de naturalisation se déroule en français. NatiCoach t'aide à te préparer, mais les questions restent en français pour t'entraîner en conditions réelles.");
+    $("examNoticeGo").textContent = t("examNotice.go", "Compris, continuer");
+    $("examNotice").hidden = false;
+  }
 
   const _frSnap = {};   // texte français d'origine, capturé une fois, pour restaurer
   function applyStaticI18n() {
@@ -1686,6 +1703,20 @@
   }
   function clearExamTimer() { if (examTimerId) { clearInterval(examTimerId); examTimerId = null; } $("examTimer").hidden = true; $("examTimer").classList.remove("warn"); }
 
+  /* Affiche (si disponible) un bouton « Voir la traduction » sous la question française. */
+  function renderQTrans(frQ) {
+    const btn = $("qtrBtn"), txt = $("qtrText");
+    if (!btn || !txt) return;
+    const tr = state.lang !== "fr" ? qTrans(frQ) : null;
+    txt.hidden = true; txt.innerHTML = "";
+    if (!tr) { btn.hidden = true; return; }
+    btn.hidden = false;
+    btn.textContent = "🌐 " + t("qtr.show", "Voir la traduction");
+    const opts = (tr.options && tr.options.length) ? `<ul>${tr.options.map((o) => `<li>${o}</li>`).join("")}</ul>` : "";
+    txt.innerHTML = `<p>${tr.q || ""}</p>${opts}`;
+    btn.onclick = () => { txt.hidden = !txt.hidden; };
+  }
+
   function renderQuestion() {
     const cur = quiz.items[quiz.i];
     quiz.answered = false;
@@ -1693,6 +1724,7 @@
     $("quizCount").textContent = (quiz.i + 1) + "/" + quiz.items.length;
     $("quizProgressFill").style.width = ((quiz.i) / quiz.items.length) * 100 + "%";
     $("questionText").textContent = cur.ref.q;
+    renderQTrans(cur.ref.q);
     $("explainBox").hidden = true;
     $("btnNext").hidden = true;
     const box = $("optionsList"); box.innerHTML = "";
@@ -2019,8 +2051,13 @@
     el.addEventListener("click", () => pickCanton(el.dataset.canton)));
   $("btnChangeCommune").addEventListener("click", () => openSetup(true));
 
-  $("btnExam").addEventListener("click", () => { if (isCards()) openStudy(); else startExam(); });
-  $("btnStudy").addEventListener("click", openStudy);
+  $("btnExam").addEventListener("click", () => frenchNotice(() => { if (isCards()) openStudy(); else startExam(); }));
+  $("btnStudy").addEventListener("click", () => frenchNotice(openStudy));
+  $("examNoticeGo").addEventListener("click", () => {
+    state.examNoticeAck = state.lang; save();
+    $("examNotice").hidden = true;
+    if (_noticeCb) { const cb = _noticeCb; _noticeCb = null; cb(); }
+  });
   $("btnExplore").addEventListener("click", openExplore);
   $("btnQuitExplore").addEventListener("click", () => showScreen("screen-home"));
   $("zoomIn").addEventListener("click", () => zoomMap(0.7));

@@ -490,6 +490,19 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .spark-mini .line { fill: none; stroke: var(--red); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 .spark-mini circle { fill: var(--red); }
 
+/* Traduction optionnelle des questions */
+.qtr-btn { display: inline-block; background: none; border: none; color: var(--red); font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 2px 0 6px; }
+.qtr-text { background: var(--bg); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+.qtr-text p { margin: 0; }
+.qtr-text ul { list-style: none; margin: 6px 0 0; padding: 0; }
+.qtr-text li { padding: 2px 0 2px 14px; position: relative; }
+.qtr-text li::before { content: "·"; position: absolute; left: 4px; }
+/* Avertissement « examen en français » */
+.notice-panel { text-align: center; padding-bottom: 22px; }
+.notice-ico { font-size: 40px; margin: 4px 0 6px; }
+.notice-panel h3 { font-family: var(--font-serif); font-size: 19px; font-weight: 500; margin-bottom: 8px; }
+.notice-panel p { font-size: 14px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 16px; }
+.notice-panel .btn { width: 100%; }
 /* Mentions légales (CGU / confidentialité) */
 .legal-body { font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; }
 .legal-draft { background: #F6EDD8; color: var(--red-dark); border-radius: 10px; padding: 9px 12px; font-size: 12.5px; margin-bottom: 12px; }

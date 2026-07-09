@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=75" />
+  <link rel="stylesheet" href="styles.css?v=76" />
 </head>
 <body>
   <div id="app">
@@ -244,6 +244,8 @@
       <div class="quiz-body">
         <span class="chip" id="quizCat"></span>
         <h2 class="question" id="questionText"></h2>
+        <button class="qtr-btn" id="qtrBtn" hidden></button>
+        <div class="qtr-text" id="qtrText" hidden></div>
         <div class="options" id="optionsList"></div>
         <div class="explain" id="explainBox" hidden>
           <div class="explain-illus" id="explainIllus"></div>
@@ -528,6 +530,16 @@
       <div id="privacyBody" class="legal-body"></div>
     </section>
 
+    <!-- Avertissement : l'examen officiel est en français -->
+    <div id="examNotice" class="sheet" hidden>
+      <div class="sheet-panel notice-panel">
+        <div class="notice-ico">🇫🇷</div>
+        <h3 id="examNoticeTitle">L'examen officiel est en français</h3>
+        <p id="examNoticeText"></p>
+        <button class="btn btn-primary" id="examNoticeGo">Continuer</button>
+      </div>
+    </div>
+
     <!-- Lightbox illustrations -->
     <div id="lightbox" class="lightbox" hidden><div class="lightbox-inner" id="lightboxInner"></div></div>
     <!-- Notification succès -->
@@ -547,7 +559,8 @@
   <script src="ge_official.js"></script>
   <script src="ne_official.js?v=56"></script>
   <script src="vs_official.js?v=56"></script>
-  <script src="i18n.js?v=75"></script>
-  <script src="app.js?v=75"></script>
+  <script src="i18n.js?v=76"></script>
+  <script src="questions_i18n.js?v=76"></script>
+  <script src="app.js?v=76"></script>
 </body>
 </html>

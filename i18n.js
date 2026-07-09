@@ -424,6 +424,10 @@ window.I18N = {
     "district.subVD": "of Vaud",
     "district.subVS": "of Valais",
     "lang.label": "Language",
+    "examNotice.title": "The official exam is in French",
+    "examNotice.body": "The official naturalisation test is held in French. NatiCoach helps you prepare, but the questions stay in French so you train in real conditions.",
+    "examNotice.go": "Got it, continue",
+    "qtr.show": "Show translation",
   },
 
   pt: {
@@ -841,6 +845,10 @@ window.I18N = {
     "district.subVD": "de Vaud",
     "district.subVS": "do Valais",
     "lang.label": "Língua",
+    "examNotice.title": "O exame oficial é em francês",
+    "examNotice.body": "O teste oficial de naturalização é realizado em francês. O NatiCoach ajuda-o a preparar-se, mas as perguntas permanecem em francês para treinar em condições reais.",
+    "examNotice.go": "Percebi, continuar",
+    "qtr.show": "Ver a tradução",
   },
 };
 
