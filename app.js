@@ -126,6 +126,7 @@
       "screen-federalisme": openFederalisme, "screen-langues": openLangues, "screen-neutralite": openNeutralite,
       "screen-symboles": openSymboles, "screen-timeline": openTimeline, "screen-vsmap": openDistricts,
       "screen-explore": openExplore, "screen-stats": openStats, "screen-badges": openBadges,
+      "screen-about": openAbout,
     };
     if (map[id]) { try { map[id](); } catch (e) {} }
   }
@@ -1294,6 +1295,42 @@
     showScreen("screen-assurances");
   }
 
+  /* Sources officielles des banques de questions, par canton (+ dates connues). */
+  const SOURCES = {
+    VD: { auth: "État de Vaud", srcFr: "Outil officiel d'entraînement au test de connaissances", srcEn: "Official knowledge-test practice tool", url: "https://www.vd.ch/prestations/naturalisation", host: "vd.ch", dateFr: "version en ligne, 2026", dateEn: "online version, 2026" },
+    GE: { auth: "République et canton de Genève", srcFr: "E-learning officiel « Connaître la Suisse et Genève »", srcEn: "Official e-learning « Getting to know Switzerland and Geneva »", url: "https://outils.ge.ch/e-learning/connaitre-suisse/", host: "outils.ge.ch", dateFr: "version en ligne, 2026", dateEn: "online version, 2026" },
+    NE: { auth: "République et canton de Neuchâtel", srcFr: "Questionnaire officiel avec réponses", srcEn: "Official questionnaire with answers", url: "https://www.ne.ch", host: "ne.ch", dateFr: "édition janvier 2026", dateEn: "January 2026 edition" },
+    VS: { auth: "Canton du Valais", srcFr: "Questionnaire officiel (questions et réponses)", srcEn: "Official questionnaire (questions and answers)", url: "https://www.vs.ch", host: "vs.ch", dateFr: "questions 2021 · réponses 2022", dateEn: "questions 2021 · answers 2022" },
+  };
+
+  function openAbout() {
+    const cn = cantonOf();
+    const en = state.lang === "en";
+    const srcRow = (k) => {
+      const s = SOURCES[k];
+      return `<div class="src-row${k === cn ? " src-cur" : ""}">
+          <span class="src-canton">${cnName(k)}</span>
+          <div class="src-detail">
+            <b>${s.auth}</b>
+            <span>${en ? s.srcEn : s.srcFr}</span>
+            <span class="src-date">📅 ${en ? s.dateEn : s.dateFr}</span>
+            <a href="${s.url}" target="_blank" rel="noopener">${s.host} ↗</a>
+          </div>
+        </div>`;
+    };
+    const order = [cn].concat(["VD", "GE", "NE", "VS"].filter((x) => x !== cn));
+    $("aboutBody").innerHTML =
+      `<div class="cs-card cs-highlight about-disclaimer">
+         <div class="cs-card-h">⚠️ ${t("about.discH", "Application non officielle")}</div>
+         <p>${t("about.disc", "NatiCoach est un outil d'entraînement <b>indépendant</b>, sans but lucratif. Les questions proviennent des <b>questionnaires officiels</b> publiés par les cantons sur leurs sites, mais <b>ce n'est pas une application officielle</b> et nous <b>ne pouvons pas garantir</b> qu'il s'agit de la version la plus récente. Les questionnaires peuvent évoluer : vérifie toujours les informations à jour auprès de ta <b>commune</b> ou de ton <b>canton</b>.")}</p>
+       </div>` +
+      `<h3 class="cs-h">📚 ${t("about.sourcesH", "Sources des questions")}</h3>` +
+      `<div class="cs-card src-list">${order.map(srcRow).join("")}</div>` +
+      csCard("✅", t("about.answersH", "Réponses & propositions"), t("about.answers", "Seule la <b>bonne réponse</b> est officielle. Pour Neuchâtel et le Valais, les <b>fausses propositions</b> des QCM sont générées par l'app pour aider à mémoriser — elles ne proviennent pas des questionnaires officiels.")) +
+      `<p class="cs-note">${t("about.offline", "NatiCoach fonctionne hors-ligne ; aucune donnée ne quitte ton téléphone. Usage personnel et familial.")}</p>`;
+    showScreen("screen-about");
+  }
+
   function openDemocratie() {
     const card = (ico, title, body) =>
       `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div><p>${body}</p></div>`;
@@ -1861,6 +1898,8 @@
   $("btnQuitSante").addEventListener("click", () => showScreen("screen-home"));
   $("btnAssurances").addEventListener("click", openAssurances);
   $("btnQuitAssurances").addEventListener("click", () => showScreen("screen-home"));
+  $("btnAbout").addEventListener("click", openAbout);
+  $("btnQuitAbout").addEventListener("click", () => showScreen("screen-home"));
   $("btnMistakes").addEventListener("click", startMistakes);
   $("btnStats").addEventListener("click", openStats);
   $("btnQuitStats").addEventListener("click", () => showScreen("screen-home"));

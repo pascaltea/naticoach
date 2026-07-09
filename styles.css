@@ -163,6 +163,20 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .btn-share { background: #25D366; color: #fff; box-shadow: 0 6px 16px rgba(37,211,102,0.28); }
 .btn-share:active { background: #1eb257; }
 .footer-note { text-align: center; color: var(--muted); font-size: 12px; margin-top: 20px; }
+.footer-btn { display: block; width: 100%; background: none; border: none; font-family: inherit; cursor: pointer; padding: 8px 0; line-height: 1.5; }
+.footer-info { color: var(--red); font-weight: 600; white-space: nowrap; }
+/* À propos & sources */
+.about-disclaimer p { font-size: 13.5px; line-height: 1.55; }
+.src-list { padding: 4px 16px; }
+.src-row { display: flex; gap: 12px; padding: 13px 0; border-top: 1px solid var(--line); }
+.src-row:first-child { border-top: none; }
+.src-cur { }
+.src-canton { flex: 0 0 74px; font-weight: 700; font-size: 13px; color: var(--red); padding-top: 1px; }
+.src-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.src-detail b { font-size: 13.5px; }
+.src-detail > span { font-size: 12.5px; color: var(--ink-soft); line-height: 1.4; }
+.src-date { color: var(--muted) !important; font-size: 12px !important; }
+.src-detail a { font-size: 12.5px; color: var(--red); font-weight: 600; text-decoration: none; margin-top: 2px; }
 
 /* ---------- Quiz ---------- */
 .quiz-top { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
