@@ -343,6 +343,8 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 
 /* ---------- Explorer la Suisse : carte des cantons ---------- */
 .explore-title { flex: 1; text-align: center; font-size: 17px; }
+/* Contrepoids droit = largeur de la flèche retour, pour un titre vraiment centré */
+.quiz-top .explore-title + span { flex: 0 0 38px; }
 .explore-sub { text-align: center; margin-bottom: 8px; }
 .canton-map { width: 100%; height: auto; display: block; margin: 0 auto 4px; touch-action: manipulation; }
 .canton { cursor: pointer; }
