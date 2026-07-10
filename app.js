@@ -108,9 +108,14 @@
   /* Coche / croix en SVG (jamais d'émoji). */
   const MK_OK = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'><path d='M5 13l4 4 10-10'/></svg>";
   const MK_NO = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round'><path d='M6 6l12 12'/><path d='M18 6L6 18'/></svg>";
-  function showScreen(id) {
+  // Mémoire de défilement par écran : le retour restaure la position quittée.
+  const scrollMem = {};
+  function showScreen(id, restore) {
+    const cur = document.querySelector(".screen.active");
+    if (cur) scrollMem[cur.id] = window.scrollY || window.pageYOffset || 0;
     document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
-    $(id).classList.add("active"); window.scrollTo(0, 0);
+    $(id).classList.add("active");
+    window.scrollTo(0, restore ? (scrollMem[id] || 0) : 0);
   }
   function setRing(el, pct) {
     el.style.strokeDasharray = RING_LEN;
@@ -2119,7 +2124,7 @@
   $("btnSetupConfirm").addEventListener("click", () => { if (pendingCommune) selectCommune(pendingCommune); });
   $("setupBack").addEventListener("click", () => {
     if (!$("setupCommuneStep").hidden) showCantonStep();
-    else { renderHome(); showScreen("screen-home"); }
+    else { renderHome(); showScreen("screen-home", true); }
   });
   document.querySelectorAll(".canton-card").forEach((el) =>
     el.addEventListener("click", () => pickCanton(el.dataset.canton)));
@@ -2133,64 +2138,64 @@
     if (_noticeCb) { const cb = _noticeCb; _noticeCb = null; cb(); }
   });
   $("btnExplore").addEventListener("click", openExplore);
-  $("btnQuitExplore").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitExplore").addEventListener("click", () => showScreen("screen-home", true));
   $("zoomIn").addEventListener("click", () => zoomMap(0.7));
   $("zoomOut").addEventListener("click", () => zoomMap(1.4));
   $("zoomReset").addEventListener("click", () => { mapView.v = Object.assign({}, mapView.base); applyView(); });
   $("btnTimeline").addEventListener("click", openTimeline);
-  $("btnQuitTimeline").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitTimeline").addEventListener("click", () => showScreen("screen-home", true));
   $("btnVsMap").addEventListener("click", openDistricts);
-  $("btnQuitVsmap").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitVsmap").addEventListener("click", () => showScreen("screen-home", true));
   $("btnPolitique").addEventListener("click", openPolitique);
-  $("btnQuitPolitique").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitPolitique").addEventListener("click", () => showScreen("screen-home", true));
   $("btnDemocratie").addEventListener("click", openDemocratie);
-  $("btnQuitDemocratie").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitDemocratie").addEventListener("click", () => showScreen("screen-home", true));
   $("btnDroits").addEventListener("click", openDroits);
-  $("btnQuitDroits").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitDroits").addEventListener("click", () => showScreen("screen-home", true));
   $("btnMonCanton").addEventListener("click", openMonCanton);
-  $("btnQuitMonCanton").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitMonCanton").addEventListener("click", () => showScreen("screen-home", true));
   $("btnNaturalisation").addEventListener("click", openNaturalisation);
-  $("btnQuitNaturalisation").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitNaturalisation").addEventListener("click", () => showScreen("screen-home", true));
   $("btnFederalisme").addEventListener("click", openFederalisme);
-  $("btnQuitFederalisme").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitFederalisme").addEventListener("click", () => showScreen("screen-home", true));
   $("btnLangues").addEventListener("click", openLangues);
-  $("btnQuitLangues").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitLangues").addEventListener("click", () => showScreen("screen-home", true));
   $("btnNeutralite").addEventListener("click", openNeutralite);
-  $("btnQuitNeutralite").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitNeutralite").addEventListener("click", () => showScreen("screen-home", true));
   $("btnSymboles").addEventListener("click", openSymboles);
-  $("btnQuitSymboles").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitSymboles").addEventListener("click", () => showScreen("screen-home", true));
   $("btnPiliers").addEventListener("click", openPiliers);
-  $("btnQuitPiliers").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitPiliers").addEventListener("click", () => showScreen("screen-home", true));
   $("btnSante").addEventListener("click", openSante);
-  $("btnQuitSante").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitSante").addEventListener("click", () => showScreen("screen-home", true));
   $("btnAssurances").addEventListener("click", openAssurances);
-  $("btnQuitAssurances").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitAssurances").addEventListener("click", () => showScreen("screen-home", true));
   $("btnAbout").addEventListener("click", openAbout);
-  $("btnQuitAbout").addEventListener("click", () => showScreen("screen-home"));
-  $("btnQuitPremium").addEventListener("click", () => showScreen("screen-home"));
-  $("btnQuitCgu").addEventListener("click", () => showScreen("screen-about"));
-  $("btnQuitPrivacy").addEventListener("click", () => showScreen("screen-about"));
+  $("btnQuitAbout").addEventListener("click", () => showScreen("screen-home", true));
+  $("btnQuitPremium").addEventListener("click", () => showScreen("screen-home", true));
+  $("btnQuitCgu").addEventListener("click", () => showScreen("screen-about", true));
+  $("btnQuitPrivacy").addEventListener("click", () => showScreen("screen-about", true));
   $("studyLock").addEventListener("click", openPremium);
   $("premiumBanner").addEventListener("click", openPremium);
   $("btnMistakes").addEventListener("click", startMistakes);
   $("btnStats").addEventListener("click", openStats);
-  $("btnQuitStats").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitStats").addEventListener("click", () => showScreen("screen-home", true));
   $("btnBadges").addEventListener("click", openBadges);
-  $("btnQuitBadges").addEventListener("click", () => showScreen("screen-home"));
+  $("btnQuitBadges").addEventListener("click", () => showScreen("screen-home", true));
 
   $("btnPrev").addEventListener("click", studyPrev);
   $("btnNextStudy").addEventListener("click", studyNext);
-  $("btnQuitStudy").addEventListener("click", () => { renderHome(); showScreen("screen-home"); });
+  $("btnQuitStudy").addEventListener("click", () => { renderHome(); showScreen("screen-home", true); });
   $("studyScopeBtn").addEventListener("click", openScopeSheet);
   $("scopeSheet").addEventListener("click", (e) => { if (e.target === $("scopeSheet")) closeScopeSheet(); });
 
   $("btnNext").addEventListener("click", nextQuestion);
-  $("btnQuitQuiz").addEventListener("click", () => { clearExamTimer(); renderHome(); showScreen("screen-home"); });
+  $("btnQuitQuiz").addEventListener("click", () => { clearExamTimer(); renderHome(); showScreen("screen-home", true); });
   $("btnRetry").addEventListener("click", retry);
-  $("btnHome").addEventListener("click", () => { renderHome(); showScreen("screen-home"); });
+  $("btnHome").addEventListener("click", () => { renderHome(); showScreen("screen-home", true); });
   $("btnReview").addEventListener("click", openReview);
   $("btnShare").addEventListener("click", shareResult);
-  $("btnQuitReview").addEventListener("click", () => showScreen("screen-result"));
+  $("btnQuitReview").addEventListener("click", () => showScreen("screen-result", true));
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
