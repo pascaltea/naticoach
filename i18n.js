@@ -177,7 +177,7 @@ window.I18N = {
     "result.bestYet": " Your best score so far.",
     "result.passMsg": "{c}/{n} correct answers ({p}%) — above the required threshold.{r}",
     "result.keepGoing": "Keep going, you're making progress.",
-    "result.failMsg": "Pass mark: {l}. Every session counts.",
+    "result.failMsg": "The pass mark is {l}. Focus on your weak topics below.",
     "result.passDefault": "70% correct answers",
     "result.t80": "Well done!", "result.m80": "Excellent. Try an exam simulation to test yourself in real conditions.",
     "result.t60": "Nicely done", "result.m60": "You're improving. One more revision round and it'll stick.",
@@ -193,7 +193,7 @@ window.I18N = {
     /* ---------- Statistiques ---------- */
     "stats.empty": "Answer a few questions (exam or revision in Quiz mode) to see your results appear here.",
     "stats.focusOn": "Focus on",
-    "stats.weakMsg": "It's your weakest topic: {p}% success, i.e. {n} question{s} to rework.",
+    "stats.weakMsg": "You're at {p}% on this topic — {n} question{s} to rework to clear the threshold.",
     "stats.reviseX": "Revise {x}",
     "stats.allThemes": "All topics",
     "stats.threshExam": "┃ exam threshold 60%",
@@ -222,7 +222,7 @@ window.I18N = {
     "explore.sub": "Tap a canton to discover its information.",
     "explore.intro": "<b>26 cantons</b>, 4 national languages, ~9 million inhabitants.<br>Tap a canton on the map to explore it.",
     "explore.cantonQuiz": "5 questions on the canton of Vaud →",
-    "explore.capital": "Capital", "explore.confed": "Joined", "explore.language": "Language",
+    "explore.capital": "Capital", "explore.confed": "Joined CH", "explore.language": "Language",
     "vsmap.sub": "Tap a district to see its info.",
 
     /* ---------- Le fédéralisme ---------- */
@@ -607,7 +607,7 @@ window.I18N = {
     "result.bestYet": " A sua melhor pontuação até agora.",
     "result.passMsg": "{c}/{n} respostas corretas ({p}%) — acima do limiar exigido.{r}",
     "result.keepGoing": "Continue, está a progredir.",
-    "result.failMsg": "Aprovação: {l}. Cada sessão conta.",
+    "result.failMsg": "O limiar é {l}. Concentre-se nos seus temas fracos abaixo.",
     "result.passDefault": "70% de respostas corretas",
     "result.t80": "Muito bem!", "result.m80": "Excelente. Faça uma simulação de exame para se testar em condições reais.",
     "result.t60": "Bom trabalho", "result.m60": "Está a melhorar. Mais uma ronda de revisão e fica.",
@@ -623,7 +623,7 @@ window.I18N = {
     /* ---------- Statistiques ---------- */
     "stats.empty": "Responda a algumas perguntas (exame ou revisão em modo Quiz) para ver o seu balanço aqui.",
     "stats.focusOn": "Concentre-se em",
-    "stats.weakMsg": "É o seu tema mais fraco: {p}% de acerto, ou seja {n} pergunta{s} a retrabalhar.",
+    "stats.weakMsg": "Está em {p}% neste tema — {n} pergunta{s} a retrabalhar para atingir o limiar.",
     "stats.reviseX": "Rever {x}",
     "stats.allThemes": "Todos os temas",
     "stats.threshExam": "┃ limiar do exame 60%",
@@ -652,7 +652,7 @@ window.I18N = {
     "explore.sub": "Toque num cantão para descobrir as suas informações.",
     "explore.intro": "<b>26 cantões</b>, 4 línguas nacionais, ~9 milhões de habitantes.<br>Toque num cantão no mapa para o explorar.",
     "explore.cantonQuiz": "5 perguntas sobre o cantão de Vaud →",
-    "explore.capital": "Capital", "explore.confed": "Adesão", "explore.language": "Língua",
+    "explore.capital": "Capital", "explore.confed": "Adesão CH", "explore.language": "Língua",
     "vsmap.sub": "Toque num distrito para ver as suas informações.",
 
     /* ---------- Le fédéralisme ---------- */

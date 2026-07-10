@@ -914,7 +914,7 @@
        </div>
        <div class="cid-cols">
          <div><div class="cid-val">${c.capital}</div><div class="cid-lab">${t("explore.capital", "Chef-lieu")}</div></div>
-         <div><div class="cid-val">${c.year}</div><div class="cid-lab">${t("explore.confed", "Confédération")}</div></div>
+         <div><div class="cid-val">${c.year}</div><div class="cid-lab">${t("explore.confed", "Entrée CH")}</div></div>
          <div><div class="cid-val">${pf(c, "langs")}</div><div class="cid-lab">${t("explore.language", "Langue")}</div></div>
        </div>
        <div class="cid-quote"><span class="cid-q" style="color:${col}">«</span><p>${pf(c, "fact")}</p></div>
@@ -988,7 +988,7 @@
         `<div class="stats-hero">
            <div class="stats-hero-sur">${t("stats.focusOn", "Concentre-toi sur")}</div>
            <div class="stats-hero-theme">${elle(w.theme)}</div>
-           <p class="stats-hero-msg">${fmt(t("stats.weakMsg", "C'est ton thème le plus fragile : {p}% de réussite, soit {n} question{s} à retravailler."), { p: w.pct, n: toReview, s: toReview > 1 ? "s" : "" })}</p>
+           <p class="stats-hero-msg">${fmt(t("stats.weakMsg", "Tu es à {p}% sur ce thème — {n} question{s} à retravailler pour franchir le seuil."), { p: w.pct, n: toReview, s: toReview > 1 ? "s" : "" })}</p>
            <button class="btn btn-primary stats-hero-cta" id="statsHeroCta" data-theme="${w.theme}">${fmt(t("stats.reviseX", "Réviser {x}"), { x: elle(w.theme) })}</button>
          </div>`;
     }
@@ -1947,7 +1947,7 @@
         titleHTML = t("result.keepGoing", "Continue, tu avances.");
         const cfgL = EXAM_CFG[cantonOf()];
         const pl = (state.lang !== "fr" && cfgL) ? (cfgL["passLabel" + state.lang.charAt(0).toUpperCase() + state.lang.slice(1)] || quiz.passLabel) : (quiz.passLabel || t("result.passDefault", "70 % de bonnes réponses"));
-        msg = fmt(t("result.failMsg", "Réussite : {l}. Chaque session compte."), { l: pl });
+        msg = fmt(t("result.failMsg", "Le seuil est à {l}. Concentre-toi sur tes thèmes faibles ci-dessous."), { l: pl });
       }
       $("resultBilan").innerHTML = pass ? recapTiles(prevPct) : themeBilan();
     } else if (quiz.trial) {
