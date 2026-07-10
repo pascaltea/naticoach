@@ -568,6 +568,30 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .pr-cta-wrap .btn { width: 100%; }
 .pr-note { text-align: center; font-size: 11.5px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
 .pr-result-cta { width: 100%; margin-top: 6px; }
+
+/* Soutenir le projet (dons) */
+.support-banner { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; cursor: pointer;
+  background: var(--pill-peach); border-radius: 16px; padding: 13px 15px; margin-bottom: 16px; box-shadow: var(--shadow-row); font-family: inherit; }
+.sb-ico { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: var(--card); display: grid; place-items: center; }
+.sb-ico img { display: block; }
+.sb-txt { flex: 1; display: flex; flex-direction: column; }
+.sb-txt b { font-size: 14.5px; }
+.sb-txt small { font-size: 12px; color: var(--muted); }
+.support-banner .chev { color: var(--muted); flex: 0 0 auto; }
+.support-banner .chev svg { width: 16px; height: 16px; display: block; }
+.sup-hero { text-align: center; padding: 8px 8px 4px; }
+.sup-hero h3 { font-family: var(--font-serif); font-size: 22px; font-weight: 500; margin-bottom: 8px; }
+.sup-hero p { color: var(--ink-soft); font-size: 14px; line-height: 1.55; max-width: 320px; margin: 0 auto; }
+.sup-amts { display: flex; gap: 8px; margin: 22px 0 18px; }
+.sup-amt { flex: 1; padding: 15px 0; border-radius: 14px; background: var(--card); box-shadow: var(--shadow-row);
+  font-family: inherit; font-size: 15px; font-weight: 700; color: var(--ink); cursor: pointer; transition: transform .1s; }
+.sup-amt:active { transform: scale(.97); }
+.sup-amt.on { background: var(--red); color: var(--on-red); box-shadow: var(--shadow-cta); }
+.sup-cta-wrap { display: flex; flex-direction: column; gap: 10px; }
+.sup-cta-wrap .btn { width: 100%; }
+.sup-nudge { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; background: var(--pill-peach);
+  border-radius: 12px; padding: 11px 16px; font-family: inherit; font-size: 13.5px; font-weight: 600; color: var(--red-dark); cursor: pointer; }
+.sup-nudge img { display: block; }
 /* Séparation « Examen » vs « Pour aller plus loin » */
 .zone-head { margin: 6px 2px 14px; }
 .zone-title { font-family: var(--font-serif); font-size: 19px; font-weight: 500; display: flex; align-items: center; gap: 8px; }

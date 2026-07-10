@@ -130,10 +130,27 @@
     if (state.lang !== "fr") { const d = DICT(); if (d[key] != null) return d[key]; }
     return fr != null ? fr : key;
   }
-  /* ---------------- Freemium (aperçu gratuit → premium) ---------------- */
-  const isPremium = () => state.premium === true;
-  const FREE_STUDY = 20;   // questions accessibles gratuitement en révision (aperçu)
-  const FREE_EXAM = 12;    // questions de l'« examen d'essai » gratuit
+  /* ---------------- Gratuit + dons ---------------- */
+  // NatiCoach est 100 % gratuit : tout est débloqué, sans achat ni pub.
+  const isPremium = () => true;
+  const FREE_STUDY = 20, FREE_EXAM = 12; // héritage (non utilisés en accès gratuit)
+
+  /* Liens de don — À REMPLACER par tes vrais liens. Le don est libre et ne
+     débloque RIEN (tout est déjà gratuit) — condition des stores respectée. */
+  const DONATE = {
+    twint:   "",   // lien / QR TWINT (public suisse) — ex. "https://…"
+    card:    "",   // lien carte (Ko-fi / page Stripe) — ex. "https://ko-fi.com/…"
+    amounts: { "3": "", "5": "", "10": "" }, // liens Stripe par montant (facultatif)
+  };
+  /* Ouvre le meilleur lien disponible pour un montant donné (ou le lien générique). */
+  function donateOpen(kind, amount) {
+    let url = "";
+    if (kind === "twint") url = DONATE.twint;
+    else if (amount && DONATE.amounts[amount]) url = DONATE.amounts[amount];
+    else url = DONATE.card || DONATE.twint;
+    if (!url) { toast("", t("support.todo", "Lien de don à configurer.")); return; }
+    window.open(url, "_blank", "noopener");
+  }
 
   /* Avertit (dans la langue de l'interface) que les questions restent en français, puis exécute proceed. */
   let _noticeCb = null;
@@ -181,7 +198,7 @@
       "screen-federalisme": openFederalisme, "screen-langues": openLangues, "screen-neutralite": openNeutralite,
       "screen-symboles": openSymboles, "screen-timeline": openTimeline, "screen-vsmap": openDistricts,
       "screen-explore": openExplore, "screen-stats": openStats, "screen-badges": openBadges,
-      "screen-about": openAbout, "screen-premium": openPremium,
+      "screen-about": openAbout, "screen-support": openSupport,
     };
     if (map[id]) { try { map[id](); } catch (e) {} }
   }
@@ -456,15 +473,6 @@
   function renderHome() {
     const cn = cantonOf();
     const cards = isCards();
-    const pb = $("premiumBanner");
-    if (pb) {
-      pb.hidden = isPremium();
-      if (!isPremium()) {
-        $("premiumBannerTitle").textContent = t("premium.bannerTitle", "Débloquer tout");
-        $("premiumBannerSub").textContent = t("premium.bannerSub", "Accès complet · achat unique");
-        $("premiumBannerPrice").textContent = PREMIUM_PRICE;
-      }
-    }
     const c = VD_DATA.communes[state.commune];
     $("homeCommune").textContent = cn === "VD" ? (c ? c.name : t("misc.chooseCommune", "Choisir…")) : cnName(cn);
     // Jauges « Découvrir & suivre » (disponibles pour tous les cantons)
@@ -731,12 +739,7 @@
     }
   }
 
-  function updateStudyLock() {
-    const el = $("studyLock"); if (!el) return;
-    const n = study && study.lockedCount;
-    if (n > 0) { el.hidden = false; el.innerHTML = `<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='11' width='16' height='10' rx='2'/><path d='M8 11V7a4 4 0 0 1 8 0v4'/></svg> ${fmt(t("premium.studyLock", "Aperçu gratuit · {n} questions verrouillées"), { n: n })} — <b>${t("premium.unlock", "Débloquer")}</b>`; }
-    else el.hidden = true;
-  }
+  function updateStudyLock() { /* accès 100 % gratuit : plus de verrou */ }
   function renderStudy() {
     updateStudyLock();
     if (study.cards) { renderStudyCard(); return; }
@@ -1466,85 +1469,64 @@
     showScreen("screen-about");
   }
 
-  /* ---------------- Premium (achat unique) ---------------- */
-  const PREMIUM_PRICE = "CHF 14.90";
+  /* ---------------- Soutenir le projet (dons) ---------------- */
+  let supportAmount = "5"; // palier pré-sélectionné (ancrage)
 
-  function openPremium() {
-    if (isPremium()) {
-      $("premiumBody").innerHTML =
-        `<div class="pr-hero pr-owned"><div class="pr-badge">${MK_OK}</div>
-           <h3>${t("premium.ownedTitle", "Tu as la version premium")}</h3>
-           <p>${t("premium.ownedMsg", "Merci ! Tout est débloqué. Bonne préparation.")}</p></div>`;
-      showScreen("screen-premium"); return;
-    }
-    const feat = (ico, txt) => `<li><span class="pr-ico">${ico}</span>${txt}</li>`;
-    $("premiumBody").innerHTML =
-      `<div class="pr-hero">
-         <img class="pr-flower" src="logo-edelweiss-red.svg" alt="" width="40" height="40" />
-         <h3>${t("premium.title", "Débloque toute ta préparation")}</h3>
-         <p>${t("premium.sub", "Un seul achat, à vie. Aucun abonnement.")}</p>
+  function openSupport() {
+    const amt = (v) => `<button class="sup-amt${v === supportAmount ? " on" : ""}" data-amt="${v}">${v === "x" ? t("support.other", "Autre") : "CHF " + v}</button>`;
+    $("supportBody").innerHTML =
+      `<div class="sup-hero">
+         <img class="pr-flower" src="logo-edelweiss-red.svg" alt="" width="44" height="44" />
+         <h3>${t("support.title", "Soutenir NatiCoach")}</h3>
+         <p>${t("support.sub", "NatiCoach est <b>100 % gratuit</b>, sans publicité. Si l'app t'aide, un <b>don libre</b> soutient son développement et les mises à jour. Merci&nbsp;!")}</p>
        </div>
-       <ul class="pr-feats">
-         ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z'/><path d='M4 19a2 2 0 0 1 2-2h13'/></svg>", t("premium.f1", "<b>Toutes les questions</b> de ton canton"))}
-         ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='4'/></svg>", t("premium.f2", "La <b>simulation d'examen complète</b> (conditions réelles, minuteur)"))}
-         ${feat("", t("premium.f3", "<b>Statistiques</b> et suivi de progression"))}
-         ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 10a8 8 0 0 1 13.9-4.4'/><path d='M20 14a8 8 0 0 1-13.9 4.4'/><path d='M18 2v4h-4'/><path d='M6 22v-4h4'/></svg>", t("premium.f4", "Révision de <b>toutes tes erreurs</b>"))}
-         ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M3 12h18'/><path d='M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z'/></svg>", t("premium.f5", "Les futures <b>langues et mises à jour</b>, sans repayer"))}
-       </ul>
-       <div class="pr-cta-wrap">
-         <button class="btn btn-primary big" id="btnPremiumBuy">${fmt(t("premium.buy", "Débloquer · {p}"), { p: PREMIUM_PRICE })}</button>
-         <button class="btn btn-ghost" id="btnPremiumRestore">${t("premium.restore", "Restaurer mon achat")}</button>
-         <p class="pr-note">${t("premium.note", "Paiement unique via l'App Store / Google Play. Débloqué à vie sur cet appareil.")}</p>
+       <div class="sup-amts">${amt("3")}${amt("5")}${amt("10")}${amt("x")}</div>
+       <div class="sup-cta-wrap">
+         <button class="btn btn-primary big" id="btnDonTwint">${t("support.twint", "Faire un don avec TWINT")}</button>
+         <button class="btn btn-outline" id="btnDonCard">${t("support.card", "Payer par carte")}</button>
+         <p class="pr-note">${t("support.note", "Le don est libre et ne débloque rien — tout est déjà gratuit.")}</p>
        </div>`;
-    const buy = $("btnPremiumBuy"); if (buy) buy.addEventListener("click", purchasePremium);
-    const res = $("btnPremiumRestore"); if (res) res.addEventListener("click", restorePurchase);
-    showScreen("screen-premium");
+    $("supportBody").querySelectorAll(".sup-amt").forEach((b) => b.addEventListener("click", () => {
+      supportAmount = b.dataset.amt;
+      $("supportBody").querySelectorAll(".sup-amt").forEach((x) => x.classList.toggle("on", x === b));
+    }));
+    const at = () => (supportAmount === "x" ? null : supportAmount);
+    $("btnDonTwint").addEventListener("click", () => donateOpen("twint", at()));
+    $("btnDonCard").addEventListener("click", () => donateOpen("card", at()));
+    showScreen("screen-support");
   }
-
-  /* Achat premium. TODO : brancher RevenueCat (Purchases.purchasePackage) une fois l'app emballée en Capacitor.
-     Pour l'instant (app web / test) : déblocage local après confirmation. */
-  function purchasePremium() {
-    if (typeof window.NatiPurchase === "function") { window.NatiPurchase(); return; } // point d'ancrage IAP natif
-    if (confirm(t("premium.testConfirm", "(Version de test) Débloquer NatiCoach Premium sans paiement ?"))) {
-      state.premium = true; save();
-      toast("", t("premium.unlocked", "Premium débloqué — merci !"));
-      renderHome(); showScreen("screen-home");
-    }
-  }
-  function restorePurchase() {
-    if (typeof window.NatiRestore === "function") { window.NatiRestore(); return; }
-    alert(t("premium.restoreTodo", "La restauration d'achat sera disponible dans la version publiée sur les stores."));
+  /* Petite relance de don (placée aux bons moments : réussite, bon score). */
+  function supportNudge() {
+    return `<button class="sup-nudge" id="resultSupport"><img src="logo-edelweiss-red.svg" width="18" height="18" alt="" /> ${t("support.nudge", "NatiCoach t'aide ? Soutiens le projet")}</button>`;
   }
 
   /* ---------------- Mentions légales (CGU + confidentialité) ---------------- */
-  /* Modèles rédactionnels — à faire valider par un·e avocat·e. Zones [entre crochets] à compléter. */
   const legalSec = (n, title, body) => `<div class="legal-sec"><h3>${n}. ${title}</h3><p>${body}</p></div>`;
-  const legalDraftNote = () => `<p class="legal-draft">${t("legal.draft", "Modèle à faire valider par un·e avocat·e avant publication.")}</p>`;
 
   function openCgu() {
-    $("cguBody").innerHTML = legalDraftNote() +
-      `<p class="legal-meta">${t("legal.cguIntro", "Conditions Générales d'Utilisation et de Vente — NatiCoach · Version 1.0")}</p>` +
-      legalSec(1, "Éditeur", "L'application <b>NatiCoach</b> (« l'Application ») est éditée par <b>Pascal Tea</b>, personne physique exerçant en <b>raison individuelle</b>, <b>Route d'Arnex 9, 1262 Eysins</b>, Suisse (« l'Éditeur »). Contact : <b>contact@naticoach.ch</b>.") +
+    $("cguBody").innerHTML =
+      `<p class="legal-meta">${t("legal.cguIntro", "Conditions Générales d'Utilisation — NatiCoach · Version 1.0")}</p>` +
+      legalSec(1, "Éditeur", "L'application <b>NatiCoach</b> (« l'Application ») est éditée par l'équipe <b>NatiCoach</b> (« l'Éditeur »). Contact : <b>contact@naticoach.ch</b>.") +
       legalSec(2, "Objet", "Les présentes conditions régissent l'accès et l'utilisation de l'Application, un <b>outil d'entraînement pédagogique</b> à la préparation du test de connaissances de la naturalisation suisse. En utilisant l'Application, l'utilisateur·rice les accepte.") +
       legalSec(3, "Absence de caractère officiel", "NatiCoach est un outil <b>indépendant</b>, <b>non affilié</b> et non approuvé par les autorités (Confédération, cantons, communes). Les questions s'inspirent de questionnaires <b>rendus publics</b> par les cantons ; l'Éditeur ne garantit ni leur exactitude ni leur mise à jour. Seule fait foi l'information de l'autorité compétente.") +
       legalSec(4, "Absence de garantie de résultat", "L'Application est fournie « en l'état » et <b>ne garantit pas la réussite</b> au test ni l'obtention de la nationalité. Les explications et propositions de réponses sont à visée pédagogique.") +
-      legalSec(5, "Version gratuite et premium", "L'Application propose un accès gratuit limité et un accès complet « premium » par <b>achat unique</b>. L'achat s'effectue exclusivement via <b>l'App Store</b> ou <b>Google Play</b>. Le déblocage est définitif : aucune somme supplémentaire n'est due pour les mises à jour futures.") +
-      legalSec(6, "Prix, facturation, remboursement", "Le prix est indiqué en CHF. La facturation, l'encaissement et les demandes de <b>remboursement</b> relèvent des politiques d'<b>Apple / Google</b> ; l'Éditeur n'a pas accès aux moyens de paiement.") +
+      legalSec(5, "Gratuité", "L'Application est <b>entièrement gratuite</b> et sans publicité. L'ensemble des fonctionnalités est accessible <b>sans achat</b>.") +
+      legalSec(6, "Dons", "Un <b>don libre et facultatif</b> peut être proposé pour soutenir le développement. Il est <b>sans contrepartie</b> et <b>ne débloque aucune fonctionnalité</b> (tout est déjà gratuit). Les dons sont traités par des <b>prestataires de paiement tiers</b> (p. ex. TWINT, Stripe) selon leurs propres conditions.") +
       legalSec(7, "Propriété intellectuelle", "L'Application, son code, son design, la marque « NatiCoach », les textes explicatifs et illustrations sont protégés et demeurent la propriété de l'Éditeur. L'utilisateur·rice bénéficie d'un droit d'usage <b>personnel</b>. Toute revente, extraction ou rediffusion non autorisée est interdite.") +
       legalSec(8, "Données personnelles", "L'Application fonctionne <b>hors-ligne</b> ; la progression est stockée <b>localement</b> sur l'appareil. Voir la <b>Politique de confidentialité</b>.") +
-      legalSec(9, "Responsabilité", "Dans les limites de la loi, l'Éditeur décline toute responsabilité pour les dommages indirects, les décisions prises sur la base du contenu, ou l'inexactitude des questions. La responsabilité est limitée au montant payé pour l'accès premium.") +
+      legalSec(9, "Responsabilité", "Dans les limites de la loi, l'Éditeur décline toute responsabilité pour les dommages indirects, les décisions prises sur la base du contenu, ou l'inexactitude des questions.") +
       legalSec(10, "Modifications", "L'Éditeur peut modifier l'Application et les présentes conditions ; la version applicable est celle en vigueur lors de l'utilisation.") +
-      legalSec(11, "Droit applicable et for", "Droit <b>suisse</b>. For au domicile de l'Éditeur, canton de <b>Vaud</b>, sous réserve des dispositions impératives protégeant les consommateurs.");
+      legalSec(11, "Droit applicable et for", "Droit <b>suisse</b>. For : canton de <b>Vaud</b>, sous réserve des dispositions impératives protégeant les consommateurs.");
     showScreen("screen-cgu");
   }
 
   function openPrivacy() {
-    $("privacyBody").innerHTML = legalDraftNote() +
+    $("privacyBody").innerHTML =
       `<p class="legal-meta">${t("legal.privIntro", "Politique de confidentialité — NatiCoach · Version 1.0")}</p>` +
-      legalSec(1, "Responsable", "<b>Pascal Tea</b>, <b>Route d'Arnex 9, 1262 Eysins</b>, Suisse. Contact : <b>contact@naticoach.ch</b>.") +
+      legalSec(1, "Responsable", "<b>NatiCoach</b>. Contact : <b>contact@naticoach.ch</b>.") +
       legalSec(2, "Principe : hors-ligne", "NatiCoach est conçue pour fonctionner <b>hors-ligne</b>. Ta progression (scores, statistiques, réglages) est enregistrée <b>uniquement sur ton appareil</b> et <b>n'est pas transmise</b> à l'Éditeur ni à des tiers.") +
       legalSec(3, "Aucun compte, aucun traceur", "L'Application ne demande <b>aucun compte</b>, n'utilise <b>ni cookie ni outil d'analyse tiers</b>, et ne collecte aucune donnée de localisation.") +
-      legalSec(4, "Achats", "Les achats sont gérés par <b>Apple</b> ou <b>Google</b>, qui traitent le paiement selon leurs propres politiques. L'Éditeur ne reçoit <b>jamais</b> tes moyens de paiement, uniquement des données de vente agrégées.") +
+      legalSec(4, "Dons", "Si tu fais un <b>don</b>, il est traité <b>hors de l'Application</b> par un prestataire de paiement tiers (TWINT, Stripe…). NatiCoach ne reçoit ni ne stocke tes <b>coordonnées bancaires</b>.") +
       legalSec(5, "Tes droits (nLPD)", "Conformément à la loi suisse sur la protection des données, tu disposes de droits d'accès, de rectification et d'effacement. Tes données étant <b>locales</b>, tu peux les effacer à tout moment en réinitialisant ou désinstallant l'Application.") +
       legalSec(6, "Conservation", "Les données restent sur ton appareil tant que l'Application est installée.") +
       legalSec(7, "Contact & modifications", "Pour toute question : <b>contact@naticoach.ch</b>. La présente politique peut être mise à jour ; la version applicable est celle en vigueur dans l'Application. Droit applicable : <b>suisse</b>.");
@@ -1954,16 +1936,11 @@
         const pl = (state.lang !== "fr" && cfgL) ? (cfgL["passLabel" + state.lang.charAt(0).toUpperCase() + state.lang.slice(1)] || quiz.passLabel) : (quiz.passLabel || t("result.passDefault", "70 % de bonnes réponses"));
         msg = fmt(t("result.failMsg", "Le seuil est à {l}. Concentre-toi sur tes thèmes faibles ci-dessous."), { l: pl });
       }
-      $("resultBilan").innerHTML = pass ? recapTiles(prevPct) : themeBilan();
-    } else if (quiz.trial) {
-      badge.hidden = true;
-      titleHTML = t("premium.trialDone", "Aperçu terminé");
-      msg = fmt(t("premium.trialMsg", "Tu viens de tester {n} questions. Débloque la simulation d'examen complète et toutes les questions."), { n: total });
-      $("resultBilan").innerHTML = `<button class="btn btn-primary big pr-result-cta" id="resultPremiumCta"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='11' width='16' height='10' rx='2'/><path d='M8 11V7a4 4 0 0 1 7.5-2'/></svg> ${fmt(t("premium.buy", "Débloquer · {p}"), { p: PREMIUM_PRICE })}</button>`;
+      $("resultBilan").innerHTML = (pass ? recapTiles(prevPct) : themeBilan()) + (pass ? supportNudge() : "");
     } else {
       badge.hidden = true;
       $("resultBilan").innerHTML = "";
-      if (pct >= 80) { titleHTML = t("result.t80", "Bravo !"); msg = t("result.m80", "Excellent. Passe en simulation d'examen pour te tester en conditions réelles."); }
+      if (pct >= 80) { titleHTML = t("result.t80", "Bravo !"); msg = t("result.m80", "Excellent. Passe en simulation d'examen pour te tester en conditions réelles."); $("resultBilan").innerHTML = supportNudge(); }
       else if (pct >= 60) { titleHTML = t("result.t60", "Bien joué"); msg = t("result.m60", "Tu progresses. Un tour de révision et ça rentre."); }
       else { titleHTML = t("result.t0", "Continue"); msg = t("result.m0", "Utilise le mode révision pour apprendre les bonnes réponses."); }
     }
@@ -2003,7 +1980,7 @@
     }
 
     showScreen("screen-result");
-    const rpc = $("resultPremiumCta"); if (rpc) rpc.addEventListener("click", openPremium);
+    const rpc = $("resultSupport"); if (rpc) rpc.addEventListener("click", openSupport);
   }
 
   function shareResult() {
@@ -2171,12 +2148,11 @@
   $("btnAssurances").addEventListener("click", openAssurances);
   $("btnQuitAssurances").addEventListener("click", () => showScreen("screen-home", true));
   $("btnAbout").addEventListener("click", openAbout);
+  $("btnSupportHome").addEventListener("click", openSupport);
   $("btnQuitAbout").addEventListener("click", () => showScreen("screen-home", true));
-  $("btnQuitPremium").addEventListener("click", () => showScreen("screen-home", true));
+  $("btnQuitSupport").addEventListener("click", () => showScreen("screen-home", true));
   $("btnQuitCgu").addEventListener("click", () => showScreen("screen-about", true));
   $("btnQuitPrivacy").addEventListener("click", () => showScreen("screen-about", true));
-  $("studyLock").addEventListener("click", openPremium);
-  $("premiumBanner").addEventListener("click", openPremium);
   $("btnMistakes").addEventListener("click", startMistakes);
   $("btnStats").addEventListener("click", openStats);
   $("btnQuitStats").addEventListener("click", () => showScreen("screen-home", true));
