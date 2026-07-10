@@ -502,6 +502,7 @@
     const mc = state.mistakes.length;
     $("btnMistakes").hidden = mc === 0;
     $("mistakesCount").textContent = mc;
+    { const mb = $("mistakesBadge"); if (mb) mb.textContent = mc; }
     $("mistakesLabel").textContent = t("home.mistakesSub", "question(s) à retravailler");
     $("badgeLabel").textContent = t("home.badgesSub", "badge(s)");
 
@@ -522,7 +523,8 @@
     let line = "";
     data.forEach((d, i) => { line += `${i === 0 ? "M" : "L"} ${xs(i).toFixed(1)} ${ys(d.pct).toFixed(1)} `; });
     const last = data[data.length - 1];
-    svg.innerHTML = `<path class="line" d="${line}"/><circle cx="${xs(data.length - 1).toFixed(1)}" cy="${ys(last.pct).toFixed(1)}" r="3"/>`;
+    const area = line + `L ${xs(data.length - 1).toFixed(1)} ${H} L ${xs(0).toFixed(1)} ${H} Z`;
+    svg.innerHTML = `<path class="area" d="${area}"/><path class="line" d="${line}"/><circle cx="${xs(data.length - 1).toFixed(1)}" cy="${ys(last.pct).toFixed(1)}" r="3"/>`;
   }
 
   /* ======================================================================

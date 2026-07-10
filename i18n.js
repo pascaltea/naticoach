@@ -24,7 +24,7 @@ window.I18N = {
     "setup.note": "300 Vaud municipalities · no data leaves your phone",
 
     /* ---------- Accueil ---------- */
-    "home.zoneExam": "🎯 For the exam",
+    "home.zoneExam": "For the exam",
     "home.zoneExamSub": "The official questionnaire and your progress — this is the only thing you are tested on.",
     "home.zoneExamSubCards": "The official questionnaire — this is the only thing you are tested on.",
     "home.reviseLabel": "Revise",
@@ -37,7 +37,7 @@ window.I18N = {
     "home.statsSub": "by topic",
     "home.badges": "Achievements",
     "home.badgesSub": "badge(s)",
-    "home.zoneBonus": "✨ Go further",
+    "home.zoneBonus": "Go further",
     "home.zoneBonusSub": "To deepen your Swiss culture. Useful but not required: everything you are tested on is in the official questionnaire.",
     "home.discover": "Discover",
     "home.explore": "Explore Switzerland",
@@ -447,7 +447,7 @@ window.I18N = {
     "setup.note": "300 municípios de Vaud · nenhum dado sai do seu telemóvel",
 
     /* ---------- Accueil ---------- */
-    "home.zoneExam": "🎯 Para o exame",
+    "home.zoneExam": "Para o exame",
     "home.zoneExamSub": "O questionário oficial e o seu progresso — é só sobre isto que é avaliado.",
     "home.zoneExamSubCards": "O questionário oficial — é só sobre isto que é avaliado.",
     "home.reviseLabel": "Rever",
@@ -460,7 +460,7 @@ window.I18N = {
     "home.statsSub": "por tema",
     "home.badges": "Conquistas",
     "home.badgesSub": "medalha(s)",
-    "home.zoneBonus": "✨ Ir mais longe",
+    "home.zoneBonus": "Ir mais longe",
     "home.zoneBonusSub": "Para aprofundar a sua cultura suíça. Útil mas não obrigatório: tudo o que é avaliado está no questionário oficial.",
     "home.discover": "Descobrir",
     "home.explore": "Explorar a Suíça",

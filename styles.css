@@ -110,11 +110,12 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .ring-wrap { position: relative; width: 120px; height: 120px; flex: 0 0 auto; }
 .ring-wrap.big { width: 150px; height: 150px; margin: 0 auto 8px; }
 .ring { width: 100%; height: 100%; transform: rotate(-90deg); }
-.ring-bg { fill: none; stroke: var(--line); stroke-width: 10; }
+.ring-bg { fill: none; stroke: var(--track); stroke-width: 12; }
 .ring-fg {
-  fill: none; stroke: var(--red); stroke-width: 10; stroke-linecap: round;
+  fill: none; stroke: var(--red); stroke-width: 12; stroke-linecap: round;
   stroke-dasharray: 327; stroke-dashoffset: 327; transition: stroke-dashoffset .9s cubic-bezier(.4,0,.2,1);
 }
+.ring-tick { fill: none; stroke: var(--ink); stroke-width: 12; opacity: .42; stroke-dasharray: 2 325; stroke-dashoffset: -228; }
 .ring-center {
   position: absolute; inset: 0; display: flex; flex-direction: column;
   align-items: center; justify-content: center; text-align: center;
@@ -481,7 +482,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 
 .prep-card { background: var(--card); border-radius: 18px; padding: 16px 18px;
   box-shadow: var(--shadow); margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
-.prep-ring { position: relative; width: 74px; height: 74px; flex: 0 0 auto; }
+.prep-ring { position: relative; width: 100px; height: 100px; flex: 0 0 auto; }
 .prep-ring .ring { width: 100%; height: 100%; }
 .prep-ring-c { position: absolute; inset: 0; display: grid; place-items: center;
   font-family: var(--font-serif); font-size: 19px; font-weight: 500; }
@@ -490,7 +491,8 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .prep-stats { display: flex; gap: 14px; }
 .prep-stats b { display: block; font-family: var(--font-serif); font-size: 18px; font-weight: 500; }
 .prep-stats span { font-size: 10.5px; color: var(--muted); }
-.spark-mini { width: 64px; height: 32px; flex: 0 0 auto; }
+.spark-mini { width: 72px; height: 40px; flex: 0 0 auto; }
+.spark-mini .area { fill: var(--pill-red); stroke: none; }
 .spark-mini .line { fill: none; stroke: var(--red); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 .spark-mini circle { fill: var(--red); }
 
@@ -518,7 +520,8 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 /* Freemium : bannière accueil, verrou révision, écran premium */
 .premium-banner { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; cursor: pointer;
   background: var(--card); border: 1.5px solid var(--gold); border-radius: 16px; padding: 12px 15px; margin-bottom: 16px; box-shadow: var(--shadow-sm); font-family: inherit; }
-.pb-ico { font-size: 20px; flex: 0 0 auto; }
+.pb-ico { flex: 0 0 auto; display: grid; place-items: center; color: var(--gold); }
+.pb-ico svg { width: 20px; height: 20px; }
 .pb-txt { flex: 1; display: flex; flex-direction: column; }
 .pb-txt b { font-size: 14.5px; }
 .pb-txt small { font-size: 12px; color: var(--muted); }
@@ -548,8 +551,15 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
   display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm); font-family: inherit;
   text-align: left; width: 100%; cursor: pointer; transition: transform .12s ease; }
 .mode-row:active { transform: scale(.985); }
-.mode-ico { font-size: 17px; width: 38px; height: 38px; border-radius: 12px; }
-.mode-ico.alert { background: #FBEDE7; }
+/* Pastilles d'icônes (v2 : icônes SVG outline sur ronds teintés, zéro émoji) */
+.mode-ico { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: 0 0 auto; background: var(--bg); position: relative; }
+.mode-ico svg { width: 20px; height: 20px; }
+.mi-green { background: var(--pill-green); color: var(--icon-green); }
+.mi-red   { background: var(--pill-red);   color: var(--icon-red); }
+.mi-blue  { background: var(--pill-blue);  color: var(--icon-blue); }
+.mi-gold  { background: var(--pill-gold);  color: var(--icon-gold); }
+.mi-terra { background: var(--pill-peach); color: var(--icon-terra); }
+.mode-ico .ico-badge { position: absolute; top: -3px; right: -3px; min-width: 17px; height: 17px; border-radius: 9px; background: var(--red); color: var(--on-red); font-size: 10.5px; font-weight: 700; display: grid; place-items: center; padding: 0 4px; }
 .mode-row-txt { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .mode-row-txt b { font-size: 14.5px; }
 .mode-row-txt small { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
@@ -559,8 +569,9 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .mode-tile { background: var(--card); border-radius: 16px; padding: 13px 14px;
   box-shadow: var(--shadow-sm); font-family: inherit; text-align: left; cursor: pointer; transition: transform .12s ease; }
 .mode-tile:active { transform: scale(.985); }
-.mode-tile .mode-ico { width: auto; height: auto; background: none; border-radius: 0; font-size: 17px; display: block; }
-.mode-tile b { display: block; font-size: 13.5px; margin-top: 6px; }
+.mode-tile .mode-ico { width: 36px; height: 36px; }
+.mode-tile .mode-ico svg { width: 18px; height: 18px; }
+.mode-tile b { display: block; font-size: 13.5px; margin-top: 9px; }
 .mode-tile small { display: block; font-size: 11px; color: var(--muted); margin-top: 1px; }
 
 /* ---------- Révision : titre de portée déroulant + toggle + progression + « Le savais-tu » ---------- */
