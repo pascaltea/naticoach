@@ -140,7 +140,7 @@
   const DONATE = {
     twint:   "",   // lien / QR TWINT (public suisse) — ex. "https://…"
     card:    "",   // lien carte (Ko-fi / page Stripe) — ex. "https://ko-fi.com/…"
-    amounts: { "3": "", "5": "", "10": "" }, // liens Stripe par montant (facultatif)
+    amounts: { "5": "", "10": "", "20": "" }, // liens Stripe par montant (facultatif)
   };
   /* Ouvre le meilleur lien disponible pour un montant donné (ou le lien générique). */
   function donateOpen(kind, amount) {
@@ -1470,7 +1470,7 @@
   }
 
   /* ---------------- Soutenir le projet (dons) ---------------- */
-  let supportAmount = "5"; // palier pré-sélectionné (ancrage)
+  let supportAmount = "10"; // palier pré-sélectionné (ancrage)
 
   function openSupport() {
     const amt = (v) => `<button class="sup-amt${v === supportAmount ? " on" : ""}" data-amt="${v}">${v === "x" ? t("support.other", "Autre") : "CHF " + v}</button>`;
@@ -1480,7 +1480,7 @@
          <h3>${t("support.title", "Soutenir NatiCoach")}</h3>
          <p>${t("support.sub", "NatiCoach est <b>100 % gratuit</b>, sans publicité. Si l'app t'aide, un <b>don libre</b> soutient son développement et les mises à jour. Merci&nbsp;!")}</p>
        </div>
-       <div class="sup-amts">${amt("3")}${amt("5")}${amt("10")}${amt("x")}</div>
+       <div class="sup-amts">${amt("5")}${amt("10")}${amt("20")}${amt("x")}</div>
        <div class="sup-cta-wrap">
          <button class="btn btn-primary big" id="btnDonTwint">${t("support.twint", "Faire un don avec TWINT")}</button>
          <button class="btn btn-outline" id="btnDonCard">${t("support.card", "Payer par carte")}</button>
