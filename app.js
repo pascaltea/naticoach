@@ -1969,7 +1969,7 @@
     const rv = $("btnReview"), rt = $("btnRetry"), sh = $("btnShare"), hm = $("btnHome");
     hm.hidden = false; hm.style.order = 4;
     if (quiz.mode === "exam" && pass) {
-      sh.hidden = false; sh.className = "btn btn-primary big"; sh.textContent = t("result.share", "Partager mon score"); sh.style.order = 1;
+      sh.hidden = false; sh.className = "btn btn-primary big"; sh.innerHTML = "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M22 2L11 13'/><path d='M22 2l-7 20-4-9-9-4z'/></svg> " + t("result.share", "Partager mon score"); sh.style.order = 1;
       rv.hidden = false; rv.className = "btn btn-outline"; rv.textContent = t("result.reviewAnswers", "Revoir mes réponses"); rv.style.order = 2;
       rt.hidden = true;
     } else if (quiz.mode === "exam") {
