@@ -2035,7 +2035,7 @@
       `<div class="badge-count"><span>${n}</span><em> / ${N}</em></div>
        <p class="badge-sub">${t("badges.unlockedSub", "succès débloqués")} — ${half}</p>
        <div class="badge-segs">` +
-        ACHIEVEMENTS.map((a) => `<span class="${b[a.id] ? "on" : ""}"></span>`).join("") +
+        ACHIEVEMENTS.map((a, i) => `<span class="${i < n ? "on" : ""}"></span>`).join("") +
        `</div>`;
     $("badgeGrid").innerHTML = ACHIEVEMENTS.map((a) => {
       const title = t("badge." + a.id + ".title", a.title), desc = t("badge." + a.id + ".desc", a.desc);

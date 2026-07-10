@@ -280,7 +280,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .search-input:focus { outline: none; border-color: var(--red); }
 .commune-results { display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px; }
 .commune-row {
-  background: var(--card); border-radius: 14px;
+  background: var(--card); border: 1.5px solid transparent; border-radius: 14px;
   padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
   cursor: pointer; text-align: left; width: 100%; font-family: inherit; transition: transform .1s, border-color .15s;
 }
