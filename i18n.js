@@ -11,7 +11,7 @@ window.I18N = {
     /* ---------- Configuration ---------- */
     "setup.surtitle": "Grüezi · <span>Hello</span> · Buongiorno",
     "setup.q": "Where are you being naturalised?",
-    "setup.sub": "Choose your canton. The official questionnaire adapts automatically.",
+    "setup.sub": "Choose your canton. The questions adapt automatically.",
     "setup.desc.VD": "Switzerland · canton · your municipality",
     "setup.desc.GE": "Switzerland · canton",
     "setup.desc.NE": "Switzerland · canton · Q&A cards",
@@ -25,8 +25,8 @@ window.I18N = {
 
     /* ---------- Accueil ---------- */
     "home.zoneExam": "For the exam",
-    "home.zoneExamSub": "The official questionnaire and your progress — this is the only thing you are tested on.",
-    "home.zoneExamSubCards": "The official questionnaire — this is the only thing you are tested on.",
+    "home.zoneExamSub": "The exam questions and your progress — this is the only thing you are tested on.",
+    "home.zoneExamSubCards": "The exam questions — this is the only thing you are tested on.",
     "home.reviseLabel": "Revise",
     "home.study": "Revise the answers",
     "home.studySub": "discovery or quiz",
@@ -38,7 +38,7 @@ window.I18N = {
     "home.badges": "Achievements",
     "home.badgesSub": "badge(s)",
     "home.zoneBonus": "Go further",
-    "home.zoneBonusSub": "To deepen your Swiss culture. Useful but not required: everything you are tested on is in the official questionnaire.",
+    "home.zoneBonusSub": "To deepen your Swiss culture. Useful but not required: everything you are tested on is in the practice questions.",
     "home.discover": "Discover",
     "home.explore": "Explore Switzerland",
     "home.exploreSub": "26 cantons",
@@ -71,8 +71,8 @@ window.I18N = {
     "home.piliersSub": "pension / retirement",
     "home.sante": "Healthcare system",
     "home.santeSub": "health insurance",
-    "home.footerVD": "Official questions of the Canton of Vaud · offline",
-    "home.footerGE": "Official questions of Switzerland & Canton of Geneva · offline",
+    "home.footerVD": "Practice questions · Canton of Vaud · offline",
+    "home.footerGE": "Practice questions · Switzerland & Canton of Geneva · offline",
 
     /* ---------- Examen / CTA ---------- */
     "exam.simulate": "Simulate the exam",
@@ -89,7 +89,7 @@ window.I18N = {
     "home.sessionsCount": "{n} sessions",
     "exam.subGE": "{n} questions · max 5 wrong",
     "exam.subVD": "{n} questions · {m} min · pass 70%",
-    "exam.subCards": "{n} official questions · MCQ & cards",
+    "exam.subCards": "{n} questions · MCQ & cards",
 
     /* ---------- Titres d'écrans ---------- */
     "title.explore": "Explore Switzerland",
@@ -120,7 +120,7 @@ window.I18N = {
     /* ---------- Premium ---------- */
     "premium.title": "Unlock your full preparation",
     "premium.sub": "One purchase, for life. No subscription.",
-    "premium.f1": "<b>All the official questions</b> for your canton",
+    "premium.f1": "<b>All the questions</b> for your canton",
     "premium.f2": "The <b>full exam simulation</b> (real conditions, timer)",
     "premium.f3": "<b>Statistics</b> and progress tracking",
     "premium.f4": "Review of <b>all your mistakes</b>",
@@ -146,8 +146,8 @@ window.I18N = {
     "study.next": "Next ›",
     "study.done": "Done",
     "study.scopeTitle": "Revision scope",
-    "study.reveal": "Show the official answer",
-    "study.officialAnswer": "Official answer",
+    "study.reveal": "Show the answer",
+    "study.officialAnswer": "The correct answer",
     "study.wellSeen": "Well spotted!",
     "study.label": "Revision",
     "study.remember": "Key point",
@@ -396,7 +396,7 @@ window.I18N = {
     "mc.note": "Indicative figures (population and number of municipalities change with mergers).",
 
     /* ---------- Home footer (cards) ---------- */
-    "home.footerCards": "Official questions of Switzerland & {c} · offline",
+    "home.footerCards": "Practice questions · Switzerland & {c} · offline",
 
     /* ---------- Frise chronologique ---------- */
     "tl.eraAntiquity": "Antiquity",
@@ -410,16 +410,16 @@ window.I18N = {
     "district.lang": "Language",
     "district.titleVS": "The {n} districts of Valais",
     "district.titleVD": "The {n} districts of Vaud",
-    "district.noteVS": "The <b>13 stars</b> of the Valais flag represent these <b>13 districts</b>. Base map: official swisstopo boundaries (open data).",
-    "district.noteVD": "The canton of Vaud has <b>10 districts</b>. Base map: official swisstopo boundaries (open data).",
+    "district.noteVS": "The <b>13 stars</b> of the Valais flag represent these <b>13 districts</b>. Base map: swisstopo boundaries (open data).",
+    "district.noteVD": "The canton of Vaud has <b>10 districts</b>. Base map: swisstopo boundaries (open data).",
 
     /* ---------- À propos & sources ---------- */
     "about.footerInfo": "· sources ⓘ",
     "about.discH": "Not an official app",
-    "about.disc": "NatiCoach is an <b>independent</b> practice tool, <b>not affiliated with or endorsed by the cantonal authorities</b>. The questions come from the <b>official questionnaires</b> published by the cantons on their websites, but <b>this is not an official app</b> and we <b>cannot guarantee</b> it reflects the most recent version. Questionnaires may change: always check the up-to-date information with your <b>municipality</b> or <b>canton</b>.",
+    "about.disc": "NatiCoach is an <b>independent</b> practice tool, <b>not affiliated with or endorsed by the cantonal authorities</b>. The questions draw on questionnaires <b>published by the cantons</b> on their websites, but <b>this is not an official app</b> and we <b>cannot guarantee</b> it reflects the most recent version. Content may change: always check the up-to-date information with your <b>municipality</b> or <b>canton</b>.",
     "about.sourcesH": "Question sources",
     "about.answersH": "Answers & options",
-    "about.answers": "Only the <b>correct answer</b> is official. For Neuchâtel and Valais, the <b>wrong options</b> in the multiple-choice questions are generated by the app to aid memorisation — they do not come from the official questionnaires.",
+    "about.answers": "Only the <b>correct answer</b> comes from the reference questionnaire. For Neuchâtel and Valais, the <b>wrong options</b> in the multiple-choice questions are generated by the app to aid memorisation — they do not come from that questionnaire.",
     "about.offline": "NatiCoach works offline; no data leaves your phone.",
 
     /* ---------- Divers ---------- */
@@ -430,8 +430,8 @@ window.I18N = {
     "district.subVD": "of Vaud",
     "district.subVS": "of Valais",
     "lang.label": "Language",
-    "examNotice.title": "The official exam is in French",
-    "examNotice.body": "The official naturalisation test is held in French. NatiCoach helps you prepare, but the questions stay in French so you train in real conditions.",
+    "examNotice.title": "The naturalisation exam is in French",
+    "examNotice.body": "The naturalisation test is held in French. NatiCoach helps you prepare, but the questions stay in French so you train in real conditions.",
     "examNotice.go": "Got it, continue",
     "qtr.show": "Show translation",
   },
@@ -440,7 +440,7 @@ window.I18N = {
     /* ---------- Configuration ---------- */
     "setup.surtitle": "Grüezi · <span>Olá</span> · Buongiorno",
     "setup.q": "Onde é que se está a naturalizar?",
-    "setup.sub": "Escolha o seu cantão. O questionário oficial adapta-se automaticamente.",
+    "setup.sub": "Escolha o seu cantão. As perguntas adaptam-se automaticamente.",
     "setup.desc.VD": "Suíça · cantão · o seu município",
     "setup.desc.GE": "Suíça · cantão",
     "setup.desc.NE": "Suíça · cantão · fichas P&R",
@@ -454,8 +454,8 @@ window.I18N = {
 
     /* ---------- Accueil ---------- */
     "home.zoneExam": "Para o exame",
-    "home.zoneExamSub": "O questionário oficial e o seu progresso — é só sobre isto que é avaliado.",
-    "home.zoneExamSubCards": "O questionário oficial — é só sobre isto que é avaliado.",
+    "home.zoneExamSub": "As perguntas do exame e o seu progresso — é só sobre isto que é avaliado.",
+    "home.zoneExamSubCards": "As perguntas do exame — é só sobre isto que é avaliado.",
     "home.reviseLabel": "Rever",
     "home.study": "Rever as respostas",
     "home.studySub": "descoberta ou quiz",
@@ -467,7 +467,7 @@ window.I18N = {
     "home.badges": "Conquistas",
     "home.badgesSub": "medalha(s)",
     "home.zoneBonus": "Ir mais longe",
-    "home.zoneBonusSub": "Para aprofundar a sua cultura suíça. Útil mas não obrigatório: tudo o que é avaliado está no questionário oficial.",
+    "home.zoneBonusSub": "Para aprofundar a sua cultura suíça. Útil mas não obrigatório: tudo o que é avaliado está nas perguntas de treino.",
     "home.discover": "Descobrir",
     "home.explore": "Explorar a Suíça",
     "home.exploreSub": "26 cantões",
@@ -576,8 +576,8 @@ window.I18N = {
     "study.next": "Seguinte ›",
     "study.done": "Concluído",
     "study.scopeTitle": "Âmbito da revisão",
-    "study.reveal": "Ver a resposta oficial",
-    "study.officialAnswer": "Resposta oficial",
+    "study.reveal": "Ver a resposta",
+    "study.officialAnswer": "A resposta correta",
     "study.wellSeen": "Muito bem!",
     "study.label": "Revisão",
     "study.remember": "A reter",
@@ -843,10 +843,10 @@ window.I18N = {
     /* ---------- À propos & sources ---------- */
     "about.footerInfo": "· fontes ⓘ",
     "about.discH": "Aplicação não oficial",
-    "about.disc": "O NatiCoach é uma ferramenta de treino <b>independente</b>, <b>não afiliada nem aprovada pelas autoridades cantonais</b>. As perguntas provêm dos <b>questionários oficiais</b> publicados pelos cantões nos seus sites, mas <b>não é uma aplicação oficial</b> e <b>não podemos garantir</b> que se trate da versão mais recente. Os questionários podem evoluir: verifique sempre as informações atualizadas junto do seu <b>município</b> ou do seu <b>cantão</b>.",
+    "about.disc": "O NatiCoach é uma ferramenta de treino <b>independente</b>, <b>não afiliada nem aprovada pelas autoridades cantonais</b>. As perguntas inspiram-se em questionários <b>publicados pelos cantões</b> nos seus sites, mas <b>não é uma aplicação oficial</b> e <b>não podemos garantir</b> que se trate da versão mais recente. Os conteúdos podem evoluir: verifique sempre as informações atualizadas junto do seu <b>município</b> ou do seu <b>cantão</b>.",
     "about.sourcesH": "Fontes das perguntas",
     "about.answersH": "Respostas e propostas",
-    "about.answers": "Só a <b>resposta correta</b> é oficial. Para Neuchâtel e Valais, as <b>respostas erradas</b> das perguntas de escolha múltipla são geradas pela aplicação para ajudar a memorizar — não provêm dos questionários oficiais.",
+    "about.answers": "Só a <b>resposta correta</b> provém do questionário de referência. Para Neuchâtel e Valais, as <b>respostas erradas</b> das perguntas de escolha múltipla são geradas pela aplicação para ajudar a memorizar — não provêm desse questionário.",
     "about.offline": "O NatiCoach funciona offline; nenhum dado sai do seu telemóvel.",
 
     /* ---------- Divers ---------- */
@@ -857,8 +857,8 @@ window.I18N = {
     "district.subVD": "de Vaud",
     "district.subVS": "do Valais",
     "lang.label": "Língua",
-    "examNotice.title": "O exame oficial é em francês",
-    "examNotice.body": "O teste oficial de naturalização é realizado em francês. O NatiCoach ajuda-o a preparar-se, mas as perguntas permanecem em francês para treinar em condições reais.",
+    "examNotice.title": "O exame de naturalização é em francês",
+    "examNotice.body": "O teste de naturalização é realizado em francês. O NatiCoach ajuda-o a preparar-se, mas as perguntas permanecem em francês para treinar em condições reais.",
     "examNotice.go": "Percebi, continuar",
     "qtr.show": "Ver a tradução",
   },

@@ -140,8 +140,8 @@
   function frenchNotice(proceed) {
     if (state.lang === "fr" || state.examNoticeAck === state.lang) { proceed(); return; }
     _noticeCb = proceed;
-    $("examNoticeTitle").textContent = t("examNotice.title", "L'examen officiel est en français");
-    $("examNoticeText").textContent = t("examNotice.body", "Le test officiel de naturalisation se déroule en français. NatiCoach t'aide à te préparer, mais les questions restent en français pour t'entraîner en conditions réelles.");
+    $("examNoticeTitle").textContent = t("examNotice.title", "L'examen de naturalisation est en français");
+    $("examNoticeText").textContent = t("examNotice.body", "Le test de naturalisation se déroule en français. NatiCoach t'aide à te préparer, mais les questions restent en français pour t'entraîner en conditions réelles.");
     $("examNoticeGo").textContent = t("examNotice.go", "Compris, continuer");
     $("examNotice").hidden = false;
   }
@@ -497,8 +497,8 @@
     if (cards) {
       const n = cardsData().questions.length;
       $("examTitle").textContent = t("exam.train", "S'entraîner");
-      $("examSub").textContent = fmt(t("exam.subCards", "{n} questions officielles · QCM & fiches"), { n: n });
-      $("homeFooter").textContent = fmt(t("home.footerCards", "Questions officielles Suisse & {c} · hors-ligne"), { c: cScope(cn) });
+      $("examSub").textContent = fmt(t("exam.subCards", "{n} questions · QCM & fiches"), { n: n });
+      $("homeFooter").textContent = fmt(t("home.footerCards", "Questions d'entraînement · Suisse & {c} · hors-ligne"), { c: cScope(cn) });
       return;
     }
 
@@ -508,8 +508,8 @@
       ? fmt(t("exam.subGE", "{n} questions · max 5 fautes"), { n: cfg.total })
       : fmt(t("exam.subVD", "{n} questions · {m} min · réussite 70 %"), { n: cfg.total, m: cfg.minutes });
     $("homeFooter").textContent = cn === "GE"
-      ? t("home.footerGE", "Questions officielles Suisse & Canton de Genève · hors-ligne")
-      : t("home.footerVD", "Questions officielles du Canton de Vaud · hors-ligne");
+      ? t("home.footerGE", "Questions d'entraînement · Suisse & Canton de Genève · hors-ligne")
+      : t("home.footerVD", "Questions d'entraînement · Canton de Vaud · hors-ligne");
 
     const recent = state.history.slice(-5);
     const readiness = recent.length ? Math.round(recent.reduce((s, h) => s + h.pct, 0) / recent.length) : 0;
@@ -700,7 +700,7 @@
       if (answered) {
         const good = cur.chosen === cur.answer;
         const head = $("studyExplainHead");
-        head.textContent = good ? t("study.wellSeen", "Bien vu !") : t("study.officialAnswer", "Réponse officielle");
+        head.textContent = good ? t("study.wellSeen", "Bien vu !") : t("study.officialAnswer", "La bonne réponse");
         head.className = "explain-head savais-head " + (good ? "ok" : "bad");
         $("studyExplainText").textContent = cur.options[cur.answer];
       }
@@ -718,14 +718,14 @@
     if (!cur.revealed) {
       const b = document.createElement("button");
       b.className = "btn btn-outline reveal-btn";
-      b.textContent = t("study.reveal", "Voir la réponse officielle");
+      b.textContent = t("study.reveal", "Voir la réponse");
       b.addEventListener("click", () => { cur.revealed = true; renderStudy(); });
       box.appendChild(b);
     }
     $("studyExplain").hidden = !cur.revealed;
     if (cur.revealed) {
       const head = $("studyExplainHead");
-      head.textContent = t("study.officialAnswer", "Réponse officielle");
+      head.textContent = t("study.officialAnswer", "La bonne réponse");
       head.className = "explain-head savais-head";
       $("studyExplainText").textContent = cur.a;
     }
@@ -1204,8 +1204,8 @@
     const svg = $("vsMapSvg");
     $("vsMapTitle").textContent = fmt(t(cantonOf() === "VS" ? "district.titleVS" : "district.titleVD", "Les {n} districts " + (cantonOf() === "VS" ? "du Valais" : "vaudois")), { n: m.districts.length });
     $("vsMapNote").innerHTML = cantonOf() === "VS"
-      ? t("district.noteVS", "Les <b>13 étoiles</b> du drapeau valaisan représentent ces <b>13 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes).")
-      : t("district.noteVD", "Le canton de Vaud compte <b>10 districts</b>. Fond de carte : limites officielles swisstopo (données ouvertes).");
+      ? t("district.noteVS", "Les <b>13 étoiles</b> du drapeau valaisan représentent ces <b>13 districts</b>. Fond de carte : limites swisstopo (données ouvertes).")
+      : t("district.noteVD", "Le canton de Vaud compte <b>10 districts</b>. Fond de carte : limites swisstopo (données ouvertes).");
 
     hideDistrictInfo();
 
@@ -1426,10 +1426,10 @@
 
   /* Sources officielles des banques de questions, par canton (+ dates connues). */
   const SOURCES = {
-    VD: { auth: "État de Vaud", srcFr: "Outil officiel d'entraînement au test de connaissances", srcEn: "Official knowledge-test practice tool", url: "https://www.vd.ch/prestations/naturalisation", host: "vd.ch", dateFr: "consulté en juillet 2026", dateEn: "accessed July 2026" },
-    GE: { auth: "République et canton de Genève", srcFr: "E-learning officiel « Connaître la Suisse et Genève »", srcEn: "Official e-learning « Getting to know Switzerland and Geneva »", url: "https://outils.ge.ch/e-learning/connaitre-suisse/", host: "outils.ge.ch", dateFr: "consulté en juillet 2026", dateEn: "accessed July 2026" },
-    NE: { auth: "République et canton de Neuchâtel", srcFr: "Questionnaire officiel avec réponses", srcEn: "Official questionnaire with answers", url: "https://www.ne.ch", host: "ne.ch", dateFr: "édition janvier 2026", dateEn: "January 2026 edition" },
-    VS: { auth: "Canton du Valais", srcFr: "Questionnaire officiel (questions et réponses)", srcEn: "Official questionnaire (questions and answers)", url: "https://www.vs.ch", host: "vs.ch", dateFr: "questions : novembre 2021 · réponses : août 2022", dateEn: "questions: November 2021 · answers: August 2022" },
+    VD: { auth: "État de Vaud", srcFr: "Outil d'entraînement au test de connaissances", srcEn: "Knowledge-test practice tool", url: "https://www.vd.ch/prestations/naturalisation", host: "vd.ch", dateFr: "consulté en juillet 2026", dateEn: "accessed July 2026" },
+    GE: { auth: "République et canton de Genève", srcFr: "E-learning « Connaître la Suisse et Genève »", srcEn: "E-learning « Getting to know Switzerland and Geneva »", url: "https://outils.ge.ch/e-learning/connaitre-suisse/", host: "outils.ge.ch", dateFr: "consulté en juillet 2026", dateEn: "accessed July 2026" },
+    NE: { auth: "République et canton de Neuchâtel", srcFr: "Questionnaire avec réponses", srcEn: "Questionnaire with answers", url: "https://www.ne.ch", host: "ne.ch", dateFr: "édition janvier 2026", dateEn: "January 2026 edition" },
+    VS: { auth: "Canton du Valais", srcFr: "Questionnaire (questions et réponses)", srcEn: "Questionnaire (questions and answers)", url: "https://www.vs.ch", host: "vs.ch", dateFr: "questions : novembre 2021 · réponses : août 2022", dateEn: "questions: November 2021 · answers: August 2022" },
   };
 
   function openAbout() {
@@ -1451,11 +1451,11 @@
     $("aboutBody").innerHTML =
       `<div class="cs-card cs-highlight about-disclaimer">
          <div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l9 16H3z'/><path d='M12 10v4'/><path d='M12 17h.01'/></svg> ${t("about.discH", "Application non officielle")}</div>
-         <p>${t("about.disc", "NatiCoach est un outil d'entraînement <b>indépendant</b>, <b>non affilié aux autorités cantonales</b> et sans lien officiel avec elles. Les questions proviennent des <b>questionnaires officiels</b> publiés par les cantons sur leurs sites, mais <b>ce n'est pas une application officielle</b> et nous <b>ne pouvons pas garantir</b> qu'il s'agit de la version la plus récente. Les questionnaires peuvent évoluer : vérifie toujours les informations à jour auprès de ta <b>commune</b> ou de ton <b>canton</b>.")}</p>
+         <p>${t("about.disc", "NatiCoach est un outil d'entraînement <b>indépendant</b>, <b>non affilié aux autorités cantonales</b> et sans aucun lien avec elles. Les questions s'inspirent de questionnaires <b>publiés par les cantons</b> sur leurs sites, mais <b>ce n'est pas une application officielle</b> et nous <b>ne pouvons pas garantir</b> qu'il s'agit de la version la plus récente. Les contenus peuvent évoluer : vérifie toujours les informations à jour auprès de ta <b>commune</b> ou de ton <b>canton</b>.")}</p>
        </div>` +
       `<h3 class="cs-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z'/><path d='M4 19a2 2 0 0 1 2-2h13'/></svg> ${t("about.sourcesH", "Sources des questions")}</h3>` +
       `<div class="cs-card src-list">${order.map(srcRow).join("")}</div>` +
-      csCard("", t("about.answersH", "Réponses & propositions"), t("about.answers", "Seule la <b>bonne réponse</b> est officielle. Pour Neuchâtel et le Valais, les <b>fausses propositions</b> des QCM sont générées par l'app pour aider à mémoriser — elles ne proviennent pas des questionnaires officiels.")) +
+      csCard("", t("about.answersH", "Réponses & propositions"), t("about.answers", "Seule la <b>bonne réponse</b> provient du questionnaire de référence. Pour Neuchâtel et le Valais, les <b>fausses propositions</b> des QCM sont générées par l'app pour aider à mémoriser — elles ne proviennent pas de ce questionnaire.")) +
       `<p class="cs-note">${t("about.offline", "NatiCoach fonctionne hors-ligne ; aucune donnée ne quitte ton téléphone.")}</p>` +
       `<div class="legal-links">
          <button class="legal-link" id="btnCgu">${t("about.cgu", "Conditions générales")} ›</button>
@@ -1485,7 +1485,7 @@
          <p>${t("premium.sub", "Un seul achat, à vie. Aucun abonnement.")}</p>
        </div>
        <ul class="pr-feats">
-         ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z'/><path d='M4 19a2 2 0 0 1 2-2h13'/></svg>", t("premium.f1", "<b>Toutes les questions</b> officielles de ton canton"))}
+         ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z'/><path d='M4 19a2 2 0 0 1 2-2h13'/></svg>", t("premium.f1", "<b>Toutes les questions</b> de ton canton"))}
          ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='4'/></svg>", t("premium.f2", "La <b>simulation d'examen complète</b> (conditions réelles, minuteur)"))}
          ${feat("", t("premium.f3", "<b>Statistiques</b> et suivi de progression"))}
          ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 10a8 8 0 0 1 13.9-4.4'/><path d='M20 14a8 8 0 0 1-13.9 4.4'/><path d='M18 2v4h-4'/><path d='M6 22v-4h4'/></svg>", t("premium.f4", "Révision de <b>toutes tes erreurs</b>"))}
@@ -1526,8 +1526,8 @@
       `<p class="legal-meta">${t("legal.cguIntro", "Conditions Générales d'Utilisation et de Vente — NatiCoach · Version 1.0")}</p>` +
       legalSec(1, "Éditeur", "L'application <b>NatiCoach</b> (« l'Application ») est éditée par <b>Pascal Tea</b>, personne physique exerçant en <b>raison individuelle</b>, <b>Route d'Arnex 9, 1262 Eysins</b>, Suisse (« l'Éditeur »). Contact : <b>contact@naticoach.ch</b>.") +
       legalSec(2, "Objet", "Les présentes conditions régissent l'accès et l'utilisation de l'Application, un <b>outil d'entraînement pédagogique</b> à la préparation du test de connaissances de la naturalisation suisse. En utilisant l'Application, l'utilisateur·rice les accepte.") +
-      legalSec(3, "Absence de caractère officiel", "NatiCoach est un outil <b>indépendant</b>, <b>non affilié</b> et non approuvé par les autorités (Confédération, cantons, communes). Les questions s'inspirent de questionnaires officiels rendus publics ; l'Éditeur ne garantit ni leur exactitude ni leur mise à jour. Seule fait foi l'information de l'autorité compétente.") +
-      legalSec(4, "Absence de garantie de résultat", "L'Application est fournie « en l'état » et <b>ne garantit pas la réussite</b> au test ni l'obtention de la nationalité. Les explications et propositions de réponses sont à visée pédagogique ; seule la bonne réponse reflète le contenu officiel.") +
+      legalSec(3, "Absence de caractère officiel", "NatiCoach est un outil <b>indépendant</b>, <b>non affilié</b> et non approuvé par les autorités (Confédération, cantons, communes). Les questions s'inspirent de questionnaires <b>rendus publics</b> par les cantons ; l'Éditeur ne garantit ni leur exactitude ni leur mise à jour. Seule fait foi l'information de l'autorité compétente.") +
+      legalSec(4, "Absence de garantie de résultat", "L'Application est fournie « en l'état » et <b>ne garantit pas la réussite</b> au test ni l'obtention de la nationalité. Les explications et propositions de réponses sont à visée pédagogique.") +
       legalSec(5, "Version gratuite et premium", "L'Application propose un accès gratuit limité et un accès complet « premium » par <b>achat unique</b>. L'achat s'effectue exclusivement via <b>l'App Store</b> ou <b>Google Play</b>. Le déblocage est définitif : aucune somme supplémentaire n'est due pour les mises à jour futures.") +
       legalSec(6, "Prix, facturation, remboursement", "Le prix est indiqué en CHF. La facturation, l'encaissement et les demandes de <b>remboursement</b> relèvent des politiques d'<b>Apple / Google</b> ; l'Éditeur n'a pas accès aux moyens de paiement.") +
       legalSec(7, "Propriété intellectuelle", "L'Application, son code, son design, la marque « NatiCoach », les textes explicatifs et illustrations sont protégés et demeurent la propriété de l'Éditeur. L'utilisateur·rice bénéficie d'un droit d'usage <b>personnel</b>. Toute revente, extraction ou rediffusion non autorisée est interdite.") +
