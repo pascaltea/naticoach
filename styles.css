@@ -30,6 +30,8 @@
   --shadow: 0 2px 14px rgba(60,45,20,.08);
   --shadow-sm: 0 1px 6px rgba(60,45,20,.06);
   --shadow-cta: 0 8px 24px rgba(200,68,46,.22);
+  --shadow-card: 0 2px 14px rgba(60,45,20,.08); /* alias design system */
+  --shadow-row: 0 1px 6px rgba(60,45,20,.06);   /* alias design system */
   --font-ui: "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-serif: "Lora", Georgia, ui-serif, "Times New Roman", serif;
   --safe-top: env(safe-area-inset-top, 0px);
@@ -567,7 +569,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .zone-bonus { margin-top: 26px; padding-top: 20px; border-top: 1px dashed var(--line); }
 .mode-group-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin: 0 4px 9px; }
 .mode-rows { display: flex; flex-direction: column; gap: 9px; margin-bottom: 16px; }
-.mode-row { background: var(--card); border-radius: 16px; padding: 13px 15px;
+.mode-row { background: var(--card); border: none; border-radius: 16px; padding: 13px 15px;
   display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm); font-family: inherit;
   text-align: left; width: 100%; cursor: pointer; transition: transform .12s ease; }
 .mode-row:active { transform: scale(.985); }
@@ -603,9 +605,11 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .mode-row-txt small.hot { color: var(--red); font-weight: 600; }
 .mode-row .chev { font-size: 18px; color: var(--muted); }
 .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 16px; }
-.mode-tile { background: var(--card); border-radius: 16px; padding: 13px 14px;
+.mode-tile { background: var(--card); border: none; border-radius: 16px; padding: 13px 14px;
   box-shadow: var(--shadow-sm); font-family: inherit; text-align: left; cursor: pointer; transition: transform .12s ease; }
 .mode-tile:active { transform: scale(.985); }
+/* Reset de la bordure UA par défaut des <button> agissant comme surfaces */
+.commune-pill, .icon-btn, .scope-title, .map-zoom button { border: none; }
 .mode-tile .mode-ico { width: 36px; height: 36px; }
 .mode-tile .mode-ico svg { width: 18px; height: 18px; }
 .mode-tile b { display: block; font-size: 13.5px; margin-top: 9px; }
