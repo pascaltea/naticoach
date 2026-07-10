@@ -103,6 +103,9 @@
   const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const LETTERS = ["A", "B", "C", "D", "E", "F"];
+  /* Coche / croix en SVG (jamais d'émoji). */
+  const MK_OK = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'><path d='M5 13l4 4 10-10'/></svg>";
+  const MK_NO = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round'><path d='M6 6l12 12'/><path d='M18 6L6 18'/></svg>";
   function showScreen(id) {
     document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
     $(id).classList.add("active"); window.scrollTo(0, 0);
@@ -230,12 +233,12 @@
 
   /* ---------------- Succès (badges) ---------------- */
   const ACHIEVEMENTS = [
-    { id: "first",    ico: "🎯", title: "Premiers pas",    desc: "Terminer une première session" },
-    { id: "exam",     ico: "🎓", title: "Citoyen·ne",      desc: "Réussir une simulation d'examen" },
-    { id: "perfect",  ico: "💯", title: "Sans-faute",      desc: "Réussir un examen à 100 %" },
-    { id: "streak3",  ico: "🔥", title: "Assidu·e",        desc: "Atteindre une série de 3 jours" },
-    { id: "cleaner",  ico: "🧹", title: "Perfectionniste", desc: "Vider sa liste d'erreurs" },
-    { id: "marathon", ico: "⭐", title: "Marathonien·ne",  desc: "Réaliser 10 sessions" },
+    { id: "first",    ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='4'/></svg>", title: "Premiers pas",    desc: "Terminer une première session" },
+    { id: "exam",     ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 9l9-4 9 4-9 4z'/><path d='M7 11v5c0 1.5 2.5 2.5 5 2.5s5-1 5-2.5v-5'/></svg>", title: "Citoyen·ne",      desc: "Réussir une simulation d'examen" },
+    { id: "perfect",  ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='9' r='5'/><path d='M8.8 13.2L7.5 21l4.5-2.7 4.5 2.7-1.3-7.8'/></svg>", title: "Sans-faute",      desc: "Réussir un examen à 100 %" },
+    { id: "streak3",  ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3c1 3-2 4-2 7a4 4 0 0 0 8 0c0-2-1-3-1-3 3 2 4 5 4 7a7 7 0 0 1-14 0c0-4 3-6 5-8z'/></svg>", title: "Assidu·e",        desc: "Atteindre une série de 3 jours" },
+    { id: "cleaner",  ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M14 3l7 7'/><path d='M11 6l7 7-3 3-9 2-3-3 8-3z'/></svg>", title: "Perfectionniste", desc: "Vider sa liste d'erreurs" },
+    { id: "marathon", ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l2.5 6 6.5.5-5 4 1.7 6.5L12 17l-5.7 3 1.7-6.5-5-4 6.5-.5z'/></svg>", title: "Marathonien·ne",  desc: "Réaliser 10 sessions" },
   ];
   function unlock(id) {
     if (state.badges[id]) return;
@@ -419,7 +422,7 @@
         const sel = c.id === pendingCommune;
         return `<button class="commune-row${sel ? " selected" : ""}" data-id="${c.id}">
              <span><b>${c.name}</b></span>
-             ${sel ? `<span class="commune-check">✓</span>` : `<span class="commune-chev">›</span>`}
+             ${sel ? `<span class="commune-check">${MK_OK}</span>` : `<span class="commune-chev">›</span>`}
            </button>`;
       }).join("");
       return `<div class="dist-label">District de ${dist} · ${items.length} commune${items.length > 1 ? "s" : ""}</div>
@@ -580,7 +583,7 @@
     const box = $("scopeOptions");
     box.innerHTML = studyScopes().map((s) =>
       `<button data-scope="${s.key}" class="${study && study.scope === s.key ? "sel" : ""}">
-         <span>${s.long}</span>${study && study.scope === s.key ? '<span class="sheet-check">✓</span>' : ""}
+         <span>${s.long}</span>${study && study.scope === s.key ? '<span class="sheet-check">'+MK_OK+'</span>' : ""}
        </button>`).join("");
     box.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
       loadStudyScope(b.dataset.scope); closeScopeSheet();
@@ -632,7 +635,7 @@
     $("studyIllus").innerHTML = "";
     const box = $("studyOptions"); box.innerHTML = "";
     $("btnPrev").disabled = study.i === 0;
-    $("btnNextStudy").textContent = study.i + 1 < study.items.length ? t("study.next", "Suivant ›") : t("study.done", "Terminé ✓");
+    $("btnNextStudy").textContent = study.i + 1 < study.items.length ? t("study.next", "Suivant ›") : t("study.done", "Terminé");
 
     if (cur.type === "mcq") {
       $("studyQuestion").textContent = cur.q;
@@ -648,7 +651,7 @@
           const ok = i === cur.answer, wrong = i === cur.chosen && !ok;
           const el = document.createElement("div");
           el.className = "option " + (ok ? "correct" : (wrong ? "wrong" : "dim"));
-          el.innerHTML = `<span class="mark">${ok ? "✓" : (wrong ? "✕" : (LETTERS[i] || ""))}</span><span>${esc(opt)}</span>`;
+          el.innerHTML = `<span class="mark">${ok ? MK_OK : (wrong ? MK_NO : (LETTERS[i] || ""))}</span><span>${esc(opt)}</span>`;
           box.appendChild(el);
         }
       });
@@ -690,7 +693,7 @@
   function updateStudyLock() {
     const el = $("studyLock"); if (!el) return;
     const n = study && study.lockedCount;
-    if (n > 0) { el.hidden = false; el.innerHTML = `🔒 ${fmt(t("premium.studyLock", "Aperçu gratuit · {n} questions verrouillées"), { n: n })} — <b>${t("premium.unlock", "Débloquer")}</b>`; }
+    if (n > 0) { el.hidden = false; el.innerHTML = `<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='11' width='16' height='10' rx='2'/><path d='M8 11V7a4 4 0 0 1 8 0v4'/></svg> ${fmt(t("premium.studyLock", "Aperçu gratuit · {n} questions verrouillées"), { n: n })} — <b>${t("premium.unlock", "Débloquer")}</b>`; }
     else el.hidden = true;
   }
   function renderStudy() {
@@ -717,7 +720,7 @@
         const wrongPick = study.interactive && answered && i === cur.chosen && !ok;
         const el = document.createElement("div");
         el.className = "option " + (ok ? "reveal" : (wrongPick ? "wrong" : "muted-opt"));
-        el.innerHTML = `<span class="mark">${ok ? "✓" : (wrongPick ? "✕" : (LETTERS[i] || ""))}</span><span>${opt}</span>`;
+        el.innerHTML = `<span class="mark">${ok ? MK_OK : (wrongPick ? MK_NO : (LETTERS[i] || ""))}</span><span>${opt}</span>`;
         box.appendChild(el);
       }
     });
@@ -742,7 +745,7 @@
     }
 
     $("btnPrev").disabled = study.i === 0;
-    $("btnNextStudy").textContent = study.i + 1 < study.items.length ? t("study.next", "Suivant ›") : t("study.done", "Terminé ✓");
+    $("btnNextStudy").textContent = study.i + 1 < study.items.length ? t("study.next", "Suivant ›") : t("study.done", "Terminé");
   }
 
   function studyNext() {
@@ -915,7 +918,7 @@
     Object.values(state.stats).forEach((s) => { tot.a += s.a; tot.c += s.c; });
 
     if (!tot.a) {
-      box.innerHTML = `<p class="stats-empty">${t("stats.empty", "Réponds à quelques questions (examen ou révision en mode Quiz) pour voir ton bilan apparaître ici. 📊")}</p>`;
+      box.innerHTML = `<p class="stats-empty">${t("stats.empty", "Réponds à quelques questions (examen ou révision en mode Quiz) pour voir ton bilan apparaître ici.")}</p>`;
       showScreen("screen-stats"); return;
     }
 
@@ -1140,8 +1143,8 @@
     if (!box) return;
     const info = DISTRICT_INFO[d.id];
     const rows = [];
-    if (info && info.chef) rows.push(`<div class="vsd-row"><span>🏛️ ${t("district.chef", "Chef-lieu")}</span><b>${info.chef}</b></div>`);
-    if (cantonOf() === "VS" && d.region) rows.push(`<div class="vsd-row"><span>🗣️ ${t("district.lang", "Langue")}</span><b>${vsLang(d.region)}</b></div>`);
+    if (info && info.chef) rows.push(`<div class="vsd-row"><span><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 21V10'/><path d='M9 21V10'/><path d='M15 21V10'/><path d='M19 21V10'/><path d='M12 3l8 5H4z'/></svg> ${t("district.chef", "Chef-lieu")}</span><b>${info.chef}</b></div>`);
+    if (cantonOf() === "VS" && d.region) rows.push(`<div class="vsd-row"><span><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M5 9v6h4l5 4V5L9 9z'/><path d='M17 9a3 3 0 0 1 0 6'/></svg> ${t("district.lang", "Langue")}</span><b>${vsLang(d.region)}</b></div>`);
     const note = info ? (state.lang === "fr" ? info.note : (info[state.lang] || info.note)) : "";
     box.innerHTML = `<div class="vsd-info-h"><span class="vsd-dot" style="background:${d.color}"></span>${d.name}</div>` +
       rows.join("") + (note ? `<p class="vsd-note">${note}</p>` : "");
@@ -1267,41 +1270,41 @@
     $("politiqueBody").innerHTML =
       `<p class="cs-intro">${t("pol.intro", "La Suisse repose sur <b>3 niveaux</b> (Confédération · Canton · Commune) et sur la <b>séparation des 3 pouvoirs</b> : qui fait les lois, qui gouverne, qui juge.")}</p>` +
       polLevel(t("pol.confedT", "Confédération"), t("pol.confedSub", "niveau fédéral · Suisse"), [
-        { k: "leg", ico: "📜", power: t("pol.legis", "Législatif — fait les lois"), body: t("pol.assemblee", "Assemblée fédérale"), note: t("pol.assembleeNote", "Conseil national (200 · élu par le peuple) + Conseil des États (46 · représente les cantons)") },
-        { k: "exe", ico: "🏛️", power: t("pol.exec", "Exécutif — gouverne"), body: t("pol.cf", "Conseil fédéral (7 ministres)"), note: t("pol.cfNote", "Présidence tournante 1 an : le·la Président·e de la Confédération") },
-        { k: "jud", ico: "⚖️", power: t("pol.judic", "Judiciaire — juge"), body: t("pol.tf", "Tribunal fédéral"), note: t("pol.tfNote", "à Lausanne") },
+        { k: "leg", ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M8 3h9a2 2 0 0 1 2 2v13a3 3 0 0 1-3 3H7a2 2 0 0 1-2-2V6'/><path d='M5 6a2 2 0 0 1 4 0v11'/></svg>", power: t("pol.legis", "Législatif — fait les lois"), body: t("pol.assemblee", "Assemblée fédérale"), note: t("pol.assembleeNote", "Conseil national (200 · élu par le peuple) + Conseil des États (46 · représente les cantons)") },
+        { k: "exe", ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 21V10'/><path d='M9 21V10'/><path d='M15 21V10'/><path d='M19 21V10'/><path d='M12 3l8 5H4z'/></svg>", power: t("pol.exec", "Exécutif — gouverne"), body: t("pol.cf", "Conseil fédéral (7 ministres)"), note: t("pol.cfNote", "Présidence tournante 1 an : le·la Président·e de la Confédération") },
+        { k: "jud", ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 4v16'/><path d='M6 21h12'/><path d='M4 8l16-2'/><path d='M6 8l-2.5 6a3 3 0 0 0 5 0z'/><path d='M18 6l-2.5 6a3 3 0 0 0 5 0z'/></svg>", power: t("pol.judic", "Judiciaire — juge"), body: t("pol.tf", "Tribunal fédéral"), note: t("pol.tfNote", "à Lausanne") },
       ]) +
       polLevel(cantonTitle, t("pol.cantonSub", "niveau cantonal"), [
-        { k: "leg", ico: "📜", power: t("pol.legisShort", "Législatif"), body: gc, note: t("pol.gcNote", "le parlement cantonal") },
-        { k: "exe", ico: "🏛️", power: t("pol.execShort", "Exécutif"), body: ce, note: t("pol.ceNote", "le gouvernement cantonal") },
-        { k: "jud", ico: "⚖️", power: t("pol.judic", "Judiciaire"), body: t("pol.tc", "Tribunal cantonal"), note: "" },
+        { k: "leg", ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M8 3h9a2 2 0 0 1 2 2v13a3 3 0 0 1-3 3H7a2 2 0 0 1-2-2V6'/><path d='M5 6a2 2 0 0 1 4 0v11'/></svg>", power: t("pol.legisShort", "Législatif"), body: gc, note: t("pol.gcNote", "le parlement cantonal") },
+        { k: "exe", ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 21V10'/><path d='M9 21V10'/><path d='M15 21V10'/><path d='M19 21V10'/><path d='M12 3l8 5H4z'/></svg>", power: t("pol.execShort", "Exécutif"), body: ce, note: t("pol.ceNote", "le gouvernement cantonal") },
+        { k: "jud", ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 4v16'/><path d='M6 21h12'/><path d='M4 8l16-2'/><path d='M6 8l-2.5 6a3 3 0 0 0 5 0z'/><path d='M18 6l-2.5 6a3 3 0 0 0 5 0z'/></svg>", power: t("pol.judic", "Judiciaire"), body: t("pol.tc", "Tribunal cantonal"), note: "" },
       ]) +
       polLevel(t("pol.communeT", "Commune"), fmt(t("pol.communeSub", "niveau communal · {c}"), { c: cantonNm }), [
-        { k: "leg", ico: "📜", power: t("pol.legisShort", "Législatif"), body: legis, note: "" },
-        { k: "exe", ico: "🏛️", power: t("pol.execShort", "Exécutif"), body: exec, note: chairedBy },
+        { k: "leg", ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M8 3h9a2 2 0 0 1 2 2v13a3 3 0 0 1-3 3H7a2 2 0 0 1-2-2V6'/><path d='M5 6a2 2 0 0 1 4 0v11'/></svg>", power: t("pol.legisShort", "Législatif"), body: legis, note: "" },
+        { k: "exe", ico: "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 21V10'/><path d='M9 21V10'/><path d='M15 21V10'/><path d='M19 21V10'/><path d='M12 3l8 5H4z'/></svg>", power: t("pol.execShort", "Exécutif"), body: exec, note: chairedBy },
       ]) +
       (() => {
         const e = ELECT[cn] || ELECT.VD;
         const gcN = e.gc + " " + t("pol.deputes", "député·es");
         const ceN = e.ce + " " + t("pol.conseillers", "conseiller·ères");
-        return `<h3 class="cs-h">${t("pol.qeH", "🗳️ Qui élit qui ?")}</h3>
+        return `<h3 class="cs-h">${t("pol.qeH", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='2'/><path d='M8.5 12l2.5 2.5 4.5-5'/></svg> Qui élit qui ?")}</h3>
           <p class="cs-intro">${t("pol.qeIntro", "Le <b>peuple</b> (Suisses dès <b>18 ans</b>) élit directement les <b>parlements</b> aux 3 niveaux, et aussi les <b>gouvernements</b> — sauf au niveau fédéral, où le Conseil fédéral est élu par le Parlement.")}</p>
-          <div class="qe-peuple">${t("pol.people", "👥 Le peuple &nbsp;·&nbsp; citoyen·nes suisses dès 18 ans")}</div>
+          <div class="qe-peuple">${t("pol.people", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='9' cy='8' r='3'/><path d='M3 20a6 6 0 0 1 12 0'/><path d='M16 5.5a3 3 0 0 1 0 5'/><path d='M17.5 20a6 6 0 0 0-3-5'/></svg> Le peuple &nbsp;·&nbsp; citoyen·nes suisses dès 18 ans")}</div>
           <div class="qe-arrow">${t("pol.elects", "élit ↓")}</div>` +
           qeLevel(t("pol.confedT", "Confédération"),
-            qeCard("leg", t("pol.roleLegFed", "Législatif · fait les lois"), t("pol.cnCe", "Conseil national + Conseil des États"), t("pol.cnCeMeta", "200 + 46 · mandat 4 ans"), t("pol.byPeopleFed", "🗳️ élus directement par le peuple"), "people") +
-            qeCard("exe", t("pol.roleExeFed", "Exécutif · gouverne"), t("pol.cf", "Conseil fédéral"), t("pol.cfMeta", "7 ministres · mandat 4 ans"), t("pol.byParl", "🏛️ élu par le Parlement (pas le peuple)"), "parl")
+            qeCard("leg", t("pol.roleLegFed", "Législatif · fait les lois"), t("pol.cnCe", "Conseil national + Conseil des États"), t("pol.cnCeMeta", "200 + 46 · mandat 4 ans"), t("pol.byPeopleFed", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='2'/><path d='M8.5 12l2.5 2.5 4.5-5'/></svg> élus directement par le peuple"), "people") +
+            qeCard("exe", t("pol.roleExeFed", "Exécutif · gouverne"), t("pol.cf", "Conseil fédéral"), t("pol.cfMeta", "7 ministres · mandat 4 ans"), t("pol.byParl", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 21V10'/><path d='M9 21V10'/><path d='M15 21V10'/><path d='M19 21V10'/><path d='M12 3l8 5H4z'/></svg> élu par le Parlement (pas le peuple)"), "parl")
           ) +
           qeLevel(cantonTitle,
-            qeCard("leg", t("pol.legisShort", "Législatif"), gc, gcN + " · " + termLabel(e.tCant), t("pol.byPeople", "🗳️ élu directement par le peuple"), "people") +
-            qeCard("exe", t("pol.execShort", "Exécutif"), ce, ceN + " · " + termLabel(e.tCant), t("pol.byPeople", "🗳️ élu directement par le peuple"), "people")
+            qeCard("leg", t("pol.legisShort", "Législatif"), gc, gcN + " · " + termLabel(e.tCant), t("pol.byPeople", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='2'/><path d='M8.5 12l2.5 2.5 4.5-5'/></svg> élu directement par le peuple"), "people") +
+            qeCard("exe", t("pol.execShort", "Exécutif"), ce, ceN + " · " + termLabel(e.tCant), t("pol.byPeople", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='2'/><path d='M8.5 12l2.5 2.5 4.5-5'/></svg> élu directement par le peuple"), "people")
           ) +
           qeLevel(t("pol.communeT", "Commune"),
-            qeCard("leg", t("pol.legisShort", "Législatif"), legis, termLabel(e.tCom), t("pol.byPeopleOr", "🗳️ élu par le peuple (ou assemblée)"), "people") +
-            qeCard("exe", t("pol.execShort", "Exécutif"), exec, chairedBy + " · " + termLabel(e.tCom), t("pol.byPeople", "🗳️ élu directement par le peuple"), "people")
+            qeCard("leg", t("pol.legisShort", "Législatif"), legis, termLabel(e.tCom), t("pol.byPeopleOr", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='2'/><path d='M8.5 12l2.5 2.5 4.5-5'/></svg> élu par le peuple (ou assemblée)"), "people") +
+            qeCard("exe", t("pol.execShort", "Exécutif"), exec, chairedBy + " · " + termLabel(e.tCom), t("pol.byPeople", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='2'/><path d='M8.5 12l2.5 2.5 4.5-5'/></svg> élu directement par le peuple"), "people")
           ) +
           `<div class="cs-card cs-highlight">
-             <div class="cs-card-h">${t("pol.takeawayH", "✅ À retenir")}</div>
+             <div class="cs-card-h">${t("pol.takeawayH", "À retenir")}</div>
              <ul class="cs-list">${t("pol.takeaway", [
                "<b>Canton & commune</b> : le peuple élit <b>parlement ET gouvernement</b> directement.",
                "<b>Confédération</b> : le peuple élit le <b>Parlement</b> (les 2 chambres) ; c'est ensuite ce Parlement qui élit le <b>Conseil fédéral</b>.",
@@ -1340,11 +1343,11 @@
       `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div><p>${body}</p></div>`;
     $("santeBody").innerHTML =
       `<p class="cs-intro">${t("san.intro", "En Suisse, l'<b>assurance maladie de base est obligatoire</b> — mais fournie par des <b>caisses privées</b> que chacun choisit librement.")}</p>` +
-      card("🩺", t("san.baseT", "Assurance de base (LAMal)"), t("san.base", "Obligatoire pour toute personne qui habite en Suisse (à souscrire dans les 3 mois). Les prestations de base sont les mêmes partout.")) +
-      card("🔄", t("san.freeT", "Libre choix de la caisse"), t("san.free", "On choisit librement sa caisse maladie (assureur), et on peut en changer chaque année. Les caisses ne peuvent pas refuser l'assurance de base.")) +
-      card("💰", t("san.primeT", "Prime & participation"), t("san.prime", "Chacun paie une <b>prime</b> mensuelle par personne (indépendante du revenu). S'ajoutent une <b>franchise</b> annuelle et une <b>quote-part</b> (part des frais à sa charge).")) +
-      card("🤝", t("san.subT", "Subsides"), t("san.sub", "Les personnes et familles à revenu modeste reçoivent des <b>subsides</b> (réductions de primes) versés par le canton.")) +
-      card("➕", t("san.compT", "Assurances complémentaires"), t("san.comp", "Facultatives (LCA) : chambre privée à l'hôpital, soins dentaires, médecines alternatives… Les caisses peuvent y poser des conditions."));
+      card("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M6 3v6a4 4 0 0 0 8 0V3'/><path d='M10 13a5 5 0 0 0 5 5 3 3 0 0 0 3-3v-1'/><circle cx='18' cy='11' r='2'/></svg>", t("san.baseT", "Assurance de base (LAMal)"), t("san.base", "Obligatoire pour toute personne qui habite en Suisse (à souscrire dans les 3 mois). Les prestations de base sont les mêmes partout.")) +
+      card("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 10a8 8 0 0 1 13.9-4.4'/><path d='M20 14a8 8 0 0 1-13.9 4.4'/><path d='M18 2v4h-4'/><path d='M6 22v-4h4'/></svg>", t("san.freeT", "Libre choix de la caisse"), t("san.free", "On choisit librement sa caisse maladie (assureur), et on peut en changer chaque année. Les caisses ne peuvent pas refuser l'assurance de base.")) +
+      card("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='8' r='5'/><path d='M15 6a5 5 0 1 1 0 10'/><path d='M6 8h4'/></svg>", t("san.primeT", "Prime & participation"), t("san.prime", "Chacun paie une <b>prime</b> mensuelle par personne (indépendante du revenu). S'ajoutent une <b>franchise</b> annuelle et une <b>quote-part</b> (part des frais à sa charge).")) +
+      card("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='9' cy='8' r='3'/><path d='M3 20a6 6 0 0 1 12 0'/><path d='M16 5.5a3 3 0 0 1 0 5'/><path d='M17.5 20a6 6 0 0 0-3-5'/></svg>", t("san.subT", "Subsides"), t("san.sub", "Les personnes et familles à revenu modeste reçoivent des <b>subsides</b> (réductions de primes) versés par le canton.")) +
+      card("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 8v8'/><path d='M8 12h8'/></svg>", t("san.compT", "Assurances complémentaires"), t("san.comp", "Facultatives (LCA) : chambre privée à l'hôpital, soins dentaires, médecines alternatives… Les caisses peuvent y poser des conditions."));
     showScreen("screen-sante");
   }
 
@@ -1356,20 +1359,20 @@
       `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div>${rows}</div>`;
     $("assurancesBody").innerHTML =
       `<p class="cs-intro">${t("asr.intro", "La Suisse protège chacun contre les grands risques de la vie par un système d'<b>assurances sociales</b>. La plupart sont <b>obligatoires</b> et financées par des <b>cotisations</b> prélevées sur les salaires.")}</p>` +
-      domain("👵", t("asr.d1", "Vieillesse · invalidité · décès"),
+      domain("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8' r='4'/><path d='M5 21a7 7 0 0 1 14 0'/></svg>", t("asr.d1", "Vieillesse · invalidité · décès"),
         branch("AVS", t("asr.avsN", "Assurance-vieillesse et survivants"), t("asr.avsD", "Rente de retraite (âge de référence 65 ans) et rentes aux survivants (conjoint, orphelins). <b>1er pilier</b>, obligatoire.")) +
         branch("AI", t("asr.aiN", "Assurance-invalidité"), t("asr.aiD", "Mesures de réadaptation et rente en cas d'incapacité de gain durable. 1er pilier.")) +
         branch("PC", t("asr.pcN", "Prestations complémentaires"), t("asr.pcD", "Complètent l'AVS/AI lorsqu'elles ne suffisent pas à couvrir les besoins vitaux.")) +
         branch("LPP", t("asr.lppN", "Prévoyance professionnelle"), t("asr.lppD", "La caisse de pension complète l'AVS pour garder son niveau de vie. <b>2e pilier</b> → voir « Les 3 piliers »."))) +
-      domain("🩺", t("asr.d2", "Maladie · accident"),
+      domain("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M6 3v6a4 4 0 0 0 8 0V3'/><path d='M10 13a5 5 0 0 0 5 5 3 3 0 0 0 3-3v-1'/><circle cx='18' cy='11' r='2'/></svg>", t("asr.d2", "Maladie · accident"),
         branch("LAMal", t("asr.lamalN", "Assurance-maladie"), t("asr.lamalD", "Soins en cas de maladie et de maternité. Obligatoire pour tout résident → voir « Système de santé ».")) +
         branch("LAA", t("asr.laaN", "Assurance-accidents"), t("asr.laaD", "Accidents professionnels, non professionnels et maladies professionnelles. Obligatoire pour les salarié·es (l'employeur paie la part accidents pro)."))) +
-      domain("💼", t("asr.d3", "Revenu remplacé"),
+      domain("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='7' width='18' height='13' rx='2'/><path d='M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/><path d='M3 12h18'/></svg>", t("asr.d3", "Revenu remplacé"),
         branch("APG", t("asr.apgN", "Allocations pour perte de gain"), t("asr.apgD", "Compensent le salaire pendant le <b>service militaire/civil</b>, le <b>congé maternité</b> (14 sem.) et le <b>congé paternité</b> (2 sem.).")) +
         branch("AC", t("asr.acN", "Assurance-chômage"), t("asr.acD", "Indemnités en cas de perte d'emploi (après au moins 12 mois de cotisation) et aide à la réinsertion. Obligatoire pour les salarié·es."))) +
-      domain("👨‍👩‍👧", t("asr.d4", "Famille"),
+      domain("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='9' cy='8' r='3'/><path d='M3 20a6 6 0 0 1 12 0'/><path d='M16 5.5a3 3 0 0 1 0 5'/><path d='M17.5 20a6 6 0 0 0-3-5'/></svg>", t("asr.d4", "Famille"),
         branch("AF", t("asr.afN", "Allocations familiales"), t("asr.afD", "Allocation pour enfant (min. <b>200 CHF</b>/mois) et de formation (min. <b>250 CHF</b>/mois). Minimums fédéraux — les cantons peuvent faire plus."))) +
-      `<div class="cs-card cs-highlight"><div class="cs-card-h">💰 ${t("asr.finT", "Comment est-ce financé ?")}</div>
+      `<div class="cs-card cs-highlight"><div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='8' r='5'/><path d='M15 6a5 5 0 1 1 0 10'/><path d='M6 8h4'/></svg> ${t("asr.finT", "Comment est-ce financé ?")}</div>
          <p>${t("asr.fin", "La plupart des assurances sociales sont payées par des <b>cotisations paritaires</b> : un pourcentage du salaire, <b>moitié par l'employé, moitié par l'employeur</b>. Exception : l'assurance-maladie (LAMal), payée par une <b>prime individuelle</b> par personne, indépendante du revenu.")}</p></div>` +
       `<p class="cs-note">${t("asr.note", "La prévoyance vieillesse (AVS + LPP + 3ᵉ pilier) est détaillée dans « Les 3 piliers » ; l'assurance-maladie dans « Système de santé ».")}</p>`;
     showScreen("screen-assurances");
@@ -1393,7 +1396,7 @@
           <div class="src-detail">
             <b>${s.auth}</b>
             <span>${en ? s.srcEn : s.srcFr}</span>
-            <span class="src-date">📅 ${en ? s.dateEn : s.dateFr}</span>
+            <span class="src-date"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16'/><path d='M8 3v4'/><path d='M16 3v4'/></svg> ${en ? s.dateEn : s.dateFr}</span>
             <a href="${s.url}" target="_blank" rel="noopener">${s.host} ↗</a>
           </div>
         </div>`;
@@ -1401,12 +1404,12 @@
     const order = [cn].concat(["VD", "GE", "NE", "VS"].filter((x) => x !== cn));
     $("aboutBody").innerHTML =
       `<div class="cs-card cs-highlight about-disclaimer">
-         <div class="cs-card-h">⚠️ ${t("about.discH", "Application non officielle")}</div>
+         <div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l9 16H3z'/><path d='M12 10v4'/><path d='M12 17h.01'/></svg> ${t("about.discH", "Application non officielle")}</div>
          <p>${t("about.disc", "NatiCoach est un outil d'entraînement <b>indépendant</b>, <b>non affilié aux autorités cantonales</b> et sans lien officiel avec elles. Les questions proviennent des <b>questionnaires officiels</b> publiés par les cantons sur leurs sites, mais <b>ce n'est pas une application officielle</b> et nous <b>ne pouvons pas garantir</b> qu'il s'agit de la version la plus récente. Les questionnaires peuvent évoluer : vérifie toujours les informations à jour auprès de ta <b>commune</b> ou de ton <b>canton</b>.")}</p>
        </div>` +
-      `<h3 class="cs-h">📚 ${t("about.sourcesH", "Sources des questions")}</h3>` +
+      `<h3 class="cs-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z'/><path d='M4 19a2 2 0 0 1 2-2h13'/></svg> ${t("about.sourcesH", "Sources des questions")}</h3>` +
       `<div class="cs-card src-list">${order.map(srcRow).join("")}</div>` +
-      csCard("✅", t("about.answersH", "Réponses & propositions"), t("about.answers", "Seule la <b>bonne réponse</b> est officielle. Pour Neuchâtel et le Valais, les <b>fausses propositions</b> des QCM sont générées par l'app pour aider à mémoriser — elles ne proviennent pas des questionnaires officiels.")) +
+      csCard("", t("about.answersH", "Réponses & propositions"), t("about.answers", "Seule la <b>bonne réponse</b> est officielle. Pour Neuchâtel et le Valais, les <b>fausses propositions</b> des QCM sont générées par l'app pour aider à mémoriser — elles ne proviennent pas des questionnaires officiels.")) +
       `<p class="cs-note">${t("about.offline", "NatiCoach fonctionne hors-ligne ; aucune donnée ne quitte ton téléphone.")}</p>` +
       `<div class="legal-links">
          <button class="legal-link" id="btnCgu">${t("about.cgu", "Conditions générales")} ›</button>
@@ -1423,9 +1426,9 @@
   function openPremium() {
     if (isPremium()) {
       $("premiumBody").innerHTML =
-        `<div class="pr-hero pr-owned"><div class="pr-badge">✓</div>
+        `<div class="pr-hero pr-owned"><div class="pr-badge">${MK_OK}</div>
            <h3>${t("premium.ownedTitle", "Tu as la version premium")}</h3>
-           <p>${t("premium.ownedMsg", "Merci ! Tout est débloqué. Bonne préparation. 🌼")}</p></div>`;
+           <p>${t("premium.ownedMsg", "Merci ! Tout est débloqué. Bonne préparation.")}</p></div>`;
       showScreen("screen-premium"); return;
     }
     const feat = (ico, txt) => `<li><span class="pr-ico">${ico}</span>${txt}</li>`;
@@ -1436,11 +1439,11 @@
          <p>${t("premium.sub", "Un seul achat, à vie. Aucun abonnement.")}</p>
        </div>
        <ul class="pr-feats">
-         ${feat("📚", t("premium.f1", "<b>Toutes les questions</b> officielles de ton canton"))}
-         ${feat("🎯", t("premium.f2", "La <b>simulation d'examen complète</b> (conditions réelles, minuteur)"))}
-         ${feat("📊", t("premium.f3", "<b>Statistiques</b> et suivi de progression"))}
-         ${feat("🔁", t("premium.f4", "Révision de <b>toutes tes erreurs</b>"))}
-         ${feat("🌍", t("premium.f5", "Les futures <b>langues et mises à jour</b>, sans repayer"))}
+         ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z'/><path d='M4 19a2 2 0 0 1 2-2h13'/></svg>", t("premium.f1", "<b>Toutes les questions</b> officielles de ton canton"))}
+         ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='4'/></svg>", t("premium.f2", "La <b>simulation d'examen complète</b> (conditions réelles, minuteur)"))}
+         ${feat("", t("premium.f3", "<b>Statistiques</b> et suivi de progression"))}
+         ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 10a8 8 0 0 1 13.9-4.4'/><path d='M20 14a8 8 0 0 1-13.9 4.4'/><path d='M18 2v4h-4'/><path d='M6 22v-4h4'/></svg>", t("premium.f4", "Révision de <b>toutes tes erreurs</b>"))}
+         ${feat("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M3 12h18'/><path d='M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z'/></svg>", t("premium.f5", "Les futures <b>langues et mises à jour</b>, sans repayer"))}
        </ul>
        <div class="pr-cta-wrap">
          <button class="btn btn-primary big" id="btnPremiumBuy">${fmt(t("premium.buy", "Débloquer · {p}"), { p: PREMIUM_PRICE })}</button>
@@ -1458,7 +1461,7 @@
     if (typeof window.NatiPurchase === "function") { window.NatiPurchase(); return; } // point d'ancrage IAP natif
     if (confirm(t("premium.testConfirm", "(Version de test) Débloquer NatiCoach Premium sans paiement ?"))) {
       state.premium = true; save();
-      toast("🌼", t("premium.unlocked", "Premium débloqué — merci !"));
+      toast("", t("premium.unlocked", "Premium débloqué — merci !"));
       renderHome(); showScreen("screen-home");
     }
   }
@@ -1507,11 +1510,11 @@
       `<div class="cs-card"><div class="cs-card-h">${ico} ${title}</div><p>${body}</p></div>`;
     $("democratieBody").innerHTML =
       `<p class="cs-intro">${t("dem.intro", "La <b>démocratie directe</b> permet au peuple de décider lui-même, en plus d'élire ses représentant·es. On vote environ <b>4 fois par an</b>.")}</p>` +
-      card("🗳️", t("dem.voteT", "Les votations"), t("dem.vote", "Aux 3 niveaux (fédéral, cantonal, communal), le peuple se prononce directement sur des objets — pas seulement sur des personnes.")) +
-      card("📝", t("dem.iniT", "Initiative populaire"), t("dem.ini", "Proposer une modification de la <b>Constitution</b>. Au niveau fédéral : <b>100 000 signatures</b> en <b>18 mois</b>. Elle est ensuite soumise au vote du peuple.")) +
-      card("🛑", t("dem.refFT", "Référendum facultatif"), t("dem.refF", "S'opposer à une <b>loi</b> votée par le Parlement. Il faut <b>50 000 signatures</b> (ou 8 cantons) en <b>100 jours</b> pour la soumettre au vote.")) +
-      card("✅", t("dem.refOT", "Référendum obligatoire"), t("dem.refO", "Toute modification de la Constitution (et certaines adhésions internationales) est <b>automatiquement</b> soumise au vote.")) +
-      `<div class="cs-card cs-highlight"><div class="cs-card-h">⚖️ ${t("dem.dblT", "La double majorité")}</div><p>${t("dem.dbl", "Pour modifier la Constitution, il faut la majorité du <b>peuple</b> <b>ET</b> la majorité des <b>cantons</b>.")}</p></div>` +
+      card("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='2'/><path d='M8.5 12l2.5 2.5 4.5-5'/></svg>", t("dem.voteT", "Les votations"), t("dem.vote", "Aux 3 niveaux (fédéral, cantonal, communal), le peuple se prononce directement sur des objets — pas seulement sur des personnes.")) +
+      card("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 20h4L18 10l-4-4L4 16z'/><path d='M13 5l4 4'/></svg>", t("dem.iniT", "Initiative populaire"), t("dem.ini", "Proposer une modification de la <b>Constitution</b>. Au niveau fédéral : <b>100 000 signatures</b> en <b>18 mois</b>. Elle est ensuite soumise au vote du peuple.")) +
+      card("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M8 3h8l5 5v8l-5 5H8l-5-5V8z'/><path d='M12 8v4'/><path d='M12 16h.01'/></svg>", t("dem.refFT", "Référendum facultatif"), t("dem.refF", "S'opposer à une <b>loi</b> votée par le Parlement. Il faut <b>50 000 signatures</b> (ou 8 cantons) en <b>100 jours</b> pour la soumettre au vote.")) +
+      card("", t("dem.refOT", "Référendum obligatoire"), t("dem.refO", "Toute modification de la Constitution (et certaines adhésions internationales) est <b>automatiquement</b> soumise au vote.")) +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 4v16'/><path d='M6 21h12'/><path d='M4 8l16-2'/><path d='M6 8l-2.5 6a3 3 0 0 0 5 0z'/><path d='M18 6l-2.5 6a3 3 0 0 0 5 0z'/></svg> ${t("dem.dblT", "La double majorité")}</div><p>${t("dem.dbl", "Pour modifier la Constitution, il faut la majorité du <b>peuple</b> <b>ET</b> la majorité des <b>cantons</b>.")}</p></div>` +
       `<p class="cs-note">${t("dem.note", "Droits politiques dès <b>18 ans</b> pour les Suisses. Dans quelques cantons (Glaris, Appenzell Rhodes-Intérieures), on vote encore à main levée : la <b>Landsgemeinde</b>.")}</p>`;
     showScreen("screen-democratie");
   }
@@ -1524,14 +1527,14 @@
        </div>`;
     $("droitsBody").innerHTML =
       `<p class="cs-intro">${t("dro.intro", "La citoyenneté, c'est un équilibre entre des <b>droits</b> et des <b>devoirs</b>.")}</p>` +
-      section("duty", "📋", t("dro.dutyT", "Mes devoirs"), t("dro.duty", [
+      section("duty", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='6' y='4' width='12' height='17' rx='2'/><path d='M9 4V3h6v1'/><path d='M9 10h6'/><path d='M9 14h4'/></svg>", t("dro.dutyT", "Mes devoirs"), t("dro.duty", [
         "Respecter la <b>Constitution</b> et les <b>lois</b>",
         "Payer ses <b>impôts</b>",
         "Envoyer ses enfants à l'école (<b>scolarité obligatoire</b>)",
         "S'assurer (<b>assurance maladie</b> de base obligatoire)",
         "<b>Service militaire ou civil</b> (hommes suisses) — sinon taxe d'exemption",
       ])) +
-      section("right", "🗽", t("dro.rightT", "Mes droits"), t("dro.right", [
+      section("right", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='9' r='5'/><path d='M8.8 13.2L7.5 21l4.5-2.7 4.5 2.7-1.3-7.8'/></svg>", t("dro.rightT", "Mes droits"), t("dro.right", [
         "<b>Libertés fondamentales</b> : opinion & information, croyance & conscience, réunion & association, langue",
         "<b>Droits politiques</b> dès 18 ans : voter, élire, être élu·e, signer initiatives & référendums",
         "<b>Liberté d'établissement</b> : s'installer où l'on veut en Suisse",
@@ -1592,14 +1595,14 @@
          ${row(t("mc.pop", "Population"), pv("pop") + " " + t("mc.popUnit", "hab."))}
        </div>
        <div class="cs-card">
-         <div class="cs-card-h">🏛️ ${t("mc.instT", "Institutions cantonales")}</div>
+         <div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 21V10'/><path d='M9 21V10'/><path d='M15 21V10'/><path d='M19 21V10'/><path d='M12 3l8 5H4z'/></svg> ${t("mc.instT", "Institutions cantonales")}</div>
          ${row(t("mc.gc", "Grand Conseil (législatif)"), p.gc + " " + t("mc.gcUnit", "sièges"))}
          ${row(t("mc.ce", "Conseil d'État (exécutif)"), p.ce + " " + t("mc.ceUnit", "membres"))}
          ${row(t("mc.legislature", "Législature"), t("mc.years5", "5 ans"))}
        </div>` +
-      (pv("motto") ? `<div class="cs-card"><div class="cs-card-h">🛡️ ${t("mc.mottoT", "Devise")}</div><p><i>${pv("motto")}</i></p></div>` : "") +
+      (pv("motto") ? `<div class="cs-card"><div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z'/></svg> ${t("mc.mottoT", "Devise")}</div><p><i>${pv("motto")}</i></p></div>` : "") +
       `<div class="cs-card cs-highlight">
-         <div class="cs-card-h">✨ ${t("mc.knowT", "À savoir")}</div>
+         <div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l1.8 4.5L18 9l-4.2 1.5L12 15l-1.8-4.5L6 9l4.2-1.5z'/><path d='M5 16l.9 2.1L8 19l-2.1.9L5 22l-.9-2.1L2 19l2.1-.9z'/></svg> ${t("mc.knowT", "À savoir")}</div>
          <ul class="cs-list">${pv("facts").map((f) => `<li>${f}</li>`).join("")}</ul>
        </div>
        <p class="cs-note">${t("mc.note", "Chiffres indicatifs (population et nombre de communes évoluent avec les fusions).")}</p>`;
@@ -1613,20 +1616,20 @@
   function openNaturalisation() {
     $("naturalisationBody").innerHTML =
       `<p class="cs-intro">${t("nat.intro", "Devenir suisse par <b>naturalisation ordinaire</b> : les conditions et les étapes principales.")}</p>` +
-      csList("", "🏠", t("nat.resT", "Résidence"), t("nat.res", [
+      csList("", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 11l8-7 8 7'/><path d='M6 10v10h12V10'/></svg>", t("nat.resT", "Résidence"), t("nat.res", [
         "<b>10 ans</b> de résidence en Suisse (les années entre 8 et 18 ans comptent double, min. 6 ans réels)",
         "Être titulaire d'un <b>permis C</b> (établissement)",
         "+ une durée de résidence dans le <b>canton</b> et la <b>commune</b> (variable selon les lieux)",
       ])) +
-      csList("", "🤝", t("nat.intT", "Intégration"), t("nat.int", [
+      csList("", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='9' cy='8' r='3'/><path d='M3 20a6 6 0 0 1 12 0'/><path d='M16 5.5a3 3 0 0 1 0 5'/><path d='M17.5 20a6 6 0 0 0-3-5'/></svg>", t("nat.intT", "Intégration"), t("nat.int", [
         "Respecter la <b>Constitution</b> et l'ordre juridique ; ne pas mettre en danger la sécurité",
         "Participer à la <b>vie économique</b> ou suivre une <b>formation</b>",
         "Encourager l'intégration de sa famille",
       ])) +
-      csCard("💬", t("nat.langT", "Langue"), t("nat.lang", "Maîtriser une <b>langue nationale</b> : à l'<b>oral (niveau B1)</b> et à l'<b>écrit (niveau A2)</b> selon le cadre européen (CECR).")) +
-      csCard("🧠", t("nat.knowT", "Connaissances"), t("nat.know", "Connaître la <b>Suisse</b>, le <b>canton</b> et la <b>commune</b> — géographie, histoire, institutions, us et coutumes. C'est l'objet du <b>test</b> que tu prépares ici. 💪")) +
-      `<div class="cs-card cs-highlight"><div class="cs-card-h">🏛️ ${t("nat.threeT", "Trois niveaux décident")}</div><p>${t("nat.three", "La naturalisation ordinaire nécessite l'accord des <b>trois</b> : autorisation de la <b>Confédération</b>, décision du <b>canton</b> et de la <b>commune</b>.")}</p></div>` +
-      csCard("⚡", t("nat.easyT", "Naturalisation facilitée"), t("nat.easy", "Procédure allégée (fédérale) dans certains cas : par ex. <b>conjoint·e de Suisse</b> (env. 5 ans de résidence + 3 ans d'union), ou personnes de la <b>3ᵉ génération</b>.")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z'/></svg>", t("nat.langT", "Langue"), t("nat.lang", "Maîtriser une <b>langue nationale</b> : à l'<b>oral (niveau B1)</b> et à l'<b>écrit (niveau A2)</b> selon le cadre européen (CECR).")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M9 18h6'/><path d='M10 21h4'/><path d='M12 3a6 6 0 0 1 4 10c-.7.7-1 1.5-1 2H9c0-.5-.3-1.3-1-2a6 6 0 0 1 4-10z'/></svg>", t("nat.knowT", "Connaissances"), t("nat.know", "Connaître la <b>Suisse</b>, le <b>canton</b> et la <b>commune</b> — géographie, histoire, institutions, us et coutumes. C'est l'objet du <b>test</b> que tu prépares ici.")) +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 21V10'/><path d='M9 21V10'/><path d='M15 21V10'/><path d='M19 21V10'/><path d='M12 3l8 5H4z'/></svg> ${t("nat.threeT", "Trois niveaux décident")}</div><p>${t("nat.three", "La naturalisation ordinaire nécessite l'accord des <b>trois</b> : autorisation de la <b>Confédération</b>, décision du <b>canton</b> et de la <b>commune</b>.")}</p></div>` +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M13 2L4 14h6l-1 8 9-12h-6z'/></svg>", t("nat.easyT", "Naturalisation facilitée"), t("nat.easy", "Procédure allégée (fédérale) dans certains cas : par ex. <b>conjoint·e de Suisse</b> (env. 5 ans de résidence + 3 ans d'union), ou personnes de la <b>3ᵉ génération</b>.")) +
       `<p class="cs-note">${t("nat.note", "Des émoluments (frais) s'appliquent et la procédure peut durer <b>plusieurs années</b>. Les détails exacts dépendent du canton et de la commune.")}</p>`;
     showScreen("screen-naturalisation");
   }
@@ -1634,43 +1637,43 @@
   function openFederalisme() {
     $("federalismeBody").innerHTML =
       `<p class="cs-intro">${t("fed.intro", "La Suisse est un <b>État fédéral</b> : le pouvoir est réparti entre <b>3 niveaux</b>, chacun avec ses compétences et ses impôts.")}</p>` +
-      csList("", "🏔️", t("fed.confedT", "Confédération"), t("fed.confed", ["Armée · monnaie (franc suisse) · affaires étrangères · douanes", "AVS/AI · routes nationales (autoroutes) · énergie"])) +
-      csList("", "🏛️", t("fed.cantonsT", "Cantons (26)"), t("fed.cantons", ["Police · écoles · santé et hôpitaux · culture", "Chaque canton a sa <b>Constitution</b>, ses lois et ses tribunaux"])) +
-      csList("", "🏘️", t("fed.communesT", "Communes (~2 100)"), t("fed.communes", ["Écoles primaires · eau · déchets · aménagement local", "État civil · pompiers · routes communales"])) +
-      `<div class="cs-card cs-highlight"><div class="cs-card-h">🧩 ${t("fed.subT", "Subsidiarité")}</div><p>${t("fed.sub", "Ce qu'un niveau <b>inférieur</b> peut faire, il le fait ; le niveau supérieur n'intervient que si nécessaire. On paie donc des impôts aux <b>3 niveaux</b>.")}</p></div>`;
+      csList("", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 20l6-11 4 6 2.5-4L21 20z'/></svg>", t("fed.confedT", "Confédération"), t("fed.confed", ["Armée · monnaie (franc suisse) · affaires étrangères · douanes", "AVS/AI · routes nationales (autoroutes) · énergie"])) +
+      csList("", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 21V10'/><path d='M9 21V10'/><path d='M15 21V10'/><path d='M19 21V10'/><path d='M12 3l8 5H4z'/></svg>", t("fed.cantonsT", "Cantons (26)"), t("fed.cantons", ["Police · écoles · santé et hôpitaux · culture", "Chaque canton a sa <b>Constitution</b>, ses lois et ses tribunaux"])) +
+      csList("", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='3' width='14' height='18' rx='1'/><path d='M9 7h2'/><path d='M13 7h2'/><path d='M9 11h2'/><path d='M13 11h2'/><path d='M9 15h2'/><path d='M13 15h2'/></svg>", t("fed.communesT", "Communes (~2 100)"), t("fed.communes", ["Écoles primaires · eau · déchets · aménagement local", "État civil · pompiers · routes communales"])) +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l9 5-9 5-9-5 9-5z'/><path d='M3 12l9 5 9-5'/><path d='M3 16l9 5 9-5'/></svg> ${t("fed.subT", "Subsidiarité")}</div><p>${t("fed.sub", "Ce qu'un niveau <b>inférieur</b> peut faire, il le fait ; le niveau supérieur n'intervient que si nécessaire. On paie donc des impôts aux <b>3 niveaux</b>.")}</p></div>`;
     showScreen("screen-federalisme");
   }
 
   function openLangues() {
     $("languesBody").innerHTML =
       `<p class="cs-intro">${t("lang.intro", "La Suisse a <b>4 langues nationales</b>. Chacun a le droit de parler la sienne (liberté de la langue).")}</p>` +
-      csCard("🇩🇪", t("lang.deT", "Allemand — ~62 %"), t("lang.de", "La plus parlée. Majorité des cantons (Zurich, Berne, Bâle, Lucerne…). En Suisse on parle surtout le <b>suisse allemand</b> (dialecte).")) +
-      csCard("🇫🇷", t("lang.frT", "Français — ~23 %"), t("lang.fr", "La <b>Suisse romande</b> : Vaud, Genève, Neuchâtel, Jura, et une partie du Valais, de Fribourg et de Berne.")) +
-      csCard("🇮🇹", t("lang.itT", "Italien — ~8 %"), t("lang.it", "Le <b>Tessin</b> et quelques vallées du sud des Grisons.")) +
-      csCard("🏔️", t("lang.rmT", "Romanche — ~0,5 %"), t("lang.rm", "Parlé dans les <b>Grisons</b> ; 4ᵉ langue nationale, langue officielle pour les échanges avec les romanchophones.")) +
-      `<div class="cs-card cs-highlight"><div class="cs-card-h">🗺️ ${t("lang.multiT", "Cantons plurilingues")}</div><p>${t("lang.multi", "<b>Bilingues</b> : Berne, Fribourg, Valais (français-allemand). <b>Trilingue</b> : Grisons (allemand, romanche, italien). Langues officielles de la Confédération : allemand, français, italien.")}</p></div>`;
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5h9'/><path d='M8 3v2c0 5-2.5 8-6 9'/><path d='M6 9c0 3 2.5 5 6 6'/><path d='M13 20l4-9 4 9'/><path d='M14.5 17h5'/></svg>", t("lang.deT", "Allemand — ~62 %"), t("lang.de", "La plus parlée. Majorité des cantons (Zurich, Berne, Bâle, Lucerne…). En Suisse on parle surtout le <b>suisse allemand</b> (dialecte).")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5h9'/><path d='M8 3v2c0 5-2.5 8-6 9'/><path d='M6 9c0 3 2.5 5 6 6'/><path d='M13 20l4-9 4 9'/><path d='M14.5 17h5'/></svg>", t("lang.frT", "Français — ~23 %"), t("lang.fr", "La <b>Suisse romande</b> : Vaud, Genève, Neuchâtel, Jura, et une partie du Valais, de Fribourg et de Berne.")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5h9'/><path d='M8 3v2c0 5-2.5 8-6 9'/><path d='M6 9c0 3 2.5 5 6 6'/><path d='M13 20l4-9 4 9'/><path d='M14.5 17h5'/></svg>", t("lang.itT", "Italien — ~8 %"), t("lang.it", "Le <b>Tessin</b> et quelques vallées du sud des Grisons.")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 20l6-11 4 6 2.5-4L21 20z'/></svg>", t("lang.rmT", "Romanche — ~0,5 %"), t("lang.rm", "Parlé dans les <b>Grisons</b> ; 4ᵉ langue nationale, langue officielle pour les échanges avec les romanchophones.")) +
+      `<div class="cs-card cs-highlight"><div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M9 4L4 6v14l5-2 6 2 5-2V4l-5 2-6-2z'/><path d='M9 4v14'/><path d='M15 6v14'/></svg> ${t("lang.multiT", "Cantons plurilingues")}</div><p>${t("lang.multi", "<b>Bilingues</b> : Berne, Fribourg, Valais (français-allemand). <b>Trilingue</b> : Grisons (allemand, romanche, italien). Langues officielles de la Confédération : allemand, français, italien.")}</p></div>`;
     showScreen("screen-langues");
   }
 
   function openNeutralite() {
     $("neutraliteBody").innerHTML =
       `<p class="cs-intro">${t("neu.intro", "La Suisse est <b>neutre</b> et une terre de dialogue et d'action humanitaire.")}</p>` +
-      csCard("🕊️", t("neu.neuT", "La neutralité"), t("neu.neu", "La Suisse ne participe pas aux conflits armés et ne prend pas parti militairement. Neutralité <b>permanente et armée</b>, reconnue au <b>Congrès de Vienne (1815)</b>.")) +
-      csCard("🌍", t("neu.onuT", "ONU"), t("neu.onu", "La Suisse a adhéré à l'<b>ONU en 2002</b>, par votation populaire.")) +
-      csCard("🛂", t("neu.schT", "Schengen — mais pas l'UE"), t("neu.sch", "La Suisse fait partie de l'espace <b>Schengen</b> (libre circulation), mais n'est <b>pas membre de l'Union européenne</b>.")) +
-      csCard("➕", t("neu.crT", "La Croix-Rouge"), t("neu.cr", "Fondée à <b>Genève</b> par <b>Henri Dunant</b> (1863), qui reçut le tout premier <b>prix Nobel de la paix</b>.")) +
-      csCard("🏢", t("neu.gvaT", "La Genève internationale"), t("neu.gva", "Siège européen de l'<b>ONU</b>, du <b>CICR</b>, de l'<b>OMS</b>, de l'<b>OMC</b>… La Suisse offre ses « bons offices » pour la médiation."));
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M20 7l-3-1a3 3 0 0 0-6 0c-4 0-6 3-8 6 2-1 4-1 5 0-1 3-1 6 1 9 2-2 3-4 3-6 2 3 6 3 8 0 1-2 1-5-1-7z'/></svg>", t("neu.neuT", "La neutralité"), t("neu.neu", "La Suisse ne participe pas aux conflits armés et ne prend pas parti militairement. Neutralité <b>permanente et armée</b>, reconnue au <b>Congrès de Vienne (1815)</b>.")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M3 12h18'/><path d='M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z'/></svg>", t("neu.onuT", "ONU"), t("neu.onu", "La Suisse a adhéré à l'<b>ONU en 2002</b>, par votation populaire.")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><circle cx='8' cy='11' r='2'/><path d='M13 10h5'/><path d='M13 14h5'/><path d='M5 16a3 3 0 0 1 6 0'/></svg>", t("neu.schT", "Schengen — mais pas l'UE"), t("neu.sch", "La Suisse fait partie de l'espace <b>Schengen</b> (libre circulation), mais n'est <b>pas membre de l'Union européenne</b>.")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 8v8'/><path d='M8 12h8'/></svg>", t("neu.crT", "La Croix-Rouge"), t("neu.cr", "Fondée à <b>Genève</b> par <b>Henri Dunant</b> (1863), qui reçut le tout premier <b>prix Nobel de la paix</b>.")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='3' width='14' height='18' rx='1'/><path d='M9 7h2'/><path d='M13 7h2'/><path d='M9 11h2'/><path d='M13 11h2'/><path d='M9 15h2'/><path d='M13 15h2'/></svg>", t("neu.gvaT", "La Genève internationale"), t("neu.gva", "Siège européen de l'<b>ONU</b>, du <b>CICR</b>, de l'<b>OMS</b>, de l'<b>OMC</b>… La Suisse offre ses « bons offices » pour la médiation."));
     showScreen("screen-neutralite");
   }
 
   function openSymboles() {
     $("symbolesBody").innerHTML =
       `<p class="cs-intro">${t("sym.intro", "Quelques symboles et traditions qui font la Suisse — souvent au programme du test.")}</p>` +
-      csCard("🎇", t("sym.natT", "Fête nationale : 1er août"), t("sym.nat", "Elle commémore le <b>Pacte de 1291</b> (alliance sur la prairie du <b>Grütli</b>). On allume des feux et des lampions.")) +
-      csCard("🤝", t("sym.pacteT", "Le Pacte fédéral (1291)"), t("sym.pacte", "<b>Uri, Schwytz et Unterwald</b> s'allient : acte fondateur de la Confédération.")) +
-      csCard("🏹", t("sym.tellT", "Guillaume Tell"), t("sym.tell", "Héros <b>légendaire</b> (la pomme, l'arbalète), symbole de la liberté et de la résistance à l'oppression.")) +
-      csCard("🚩", t("sym.flagT", "Le drapeau"), t("sym.flag", "Une <b>croix blanche</b> sur fond <b>rouge</b> — l'un des rares drapeaux carrés. (Emblème protégé par la loi.)")) +
-      csList("", "🎶", t("sym.custT", "Us et coutumes"), t("sym.cust", ["Cor des Alpes · yodel · lutte suisse (Schwingen)", "Désalpe · carnaval · Fête des Vignerons", "Chocolat · fromage (fondue, raclette, Gruyère)"]));
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l1.8 4.5L18 9l-4.2 1.5L12 15l-1.8-4.5L6 9l4.2-1.5z'/><path d='M5 16l.9 2.1L8 19l-2.1.9L5 22l-.9-2.1L2 19l2.1-.9z'/></svg>", t("sym.natT", "Fête nationale : 1er août"), t("sym.nat", "Elle commémore le <b>Pacte de 1291</b> (alliance sur la prairie du <b>Grütli</b>). On allume des feux et des lampions.")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='9' cy='8' r='3'/><path d='M3 20a6 6 0 0 1 12 0'/><path d='M16 5.5a3 3 0 0 1 0 5'/><path d='M17.5 20a6 6 0 0 0-3-5'/></svg>", t("sym.pacteT", "Le Pacte fédéral (1291)"), t("sym.pacte", "<b>Uri, Schwytz et Unterwald</b> s'allient : acte fondateur de la Confédération.")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='4'/></svg>", t("sym.tellT", "Guillaume Tell"), t("sym.tell", "Héros <b>légendaire</b> (la pomme, l'arbalète), symbole de la liberté et de la résistance à l'oppression.")) +
+      csCard("<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M5 21V4'/><path d='M5 4h11l-2 4 2 4H5'/></svg>", t("sym.flagT", "Le drapeau"), t("sym.flag", "Une <b>croix blanche</b> sur fond <b>rouge</b> — l'un des rares drapeaux carrés. (Emblème protégé par la loi.)")) +
+      csList("", "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='7' cy='18' r='2.5'/><circle cx='17' cy='16' r='2.5'/><path d='M9.5 18V6l10-2v10'/></svg>", t("sym.custT", "Us et coutumes"), t("sym.cust", ["Cor des Alpes · yodel · lutte suisse (Schwingen)", "Désalpe · carnaval · Fête des Vignerons", "Chocolat · fromage (fondue, raclette, Gruyère)"]));
     showScreen("screen-symboles");
   }
 
@@ -1741,7 +1744,7 @@
     txt.hidden = true; txt.innerHTML = "";
     if (!tr) { btn.hidden = true; return; }
     btn.hidden = false;
-    btn.textContent = "🌐 " + t("qtr.show", "Voir la traduction");
+    btn.textContent = "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M3 12h18'/><path d='M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z'/></svg> " + t("qtr.show", "Voir la traduction");
     const opts = (tr.options && tr.options.length) ? `<ul>${tr.options.map((o) => `<li>${o}</li>`).join("")}</ul>` : "";
     txt.innerHTML = `<p>${tr.q || ""}</p>${opts}`;
     btn.onclick = () => { txt.hidden = !txt.hidden; };
@@ -1785,8 +1788,8 @@
       btns.forEach((b, i) => {
         b.setAttribute("disabled", "");
         const mark = b.querySelector(".mark");
-        if (i === cur.answer) { b.classList.add("correct"); mark.textContent = "✓"; }
-        else if (i === chosen) { b.classList.add("wrong"); mark.textContent = "✕"; }
+        if (i === cur.answer) { b.classList.add("correct"); mark.innerHTML = MK_OK; }
+        else if (i === chosen) { b.classList.add("wrong"); mark.innerHTML = MK_NO; }
         else { b.classList.add("dim"); }
       });
       const head = $("explainHead");
@@ -1894,7 +1897,7 @@
     if (quiz.mode === "exam") {
       badge.hidden = false;
       badge.className = "result-badge " + (pass ? "pass" : "fail");
-      badge.textContent = pass ? t("result.examPass", "✓ Examen réussi") : t("result.examFail", "✕ Pas encore réussi");
+      badge.innerHTML = pass ? (MK_OK + " " + t("result.examPass", "Examen réussi")) : (MK_NO + " " + t("result.examFail", "Pas encore réussi"));
       if (pass) {
         titleHTML = t("result.congrats", "Félicitations,<br><i>tu es prêt·e.</i>");
         const rec = pct >= state.best ? t("result.bestYet", " Ton meilleur score à ce jour.") : "";
@@ -1908,15 +1911,15 @@
       $("resultBilan").innerHTML = pass ? recapTiles(prevPct) : themeBilan();
     } else if (quiz.trial) {
       badge.hidden = true;
-      titleHTML = t("premium.trialDone", "Aperçu terminé 🎬");
+      titleHTML = t("premium.trialDone", "Aperçu terminé");
       msg = fmt(t("premium.trialMsg", "Tu viens de tester {n} questions. Débloque la simulation d'examen complète et toutes les questions."), { n: total });
-      $("resultBilan").innerHTML = `<button class="btn btn-primary big pr-result-cta" id="resultPremiumCta">🔓 ${fmt(t("premium.buy", "Débloquer · {p}"), { p: PREMIUM_PRICE })}</button>`;
+      $("resultBilan").innerHTML = `<button class="btn btn-primary big pr-result-cta" id="resultPremiumCta"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='11' width='16' height='10' rx='2'/><path d='M8 11V7a4 4 0 0 1 7.5-2'/></svg> ${fmt(t("premium.buy", "Débloquer · {p}"), { p: PREMIUM_PRICE })}</button>`;
     } else {
       badge.hidden = true;
       $("resultBilan").innerHTML = "";
-      if (pct >= 80) { titleHTML = t("result.t80", "Bravo ! 🎉"); msg = t("result.m80", "Excellent. Passe en simulation d'examen pour te tester en conditions réelles."); }
-      else if (pct >= 60) { titleHTML = t("result.t60", "Bien joué 👍"); msg = t("result.m60", "Tu progresses. Un tour de révision et ça rentre."); }
-      else { titleHTML = t("result.t0", "Continue 💪"); msg = t("result.m0", "Utilise le mode révision pour apprendre les bonnes réponses."); }
+      if (pct >= 80) { titleHTML = t("result.t80", "Bravo !"); msg = t("result.m80", "Excellent. Passe en simulation d'examen pour te tester en conditions réelles."); }
+      else if (pct >= 60) { titleHTML = t("result.t60", "Bien joué"); msg = t("result.m60", "Tu progresses. Un tour de révision et ça rentre."); }
+      else { titleHTML = t("result.t0", "Continue"); msg = t("result.m0", "Utilise le mode révision pour apprendre les bonnes réponses."); }
     }
     $("resultTitle").innerHTML = titleHTML;
     $("resultMsg").textContent = msg;
@@ -1925,15 +1928,15 @@
     const rv = $("btnReview"), rt = $("btnRetry"), sh = $("btnShare"), hm = $("btnHome");
     hm.hidden = false; hm.style.order = 4;
     if (quiz.mode === "exam" && pass) {
-      sh.hidden = false; sh.className = "btn btn-primary big"; sh.textContent = t("result.share", "📲 Partager mon score"); sh.style.order = 1;
+      sh.hidden = false; sh.className = "btn btn-primary big"; sh.textContent = t("result.share", "Partager mon score"); sh.style.order = 1;
       rv.hidden = false; rv.className = "btn btn-outline"; rv.textContent = t("result.reviewAnswers", "Revoir mes réponses"); rv.style.order = 2;
       rt.hidden = true;
     } else if (quiz.mode === "exam") {
-      rv.hidden = false; rv.className = "btn btn-primary big"; rv.textContent = fmt(t("result.reviewErrs", "🔎 Revoir mes {n} erreur{s}"), { n: errs, s: errs > 1 ? "s" : "" }); rv.style.order = 1;
+      rv.hidden = false; rv.className = "btn btn-primary big"; rv.textContent = fmt(t("result.reviewErrs", "Revoir mes {n} erreur{s}"), { n: errs, s: errs > 1 ? "s" : "" }); rv.style.order = 1;
       rt.hidden = false; rt.className = "btn btn-outline"; rt.textContent = t("result.retryExam", "Recommencer l'examen"); rt.style.order = 2;
       sh.hidden = true;
     } else {
-      rv.hidden = false; rv.className = "btn btn-primary big"; rv.textContent = t("result.review", "🔎 Revoir mes réponses"); rv.style.order = 1;
+      rv.hidden = false; rv.className = "btn btn-primary big"; rv.textContent = t("result.review", "Revoir mes réponses"); rv.style.order = 1;
       const canRetry = quiz.isMistakes && state.mistakes.length;
       rt.hidden = !canRetry; rt.className = "btn btn-outline"; rt.textContent = t("result.retry", "Recommencer"); rt.style.order = 2;
       sh.hidden = true;
@@ -1946,7 +1949,7 @@
     if (quiz.mode === "exam") {
       lastShareText =
         fmt(t("share.examLine1", "NatiCoach — Simulation du test de naturalisation{l}"), { l: lieu }) + "\n" +
-        fmt(t("share.examLine2", "Mon score : {c}/{n} ({p}%) — {r}"), { c: quiz.correct, n: total, p: pct, r: pass ? t("share.passed", "réussi ✅") : t("share.notYet", "pas encore 💪") });
+        fmt(t("share.examLine2", "Mon score : {c}/{n} ({p}%) — {r}"), { c: quiz.correct, n: total, p: pct, r: pass ? t("share.passed", "réussi") : t("share.notYet", "pas encore") });
     } else {
       lastShareText =
         fmt(t("share.trainLine1", "NatiCoach — Entraînement au test de naturalisation{l}"), { l: lieu }) + "\n" +
@@ -1999,7 +2002,7 @@
         return `<div class="badge-card on">
            <div class="badge-medal">${a.ico}</div>
            <b>${title}</b><small>${desc}</small>
-           <span class="badge-done">${t("badges.unlocked", "✓ Débloqué")}</span>
+           <span class="badge-done">${MK_OK} ${t("badges.unlocked", "Débloqué")}</span>
          </div>`;
       }
       const p = badgeProgress(a.id);
@@ -2033,7 +2036,7 @@
     const items = reviewMode === "errors" ? quiz.items.filter((it) => it.chosen !== it.answer) : quiz.items;
     $("reviewCount").textContent = items.length + (reviewMode === "errors" ? t("review.toReview", " à revoir") : t("review.total", " au total"));
     const box = $("reviewList");
-    if (!items.length) { box.innerHTML = `<p class="results-empty">${t("review.noErrors", "Aucune erreur — parfait ! 🎉")}</p>`; return; }
+    if (!items.length) { box.innerHTML = `<p class="results-empty">${t("review.noErrors", "Aucune erreur — parfait !")}</p>`; return; }
     box.innerHTML = items.map((it) => {
       const answered = it.chosen !== undefined && it.chosen !== null;
       const ok = it.chosen === it.answer;
@@ -2042,7 +2045,7 @@
         if (i === it.answer) cls += " correct";
         else if (i === it.chosen) cls += " wrong";
         else cls += " dim";
-        const mark = i === it.answer ? "✓" : (i === it.chosen ? "✕" : "");
+        const mark = i === it.answer ? MK_OK : (i === it.chosen ? MK_NO : "");
         return `<div class="${cls}"><span class="mark">${mark}</span><span>${esc(o)}</span></div>`;
       }).join("");
       const exp = (it.ref.explanation && it.ref.explanation.trim())
@@ -2052,7 +2055,7 @@
         ? `<div class="review-illus">${ILLUSTRATIONS[ik]}</div>` : "";
       return `<div class="review-card">
         <div class="review-head"><span class="chip">${esc(trScope(it.ref.scope))} · ${esc(trTheme(it.ref.theme))}</span>
-          <span class="review-flag ${ok ? "ok" : "bad"}">${ok ? "✓" : "✕"}</span></div>
+          <span class="review-flag ${ok ? "ok" : "bad"}">${ok ? MK_OK : MK_NO}</span></div>
         <h3 class="review-qtext">${esc(it.ref.q)}</h3>
         <div class="options">${opts}</div>
         ${answered ? "" : `<p class="review-noans">${t("review.noAnswer", "Non répondu (temps écoulé)")}</p>`}

@@ -84,7 +84,7 @@ h1, .explore-title, .result-inner h2, .question, .modal-card h3, .cd-head b, .se
 .wordmark { display: flex; align-items: baseline; font-size: 27px; letter-spacing: -.2px; line-height: 1.05; margin: 0; }
 .commune-pill { margin-top: 0; }
 /* Sélecteur de langue FR / EN */
-.lang-toggle { display: inline-flex; gap: 2px; background: var(--bg); border: 1px solid var(--line); border-radius: 99px; padding: 2px; }
+.lang-toggle { display: inline-flex; gap: 2px; background: var(--bg); border-radius: 99px; padding: 2px; }
 .home-hero .lang-toggle { margin-left: auto; align-self: center; flex: 0 0 auto; }
 #setupCantonStep .lang-toggle { position: absolute; top: calc(var(--safe-top) + 14px); right: 16px; z-index: 3; }
 .lang-btn { border: none; background: transparent; font-family: inherit; font-size: 11px; font-weight: 700; letter-spacing: .5px; color: var(--muted); padding: 4px 9px; border-radius: 99px; cursor: pointer; }
@@ -197,7 +197,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 
 .options { display: flex; flex-direction: column; gap: 10px; }
 .option {
-  background: var(--card); border: 1.5px solid var(--line); border-radius: 14px;
+  background: var(--card); border: 1.5px solid transparent; box-shadow: var(--shadow-sm); border-radius: 14px;
   padding: 15px 16px; font-size: 16px; font-weight: 500; text-align: left; cursor: pointer; width: 100%;
   font-family: var(--font-ui); color: var(--ink); display: flex; align-items: center; gap: 13px;
   transition: border-color .15s, background .15s, transform .1s, box-shadow .15s;
@@ -391,7 +391,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .canton-map { cursor: grab; touch-action: none; }
 .canton-map.grabbing { cursor: grabbing; }
 .map-zoom { position: absolute; right: 6px; bottom: 6px; display: flex; flex-direction: column; gap: 6px; }
-.map-zoom button { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,0.92); font-size: 18px; font-weight: 600; color: var(--ink); cursor: pointer; box-shadow: var(--shadow); display: grid; place-items: center; }
+.map-zoom button { width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.92); font-size: 18px; font-weight: 600; color: var(--ink); cursor: pointer; box-shadow: var(--shadow); display: grid; place-items: center; }
 .map-zoom button:active { background: var(--bg); }
 
 /* ---------- Frise chronologique ---------- */
@@ -560,6 +560,23 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .mi-gold  { background: var(--pill-gold);  color: var(--icon-gold); }
 .mi-terra { background: var(--pill-peach); color: var(--icon-terra); }
 .mode-ico .ico-badge { position: absolute; top: -3px; right: -3px; min-width: 17px; height: 17px; border-radius: 9px; background: var(--red); color: var(--on-red); font-size: 10.5px; font-weight: 700; display: grid; place-items: center; padding: 0 4px; }
+/* Icônes inline (émojis remplacés par SVG outline) */
+.ic { width: 1.05em; height: 1.05em; vertical-align: -.16em; flex: none; }
+.cs-card-h .ic, .cs-h .ic { color: var(--red); margin-right: 4px; vertical-align: -.18em; }
+.canton-emoji { font-size: 0; margin-bottom: 4px; color: var(--red); }
+.canton-emoji svg { width: 30px; height: 30px; }
+.search-ico { width: 16px; height: 16px; color: var(--muted); }
+.search-ico svg { width: 100%; height: 100%; }
+.notice-ico { color: var(--red); display: grid; place-items: center; }
+.notice-ico svg { width: 40px; height: 40px; }
+.option .mark svg { width: 15px; height: 15px; }
+.pr-owned .pr-badge { font-size: 0; }
+.pr-badge svg { width: 26px; height: 26px; }
+.sheet-check svg, .commune-check svg { width: 15px; height: 15px; }
+.badge-done svg { width: 11px; height: 11px; vertical-align: -1.5px; margin-right: 2px; }
+.review-flag svg { width: 13px; height: 13px; }
+.map-zoom button svg { width: 17px; height: 17px; }
+.result-badge svg { width: 13px; height: 13px; vertical-align: -2px; }
 .mode-row-txt { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .mode-row-txt b { font-size: 14.5px; }
 .mode-row-txt small { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
@@ -576,7 +593,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 
 /* ---------- Révision : titre de portée déroulant + toggle + progression + « Le savais-tu » ---------- */
 .scope-title { display: inline-flex; align-items: baseline; gap: 7px; margin: 0 auto; background: var(--card);
-  border: 1px solid var(--line); border-radius: 99px; padding: 8px 16px; box-shadow: var(--shadow-sm);
+  border-radius: 99px; padding: 8px 16px; box-shadow: var(--shadow-sm);
   font-family: var(--font-serif); font-size: 16px; font-weight: 500; color: var(--ink); cursor: pointer; }
 .scope-title .chev { font-size: 10px; color: var(--muted); font-family: var(--font-ui); }
 .study-modebar { display: block; margin: 0 0 12px; }
@@ -625,7 +642,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .cid-cols > div:nth-child(2) { border-left: 1px solid #EFE3D2; border-right: 1px solid #EFE3D2; }
 .cid-val { font-family: var(--font-serif); font-size: 19px; font-weight: 500; line-height: 1.15; }
 .cid-lab { font-size: 9.5px; font-weight: 600; letter-spacing: 1.3px; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
-.cid-quote { margin: 0 16px 14px; background: #FBF7EE; border: 1px solid #EFE3D2; border-radius: 14px; padding: 14px 16px; display: flex; gap: 12px; }
+.cid-quote { margin: 0 16px 14px; background: #FBF7EE; border-radius: 14px; padding: 14px 16px; display: flex; gap: 12px; }
 .cid-q { font-family: var(--font-serif); font-size: 34px; line-height: .9; flex: none; }
 .cid-quote p { margin: 2px 0 0; font-family: var(--font-serif); font-style: italic; font-size: 14.5px; line-height: 1.55; color: var(--ink-soft); }
 .cid-cta-wrap { padding: 0 16px 16px; }
@@ -664,7 +681,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .result-inner h2 { font-family: var(--font-serif); font-weight: 500; }
 .result-card { background: var(--card); border-radius: 18px; padding: 18px 20px;
   box-shadow: var(--shadow); margin-bottom: 14px; text-align: left; }
-.btn-outline { background: var(--card); border: 1.5px solid var(--line); color: var(--ink-soft); box-shadow: none; font-weight: 600; }
+.btn-outline { background: var(--card); color: var(--ink-soft); box-shadow: var(--shadow-sm); font-weight: 600; }
 .btn-outline:active { background: rgba(43,38,32,.04); }
 .btn-share { background: var(--red); color: var(--on-red); box-shadow: var(--shadow-cta); }
 .btn-share:active { filter: brightness(.94); }
@@ -683,7 +700,9 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .badge-card { position: relative; }
 .badge-card.on { background: var(--card); opacity: 1; filter: none; }
 .badge-medal { width: 54px; height: 54px; margin: 0 auto 10px; border-radius: 50%; background: var(--badge-bg);
-  display: grid; place-items: center; font-size: 24px; box-shadow: inset 0 0 0 2px rgba(200,68,46,.25); }
+  display: grid; place-items: center; color: var(--red-dark); box-shadow: inset 0 0 0 2px rgba(200,68,46,.25); }
+.badge-medal svg { width: 26px; height: 26px; }
+.badge-card.locked .badge-medal { color: var(--muted); }
 .badge-done { display: inline-block; margin-top: 8px; font-size: 9.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ok); }
 .badge-card.locked { background: var(--paper); border: 1.5px dashed #D8CBB2; opacity: 1; filter: none; }
 .badge-card.locked .badge-medal { background: var(--bg); filter: grayscale(1); opacity: .7; box-shadow: none; font-size: 22px; }
@@ -826,7 +845,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 /* ---------- Sélecteur de canton (Vaud / Genève) ---------- */
 .canton-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 6px; }
 .canton-card { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; position: relative;
-  background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 18px 20px;
+  background: var(--card); border: 1.5px solid transparent; border-radius: 18px; padding: 18px 20px;
   box-shadow: var(--shadow-sm); font-family: inherit; text-align: left; cursor: pointer; transition: transform .12s ease, border-color .15s; }
 .canton-card:active { transform: scale(.985); }
 .canton-card.sel { border-color: var(--red); box-shadow: 0 2px 12px rgba(200,68,46,.12); }
