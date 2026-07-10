@@ -39,6 +39,10 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+/* Reset global : aucun <button> n'a de bordure par défaut du navigateur.
+   Les bordures voulues (réponse correcte, sélection, verrou, outline, chips)
+   restent portées par leurs classes, qui l'emportent en spécificité. */
+button { border: none; }
 
 /* Un élément avec l'attribut [hidden] doit TOUJOURS être masqué, même si une
    classe lui donne display:flex/grid (sinon l'attribut hidden est ignoré). */
