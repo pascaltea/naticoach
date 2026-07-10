@@ -21,11 +21,15 @@
   --bad: #C8442E; --bad-bg: #FBEDE7;
   --gold: #C69A3A;
   --warning: #C08A2E;
+  /* Pastilles teintées (fonds d'icônes) — v2 */
+  --pill-green: #E9F1E6; --pill-red: #FBEDE7; --pill-blue: #EAEFF6; --pill-gold: #F6EBD5; --pill-peach: #F3E3D3;
+  --icon-green: #3E7A4E; --icon-red: #C8442E; --icon-blue: #5B7DB1; --icon-gold: #C08A2E; --icon-terra: #A1502E;
   --radius: 16px;
   --radius-pill: 99px;
-  --shadow: 0 2px 8px rgba(90,70,40,.06);
-  --shadow-sm: 0 1px 4px rgba(90,70,40,.05);
-  --shadow-cta: 0 4px 14px rgba(200,68,46,.25);
+  /* Ombres douces v2 (remplacent la bordure de carte) */
+  --shadow: 0 2px 14px rgba(60,45,20,.08);
+  --shadow-sm: 0 1px 6px rgba(60,45,20,.06);
+  --shadow-cta: 0 8px 24px rgba(200,68,46,.22);
   --font-ui: "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-serif: "Lora", Georgia, ui-serif, "Times New Roman", serif;
   --safe-top: env(safe-area-inset-top, 0px);
@@ -93,7 +97,7 @@ h1 { font-size: 27px; font-weight: 500; letter-spacing: 0; line-height: 1.12; }
 /* ---------- Cards ---------- */
 .card {
   background: var(--card); border-radius: var(--radius); padding: 20px;
-  box-shadow: var(--shadow); margin-bottom: 16px; border: 1px solid var(--line);
+  box-shadow: var(--shadow); margin-bottom: 16px;
 }
 .card-title-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
 h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-spacing: 0; }
@@ -133,7 +137,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 /* ---------- Category list ---------- */
 .cat-list { display: flex; flex-direction: column; gap: 10px; }
 .cat-item {
-  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  background: var(--card); border-radius: 16px;
   padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer;
   box-shadow: var(--shadow); transition: transform .12s ease;
 }
@@ -180,7 +184,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 
 /* ---------- Quiz ---------- */
 .quiz-top { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-.icon-btn { background: var(--card); border: 1px solid var(--line); width: 38px; height: 38px;
+.icon-btn { background: var(--card); width: 38px; height: 38px;
   border-radius: 50%; font-size: 16px; cursor: pointer; color: var(--ink-soft); flex: 0 0 auto; box-shadow: var(--shadow-sm); }
 .quiz-progress { flex: 1; height: 6px; background: var(--track); border-radius: var(--radius-pill); overflow: hidden; }
 .quiz-progress-fill { height: 100%; background: var(--red); width: 0; border-radius: var(--radius-pill); transition: width .4s ease; }
@@ -215,7 +219,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 
 /* ---------- Explanation ---------- */
 .explain {
-  margin-top: 20px; background: #FBF7EE; border: 1px solid var(--line);
+  margin-top: 20px; background: #FBF7EE; box-shadow: var(--shadow-sm);
   border-radius: 16px; padding: 16px; display: flex; gap: 14px; align-items: flex-start;
   animation: fade .3s ease;
 }
@@ -273,7 +277,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .search-input:focus { outline: none; border-color: var(--red); }
 .commune-results { display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px; }
 .commune-row {
-  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  background: var(--card); border-radius: 14px;
   padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
   cursor: pointer; text-align: left; width: 100%; font-family: inherit; transition: transform .1s, border-color .15s;
 }
@@ -287,14 +291,14 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 /* ---------- Accueil : commune + modes ---------- */
 .home-hero-txt { flex: 1; }
 .commune-pill {
-  margin-top: 5px; background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+  margin-top: 5px; background: var(--card); border-radius: 20px;
   padding: 6px 13px; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer;
   display: inline-flex; align-items: center; gap: 5px; font-family: inherit; box-shadow: var(--shadow-sm);
 }
 .commune-pill .chev { color: var(--muted); font-size: 11px; }
 .modes { display: flex; flex-direction: column; gap: 11px; margin-bottom: 18px; }
 .mode-btn {
-  background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+  background: var(--card); border-radius: 18px;
   padding: 15px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer;
   box-shadow: var(--shadow-sm); font-family: inherit; text-align: left; width: 100%;
   transition: transform .12s ease, box-shadow .2s ease;
@@ -346,7 +350,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .legend-item { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
 .legend-dot { width: 11px; height: 11px; border-radius: 3px; }
 
-.canton-detail { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: var(--shadow); }
+.canton-detail { background: var(--card); border-radius: 18px; padding: 18px; box-shadow: var(--shadow); }
 .cd-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
 .cd-badge { width: 48px; height: 48px; border-radius: 13px; color: #fff; font-weight: 800; font-size: 17px; display: grid; place-items: center; flex: 0 0 auto; letter-spacing: .5px; }
 .cd-head b { font-size: 18px; display: block; }
@@ -360,7 +364,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .cd-intro b { color: var(--ink); }
 
 /* ---------- Statistiques ---------- */
-.stats-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: var(--shadow); margin-bottom: 16px; }
+.stats-card { background: var(--card); border-radius: 18px; padding: 18px; box-shadow: var(--shadow); margin-bottom: 16px; }
 .stats-card h3 { font-size: 15px; margin-bottom: 14px; }
 .stat-row { margin-bottom: 14px; }
 .stat-row:last-child { margin-bottom: 0; }
@@ -405,7 +409,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 
 /* ---------- Écran de correction ---------- */
 .review-list { display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px; }
-.review-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); }
+.review-card { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); }
 .review-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .review-head .chip { margin-bottom: 0; }
 .review-flag { font-weight: 700; font-size: 14px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex: 0 0 auto; }
@@ -416,7 +420,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .review-card .option { padding: 12px 14px; font-size: 14.5px; cursor: default; }
 .review-card .option:active { transform: none; }
 .review-noans { color: var(--bad); font-size: 12.5px; font-weight: 600; margin-top: 8px; }
-.review-exp { margin-top: 12px; background: #FBF7EE; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; display: flex; gap: 12px; align-items: flex-start; }
+.review-exp { margin-top: 12px; background: #FBF7EE; border-radius: 12px; padding: 12px 14px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; display: flex; gap: 12px; align-items: flex-start; }
 .review-illus { flex: 0 0 auto; width: 88px; }
 .review-illus svg { width: 100%; height: auto; border-radius: 8px; display: block; }
 .review-illus:empty { display: none; }
@@ -451,7 +455,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 
 /* Écran Succès */
 .badge-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 24px; }
-.badge-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 12px;
+.badge-card { background: var(--card); border-radius: 16px; padding: 16px 12px;
   text-align: center; box-shadow: var(--shadow); }
 .badge-card.on { animation: badgePush .4s ease both; }
 .badge-card.locked { opacity: .55; filter: grayscale(1); }
@@ -475,7 +479,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .exam-cta-arrow { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.18);
   display: grid; place-items: center; font-size: 18px; flex: 0 0 auto; }
 
-.prep-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px;
+.prep-card { background: var(--card); border-radius: 18px; padding: 16px 18px;
   box-shadow: var(--shadow); margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
 .prep-ring { position: relative; width: 74px; height: 74px; flex: 0 0 auto; }
 .prep-ring .ring { width: 100%; height: 100%; }
@@ -510,7 +514,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .legal-sec { margin-bottom: 14px; }
 .legal-sec h3 { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
 .legal-links { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
-.legal-link { text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-family: inherit; font-size: 14px; color: var(--red); font-weight: 600; cursor: pointer; box-shadow: var(--shadow-sm); }
+.legal-link { text-align: left; background: var(--card); border-radius: 12px; padding: 12px 14px; font-family: inherit; font-size: 14px; color: var(--red); font-weight: 600; cursor: pointer; box-shadow: var(--shadow-sm); }
 /* Freemium : bannière accueil, verrou révision, écran premium */
 .premium-banner { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; cursor: pointer;
   background: var(--card); border: 1.5px solid var(--gold); border-radius: 16px; padding: 12px 15px; margin-bottom: 16px; box-shadow: var(--shadow-sm); font-family: inherit; }
@@ -540,7 +544,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .zone-bonus { margin-top: 26px; padding-top: 20px; border-top: 1px dashed var(--line); }
 .mode-group-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin: 0 4px 9px; }
 .mode-rows { display: flex; flex-direction: column; gap: 9px; margin-bottom: 16px; }
-.mode-row { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 13px 15px;
+.mode-row { background: var(--card); border-radius: 16px; padding: 13px 15px;
   display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm); font-family: inherit;
   text-align: left; width: 100%; cursor: pointer; transition: transform .12s ease; }
 .mode-row:active { transform: scale(.985); }
@@ -552,7 +556,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .mode-row-txt small.hot { color: var(--red); font-weight: 600; }
 .mode-row .chev { font-size: 18px; color: var(--muted); }
 .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 16px; }
-.mode-tile { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 13px 14px;
+.mode-tile { background: var(--card); border-radius: 16px; padding: 13px 14px;
   box-shadow: var(--shadow-sm); font-family: inherit; text-align: left; cursor: pointer; transition: transform .12s ease; }
 .mode-tile:active { transform: scale(.985); }
 .mode-tile .mode-ico { width: auto; height: auto; background: none; border-radius: 0; font-size: 17px; display: block; }
@@ -579,7 +583,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .explain.savais .explain-illus { width: 100%; margin-top: 10px; }
 .reveal-btn { margin-top: 4px; }
 .card-choices { list-style: none; display: flex; flex-direction: column; gap: 9px; margin: 0 0 6px; }
-.card-choices li { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+.card-choices li { background: var(--card); border-radius: 14px;
   padding: 13px 16px 13px 40px; font-size: 15.5px; color: var(--ink); position: relative; box-shadow: var(--shadow-sm); }
 .card-choices li::before { content: ""; position: absolute; left: 17px; top: 50%; transform: translateY(-50%);
   width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
@@ -592,7 +596,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .sheet-title { font-family: var(--font-serif); font-size: 16px; font-weight: 500; margin-bottom: 12px; text-align: center; }
 .sheet-options { display: flex; flex-direction: column; gap: 8px; }
 .sheet-options button { display: flex; justify-content: space-between; align-items: center; background: var(--card);
-  border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; font-family: inherit; font-size: 15px; color: var(--ink); cursor: pointer; }
+  border: 1.5px solid transparent; box-shadow: var(--shadow-sm); border-radius: 14px; padding: 14px 16px; font-family: inherit; font-size: 15px; color: var(--ink); cursor: pointer; }
 .sheet-options button.sel { border-color: var(--red); color: var(--red); font-weight: 700; }
 .sheet-check { color: var(--red); font-weight: 700; }
 
@@ -632,11 +636,11 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .sbar-head span { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .sbar-head span.weak { color: var(--red); font-weight: 700; }
 .sbar-head span.good { color: var(--ok); font-weight: 700; }
-.sbar { position: relative; height: 8px; background: var(--track); border-radius: 4px; }
-.sbar > i { display: block; height: 100%; border-radius: 4px; transition: width .6s ease; }
+.sbar { position: relative; height: 10px; background: var(--track); border-radius: 5px; }
+.sbar > i { display: block; height: 100%; border-radius: 5px; transition: width .6s ease; }
 .sbar > u { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); opacity: .55; }
 .stats-tiles { display: flex; gap: 10px; margin: 14px 0 16px; }
-.stats-tile { flex: 1; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; text-align: center; }
+.stats-tile { flex: 1; background: var(--card); border-radius: 14px; padding: 13px 14px; text-align: center; }
 .stats-tile-val { font-family: var(--font-serif); font-size: 21px; font-weight: 500; }
 .stats-tile-lab { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
 
@@ -647,14 +651,14 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .result-confetti i { position: absolute; border-radius: 50%; animation: confDrop 1s ease both; }
 @keyframes confDrop { from { transform: translateY(-8px); opacity: 0; } to { transform: none; } }
 .result-inner h2 { font-family: var(--font-serif); font-weight: 500; }
-.result-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px;
+.result-card { background: var(--card); border-radius: 18px; padding: 18px 20px;
   box-shadow: var(--shadow); margin-bottom: 14px; text-align: left; }
 .btn-outline { background: var(--card); border: 1.5px solid var(--line); color: var(--ink-soft); box-shadow: none; font-weight: 600; }
 .btn-outline:active { background: rgba(43,38,32,.04); }
 .btn-share { background: var(--red); color: var(--on-red); box-shadow: var(--shadow-cta); }
 .btn-share:active { filter: brightness(.94); }
 .recap-tiles { display: flex; justify-content: center; gap: 10px; margin-bottom: 6px; }
-.recap-tile { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 11px 16px; text-align: center; }
+.recap-tile { background: var(--card); border-radius: 14px; padding: 11px 16px; text-align: center; }
 .recap-val { font-family: var(--font-serif); font-size: 18px; font-weight: 500; }
 .recap-lab { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
 
@@ -666,7 +670,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .badge-segs span { width: 26px; height: 5px; border-radius: 3px; background: #E0D5C0; }
 .badge-segs span.on { background: var(--red); }
 .badge-card { position: relative; }
-.badge-card.on { background: var(--card); border: 1px solid var(--line); opacity: 1; filter: none; }
+.badge-card.on { background: var(--card); opacity: 1; filter: none; }
 .badge-medal { width: 54px; height: 54px; margin: 0 auto 10px; border-radius: 50%; background: var(--badge-bg);
   display: grid; place-items: center; font-size: 24px; box-shadow: inset 0 0 0 2px rgba(200,68,46,.25); }
 .badge-done { display: inline-block; margin-top: 8px; font-size: 9.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ok); }
@@ -710,7 +714,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .tl-node.ch .tl-year { color: var(--red); }
 .tl-node.vd .tl-year { color: var(--ok); }
 .tl-year em { font-family: var(--font-ui); font-style: normal; font-size: 11px; font-weight: 700; letter-spacing: 1.4px; vertical-align: 3px; }
-.tl-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-top: 7px; box-shadow: var(--shadow-sm); }
+.tl-card { background: var(--card); border-radius: 14px; padding: 12px 14px; margin-top: 7px; box-shadow: var(--shadow-sm); }
 .tl-card b { font-size: 14px; }
 .tl-card p { margin: 3px 0 0; font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; }
 .tl-card.key { background: var(--badge-bg); border: none; }
@@ -718,14 +722,14 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .tl-card.key p i { font-family: var(--font-serif); }
 
 /* ---------- Districts du Valais (ressource) ---------- */
-.vsmap-frame { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px; box-shadow: var(--shadow-sm); margin-bottom: 12px; }
+.vsmap-frame { background: var(--card); border-radius: 16px; padding: 10px; box-shadow: var(--shadow-sm); margin-bottom: 12px; }
 .vsmap-svg { width: 100%; height: auto; display: block; }
 .vsd-path { stroke: #fff; stroke-width: 0.8; cursor: pointer; transition: filter .15s; }
 .vsd-path.sel { stroke: var(--ink); stroke-width: 2; }
 .vsd-label { font-family: var(--font-ui); font-size: 13px; font-weight: 700; fill: #fff; pointer-events: none;
   paint-order: stroke; stroke: rgba(0,0,0,0.30); stroke-width: 0.7; }
 .vsd-chip.on { border-color: var(--red); background: var(--bad-bg); font-weight: 700; }
-.vsd-info { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--red); border-radius: 14px; box-shadow: var(--shadow-sm); padding: 13px 15px; margin: 12px 0 16px; animation: vsdFade .25s ease; }
+.vsd-info { background: var(--card); border-left: 4px solid var(--red); border-radius: 14px; box-shadow: var(--shadow-sm); padding: 13px 15px; margin: 12px 0 16px; animation: vsdFade .25s ease; }
 @keyframes vsdFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .vsd-info-h { display: flex; align-items: center; gap: 8px; font-family: var(--font-serif); font-size: 17px; font-weight: 500; margin-bottom: 8px; }
 .vsd-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 5px 0; border-top: 1px solid var(--line); }
@@ -737,13 +741,13 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .vsd-region { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 .vsd-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
 .vsd-items { display: flex; flex-wrap: wrap; gap: 8px; }
-.vsd-chip { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; font-size: 13.5px; color: var(--ink); box-shadow: var(--shadow-sm); }
+.vsd-chip { background: var(--card); border-radius: 12px; padding: 8px 12px; font-size: 13.5px; color: var(--ink); box-shadow: var(--shadow-sm); }
 .vsd-chip b { font-variant-numeric: tabular-nums; margin-right: 5px; }
 
 /* ---------- Comprendre la Suisse (politique · piliers · santé) ---------- */
 .cs-intro { font-size: 14px; color: var(--ink-soft); line-height: 1.55; margin: 0 2px 16px; }
 .cs-note { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 12px 2px 6px; }
-.pol-level { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-sm); padding: 14px 16px; margin-bottom: 12px; }
+.pol-level { background: var(--card); border-radius: 16px; box-shadow: var(--shadow-sm); padding: 14px 16px; margin-bottom: 12px; }
 .pol-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
 .pol-head b { font-family: var(--font-serif); font-size: 17px; font-weight: 500; }
 .pol-head span { font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
@@ -755,7 +759,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .pol-power { display: block; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 1px; }
 .pol-txt b { font-size: 15px; }
 .pol-txt small { display: block; font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; margin-top: 2px; }
-.cs-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-sm); padding: 14px 16px; margin-bottom: 11px; }
+.cs-card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow-sm); padding: 14px 16px; margin-bottom: 11px; }
 .cs-card-h { font-family: var(--font-serif); font-size: 15.5px; font-weight: 500; margin-bottom: 4px; }
 .cs-card p { font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; }
 .cs-highlight { background: var(--badge-bg); border: none; margin-top: 4px; }
@@ -769,7 +773,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .qe-level { margin-bottom: 14px; }
 .qe-lvl { display: block; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 0 0 7px 2px; }
 .qe-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.qe-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-sm); padding: 11px 12px; display: flex; flex-direction: column; gap: 3px; }
+.qe-card { background: var(--card); border-radius: 14px; box-shadow: var(--shadow-sm); padding: 11px 12px; display: flex; flex-direction: column; gap: 3px; }
 .qe-leg { border-top: 3px solid #6E8CAE; }
 .qe-exe { border-top: 3px solid var(--red); }
 .qe-role { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--muted); }
@@ -786,7 +790,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .as-txt > b { font-size: 14.5px; display: block; }
 .as-txt small { display: block; font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; margin-top: 2px; }
 .as-txt small b { font-size: inherit; }
-.cs-pillar { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-sm); padding: 16px; margin-bottom: 11px; }
+.cs-pillar { background: var(--card); border-radius: 16px; box-shadow: var(--shadow-sm); padding: 16px; margin-bottom: 11px; }
 .cs-pillar-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .cs-pillar-n { width: 38px; height: 38px; border-radius: 50%; color: #fff; display: grid; place-items: center; font-family: var(--font-serif); font-size: 19px; font-weight: 500; flex: 0 0 auto; }
 .cs-pillar-top b { font-size: 16px; } .cs-pillar-top small { display: block; font-size: 12px; color: var(--muted); margin-top: 1px; }
