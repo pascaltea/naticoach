@@ -82,6 +82,8 @@
     mistakes: [],   // [{q, options, answer, theme, scope}]
     stats: {},      // { "Niveau|Thème": {a, c} }
     badges: {},     // { badgeId: true }
+    seenCantons: [], // codes de cantons ouverts dans « Explorer »
+    seenDates: [],   // années/repères de frise déjà consultés
   });
   function load() {
     try {
@@ -460,7 +462,20 @@
     }
     const c = VD_DATA.communes[state.commune];
     $("homeCommune").textContent = cn === "VD" ? (c ? c.name : t("misc.chooseCommune", "Choisir…")) : cnName(cn);
-    $("friseTileSub").textContent = t("misc.swiss", "Suisse") + " · " + cnName(cn);
+    // Jauges « Découvrir & suivre » (disponibles pour tous les cantons)
+    const seenC = state.seenCantons.length;
+    setGauge($("gaugeExplore"), seenC / 26, 4);
+    $("exploreProg").textContent = seenC > 0
+      ? fmt(t("home.cantonsSeen", "{n} / 26 cantons vus"), { n: seenC })
+      : t("home.exploreSub", "26 cantons");
+    const tlBase = timelineBase();
+    const seenD = tlBase.filter((e) => state.seenDates.indexOf(e.year + "|" + e.scope) >= 0).length;
+    setGauge($("gaugeFrise"), tlBase.length ? seenD / tlBase.length : 0, 4);
+    $("friseTileSub").textContent = seenD > 0
+      ? fmt(t("home.datesSeen", "{n} / {t} dates vues"), { n: seenD, t: tlBase.length })
+      : t("misc.swiss", "Suisse") + " · " + cnName(cn);
+    const nBadges = ACHIEVEMENTS.filter((a) => state.badges && state.badges[a.id]).length;
+    setGauge($("gaugeBadges"), ACHIEVEMENTS.length ? nBadges / ACHIEVEMENTS.length : 0, ACHIEVEMENTS.length);
 
     // Ressource « districts » : cantons ayant une carte (Vaud, Valais).
     const dm = districtMap();
@@ -473,19 +488,16 @@
     // Blocs à score (prépa, révision QCM, suivi) : uniquement pour les cantons QCM.
     const pc = document.querySelector(".prep-card"); if (pc) pc.hidden = cards;
     $("grpReviser").hidden = cards;
-    $("grpSuivre").hidden = cards;
 
     if (cards) {
       const n = cardsData().questions.length;
       $("examTitle").textContent = t("exam.train", "S'entraîner");
       $("examSub").textContent = fmt(t("exam.subCards", "{n} questions officielles · QCM & fiches"), { n: n });
-      $("examZoneSub").textContent = t("home.zoneExamSubCards", "Le questionnaire officiel — c'est uniquement là-dessus que tu es évalué·e.");
       $("homeFooter").textContent = fmt(t("home.footerCards", "Questions officielles Suisse & {c} · hors-ligne"), { c: cScope(cn) });
       return;
     }
 
     const cfg = EXAM_CFG[cn];
-    $("examZoneSub").textContent = t("home.zoneExamSub", "Le questionnaire officiel et ton suivi — c'est uniquement là-dessus que tu es évalué·e.");
     $("examTitle").textContent = t("exam.simulate", "Simuler l'examen");
     $("examSub").textContent = cn === "GE"
       ? fmt(t("exam.subGE", "{n} questions · max 5 fautes"), { n: cfg.total })
@@ -500,6 +512,9 @@
     $("statBest").textContent = state.best + "%";
     $("statSessions").textContent = state.sessions;
     $("statStreak").textContent = state.streak + " " + t("misc.dayUnit", "j");
+    $("statsTileSub").textContent = readiness > 0
+      ? fmt(t("home.statsGlobal", "{n}% global · par thème"), { n: readiness })
+      : t("home.statsSub", "par thème");
     setTimeout(() => setRing($("readinessRing"), readiness), 60);
 
     const mc = state.mistakes.length;
@@ -514,13 +529,29 @@
     renderSparkline();
   }
 
-  /* Mini-courbe de progression (carte préparation, viewBox 80×40). */
+  /* Jauge segmentée (design system nc-gauge) : remplit `segs` segments,
+     dont round(ratio·segs) allumés. La couleur vient de `color:` sur le parent. */
+  function setGauge(el, ratio, segs) {
+    if (!el) return;
+    ratio = Math.max(0, Math.min(1, ratio || 0));
+    const on = Math.round(ratio * segs);
+    let h = "";
+    for (let i = 0; i < segs; i++) h += `<span class="${i < on ? "on" : ""}"></span>`;
+    el.innerHTML = h;
+  }
+  /* Triangles de tendance en SVG (jamais de caractère glyphe, hors charte). */
+  const TRI_UP = "<svg class='tri' viewBox='0 0 10 10' fill='currentColor'><path d='M5 1.5l3.6 6.5h-7.2z'/></svg>";
+  const TRI_DN = "<svg class='tri' viewBox='0 0 10 10' fill='currentColor'><path d='M5 8.5l3.6-6.5h-7.2z'/></svg>";
+
+  /* Mini-courbe de progression en aire (carte préparation, viewBox 150×54). */
   function renderSparkline() {
     const svg = $("sparkline");
     const data = state.history.slice(-12);
-    if (data.length < 2) { svg.innerHTML = ""; svg.style.visibility = "hidden"; return; }
+    $("sparkSessions").textContent = fmt(t("home.sessionsCount", "{n} sessions"), { n: state.sessions });
+    const sd = $("sparkDelta");
+    if (data.length < 2) { svg.innerHTML = ""; svg.style.visibility = "hidden"; if (sd) sd.innerHTML = ""; return; }
     svg.style.visibility = "visible";
-    const W = 80, H = 40, padX = 2, padY = 6;
+    const W = 150, H = 54, padX = 3, padY = 6;
     const xs = (i) => padX + (i * (W - padX * 2)) / (data.length - 1);
     const ys = (v) => H - padY - (v / 100) * (H - padY * 2);
     let line = "";
@@ -528,6 +559,11 @@
     const last = data[data.length - 1];
     const area = line + `L ${xs(data.length - 1).toFixed(1)} ${H} L ${xs(0).toFixed(1)} ${H} Z`;
     svg.innerHTML = `<path class="area" d="${area}"/><path class="line" d="${line}"/><circle cx="${xs(data.length - 1).toFixed(1)}" cy="${ys(last.pct).toFixed(1)}" r="3"/>`;
+    if (sd) {
+      const delta = Math.round(last.pct - data[0].pct);
+      if (delta === 0) { sd.className = "prep-delta"; sd.innerHTML = ""; }
+      else { sd.className = "prep-delta " + (delta > 0 ? "up" : "down"); sd.innerHTML = (delta > 0 ? TRI_UP : TRI_DN) + " " + (delta > 0 ? "+" : "") + delta + " pts"; }
+    }
   }
 
   /* ======================================================================
@@ -865,6 +901,7 @@
       box.innerHTML = exploreIntro();
       return;
     }
+    if (state.seenCantons.indexOf(c.code) < 0) { state.seenCantons.push(c.code); save(); }
     const col = REGION_COLORS[c.region];
     const cta = (c.code === "VD" && cantonOf() === "VD")
       ? `<div class="cid-cta-wrap"><button class="cid-cta" id="cantonQuizBtn" style="border-color:${col};color:${col}">${t("explore.cantonQuiz", "5 questions sur le canton de Vaud →")}</button></div>`
@@ -1074,6 +1111,10 @@
     // Le filtre courant peut être invalide après un changement de canton.
     if (timelineFilter !== "all" && timelineFilter !== "ch" && timelineFilter !== cn) timelineFilter = "all";
     const base = timelineBase();
+    // Repères consultés : ouvrir la frise marque comme « vus » les événements affichés.
+    let sd = false;
+    base.forEach((e) => { const k = e.year + "|" + e.scope; if (state.seenDates.indexOf(k) < 0) { state.seenDates.push(k); sd = true; } });
+    if (sd) save();
     const filters = [
       { key: "all", label: t("scope.all", "Tout"), dot: null },
       { key: "ch", label: t("misc.swiss", "Suisse"), dot: "var(--red)" },
@@ -1842,7 +1883,7 @@
   function recapTiles(prevPct) {
     const pct = state.history.length ? state.history[state.history.length - 1].pct : 0;
     let prog = "—";
-    if (prevPct !== null) { const d = pct - prevPct; prog = (d >= 0 ? "▲ +" : "▼ ") + Math.abs(d); }
+    if (prevPct !== null) { const d = pct - prevPct; prog = (d >= 0 ? TRI_UP + " +" : TRI_DN + " ") + Math.abs(d); }
     return `<div class="recap-tiles">
         <div class="recap-tile"><div class="recap-val">${state.sessions}</div><div class="recap-lab">${t("recap.sessions", "Sessions")}</div></div>
         <div class="recap-tile"><div class="recap-val">${prog}</div><div class="recap-lab">${t("recap.progress", "Progression")}</div></div>

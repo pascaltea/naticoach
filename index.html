@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=81" />
+  <link rel="stylesheet" href="styles.css?v=82" />
 </head>
 <body>
   <div id="app">
@@ -98,9 +98,28 @@
         </div>
       </header>
 
-      <div class="zone-head">
-        <h2 class="zone-title" data-i18n="home.zoneExam">Pour l'examen</h2>
-        <p class="zone-sub" id="examZoneSub">Le questionnaire officiel et ton suivi — c'est uniquement là-dessus que tu es évalué·e.</p>
+      <!-- Carte préparation (héros) -->
+      <div class="prep-card">
+        <div class="prep-top">
+          <div class="prep-ring">
+            <svg viewBox="0 0 120 120" class="ring">
+              <circle class="ring-bg" cx="60" cy="60" r="52"/>
+              <circle class="ring-fg" cx="60" cy="60" r="52" id="readinessRing"/>
+              <circle class="ring-tick" cx="60" cy="60" r="52"/>
+            </svg>
+            <div class="prep-ring-c"><span id="readinessPct">0%</span><small data-i18n="exam.ready">prêt·e</small></div>
+          </div>
+          <div class="prep-graph">
+            <div class="prep-label" data-i18n="exam.prep">Ta préparation</div>
+            <svg viewBox="0 0 150 54" class="spark-mini" id="sparkline" preserveAspectRatio="none"></svg>
+            <div class="prep-graph-meta"><span id="sparkSessions">0 sessions</span><span class="prep-delta" id="sparkDelta"></span></div>
+          </div>
+        </div>
+        <div class="prep-tiles">
+          <div class="prep-tile"><b id="statBest">0%</b><small data-i18n="exam.best">meilleur</small></div>
+          <div class="prep-tile"><b id="statSessions">0</b><small data-i18n="exam.sessions">sessions</small></div>
+          <div class="prep-tile"><b id="statStreak">0</b><small data-i18n="exam.streak">série</small></div>
+        </div>
       </div>
 
       <button class="exam-cta" id="btnExam">
@@ -108,7 +127,7 @@
           <b id="examTitle">Simuler l'examen</b>
           <small id="examSub">48 questions · 60 min · réussite 70 %</small>
         </span>
-        <span class="exam-cta-arrow">›</span>
+        <span class="exam-cta-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
       </button>
 
       <button class="premium-banner" id="premiumBanner" hidden>
@@ -117,61 +136,35 @@
         <span class="pb-price" id="premiumBannerPrice">CHF 14.90</span>
       </button>
 
-      <div class="prep-card">
-        <div class="prep-ring">
-          <svg viewBox="0 0 120 120" class="ring">
-            <circle class="ring-bg" cx="60" cy="60" r="52"/>
-            <circle class="ring-fg" cx="60" cy="60" r="52" id="readinessRing"/>
-            <circle class="ring-tick" cx="60" cy="60" r="52"/>
-          </svg>
-          <div class="prep-ring-c" id="readinessPct">0%</div>
-        </div>
-        <div class="prep-meta">
-          <div class="prep-label" data-i18n="exam.prep">Ta préparation</div>
-          <div class="prep-stats">
-            <div><b id="statBest">0%</b><span data-i18n="exam.best">meilleur</span></div>
-            <div><b id="statSessions">0</b><span data-i18n="exam.sessions">sessions</span></div>
-            <div><b id="statStreak">0</b><span data-i18n="exam.streak">série</span></div>
-          </div>
-        </div>
-        <svg viewBox="0 0 80 40" class="spark-mini" id="sparkline" preserveAspectRatio="none"></svg>
-      </div>
-
       <div id="grpReviser">
         <div class="mode-group-label" data-i18n="home.reviseLabel">Réviser</div>
         <div class="mode-rows">
           <button class="mode-row" id="btnStudy">
             <span class="mode-ico mi-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6C10 4.6 7.6 4 5 4v13c2.6 0 5 .6 7 2 2-1.4 4.4-2 7-2V4c-2.6 0-5 .6-7 2z"/><path d="M12 6v13"/></svg></span>
             <span class="mode-row-txt"><b data-i18n="home.study">Réviser les réponses</b><small data-i18n="home.studySub">découverte ou quiz</small></span>
-            <span class="chev">›</span>
+            <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
           </button>
           <button class="mode-row" id="btnMistakes" hidden>
             <span class="mode-ico mi-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a8 8 0 0 1 13.9-4.4"/><path d="M20 14a8 8 0 0 1-13.9 4.4"/><path d="M18 2v4h-4"/><path d="M6 22v-4h4"/></svg><span class="ico-badge" id="mistakesBadge">0</span></span>
             <span class="mode-row-txt"><b data-i18n="home.mistakes">Réviser mes erreurs</b><small class="hot"><span id="mistakesCount">0</span> <span id="mistakesLabel">question(s) à retravailler</span></small></span>
-            <span class="chev">›</span>
+            <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
           </button>
         </div>
       </div>
 
-      <div id="grpSuivre">
-        <div class="mode-group-label" data-i18n="home.trackLabel">Suivre</div>
-        <div class="mode-grid">
-          <button class="mode-tile" id="btnStats"><span class="mode-ico mi-terra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-7"/><path d="M12 20V5"/><path d="M19 20v-10"/></svg></span><b data-i18n="home.stats">Statistiques</b><small data-i18n="home.statsSub">par thème</small></button>
-          <button class="mode-tile" id="btnBadges"><span class="mode-ico mi-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M8.8 13.2L7.5 21l4.5-2.7 4.5 2.7-1.3-7.8"/></svg></span><b data-i18n="home.badges">Succès</b><small><span id="badgeCount">0</span> <span id="badgeLabel">badge(s)</span></small></button>
-        </div>
+      <div class="mode-group-label" data-i18n="home.discoverTrack">Découvrir &amp; suivre</div>
+      <div class="mode-grid">
+        <button class="mode-tile" id="btnExplore"><span class="mode-ico mi-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4L4 6v14l5-2 6 2 5-2V4l-5 2-6-2z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg></span><b data-i18n="home.explore">Explorer la Suisse</b><div class="nc-gauge" id="gaugeExplore" style="color:var(--icon-blue)"></div><small class="tile-prog" id="exploreProg">26 cantons</small></button>
+        <button class="mode-tile" id="btnTimeline"><span class="mode-ico mi-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><b data-i18n="home.timeline">Frise chrono</b><div class="nc-gauge" id="gaugeFrise" style="color:var(--icon-gold)"></div><small class="tile-prog" id="friseTileSub">Suisse · canton</small></button>
+        <button class="mode-tile" id="btnVsMap" hidden><span class="mode-ico mi-terra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.7-6-10a6 6 0 0 1 12 0c0 4.3-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></span><b id="districtTileTitle">Districts</b><small id="districtTileSub">du canton</small></button>
+        <button class="mode-tile" id="btnMonCanton"><span class="mode-ico mi-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg></span><b id="monCantonTile" data-i18n="home.monCanton">Mon canton</b><small data-i18n="home.monCantonSub">fiche d'identité</small></button>
+        <button class="mode-tile" id="btnStats"><span class="mode-ico mi-terra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-7"/><path d="M12 20V5"/><path d="M19 20v-10"/></svg></span><b data-i18n="home.stats">Statistiques</b><small class="tile-prog" id="statsTileSub">par thème</small></button>
+        <button class="mode-tile" id="btnBadges"><span class="mode-ico mi-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M8.8 13.2L7.5 21l4.5-2.7 4.5 2.7-1.3-7.8"/></svg></span><b data-i18n="home.badges">Succès</b><div class="nc-gauge" id="gaugeBadges" style="color:var(--icon-green)"></div><small class="tile-prog"><span id="badgeCount">0</span> <span id="badgeLabel">badge(s)</span></small></button>
       </div>
 
       <div class="zone-head zone-bonus">
         <h2 class="zone-title" data-i18n="home.zoneBonus">Pour aller plus loin</h2>
         <p class="zone-sub" data-i18n="home.zoneBonusSub">Pour approfondir ta culture suisse. Utile mais non requis : tout ce qui est évalué est dans le questionnaire officiel.</p>
-      </div>
-
-      <div class="mode-group-label" data-i18n="home.discover">Découvrir</div>
-      <div class="mode-grid">
-        <button class="mode-tile" id="btnExplore"><span class="mode-ico mi-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4L4 6v14l5-2 6 2 5-2V4l-5 2-6-2z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg></span><b data-i18n="home.explore">Explorer la Suisse</b><small data-i18n="home.exploreSub">26 cantons</small></button>
-        <button class="mode-tile" id="btnTimeline"><span class="mode-ico mi-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><b data-i18n="home.timeline">Frise chrono</b><small id="friseTileSub">Suisse · canton</small></button>
-        <button class="mode-tile" id="btnVsMap" hidden><span class="mode-ico mi-terra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.7-6-10a6 6 0 0 1 12 0c0 4.3-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></span><b id="districtTileTitle">Districts</b><small id="districtTileSub">du canton</small></button>
-        <button class="mode-tile" id="btnMonCanton"><span class="mode-ico mi-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg></span><b id="monCantonTile" data-i18n="home.monCanton">Mon canton</b><small data-i18n="home.monCantonSub">fiche d'identité</small></button>
       </div>
 
       <div class="mode-group-label" data-i18n="home.understand">Comprendre la Suisse</div>
@@ -560,8 +553,8 @@
   <script src="ge_official.js"></script>
   <script src="ne_official.js?v=56"></script>
   <script src="vs_official.js?v=56"></script>
-  <script src="i18n.js?v=80"></script>
-  <script src="questions_i18n.js?v=80"></script>
-  <script src="app.js?v=80"></script>
+  <script src="i18n.js?v=82"></script>
+  <script src="questions_i18n.js?v=82"></script>
+  <script src="app.js?v=82"></script>
 </body>
 </html>

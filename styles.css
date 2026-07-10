@@ -480,21 +480,41 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .exam-cta-arrow { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.18);
   display: grid; place-items: center; font-size: 18px; flex: 0 0 auto; }
 
-.prep-card { background: var(--card); border-radius: 18px; padding: 16px 18px;
-  box-shadow: var(--shadow); margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
-.prep-ring { position: relative; width: 100px; height: 100px; flex: 0 0 auto; }
+/* Carte préparation (héros) : anneau + sparkline aire, puis 3 mini-stats */
+.prep-card { background: var(--card); border-radius: 24px; padding: 22px 20px 18px;
+  box-shadow: var(--shadow-card); margin-bottom: 18px; }
+.prep-top { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+.prep-ring { position: relative; width: 118px; height: 118px; flex: 0 0 auto; }
 .prep-ring .ring { width: 100%; height: 100%; }
-.prep-ring-c { position: absolute; inset: 0; display: grid; place-items: center;
-  font-family: var(--font-serif); font-size: 19px; font-weight: 500; }
-.prep-meta { flex: 1; min-width: 0; }
-.prep-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-.prep-stats { display: flex; gap: 14px; }
-.prep-stats b { display: block; font-family: var(--font-serif); font-size: 18px; font-weight: 500; }
-.prep-stats span { font-size: 10.5px; color: var(--muted); }
-.spark-mini { width: 72px; height: 40px; flex: 0 0 auto; }
+.prep-ring-c { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+.prep-ring-c span { display: block; font-family: var(--font-serif); font-size: 27px; font-weight: 500; line-height: 1; }
+.prep-ring-c small { display: block; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+.prep-graph { flex: 1; min-width: 0; }
+.prep-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.spark-mini { width: 100%; height: 54px; display: block; }
 .spark-mini .area { fill: var(--pill-red); stroke: none; }
 .spark-mini .line { fill: none; stroke: var(--red); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 .spark-mini circle { fill: var(--red); }
+.prep-graph-meta { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--muted); margin-top: 4px; }
+.prep-delta { display: inline-flex; align-items: center; gap: 3px; font-weight: 700; }
+.prep-delta.up { color: var(--red); }
+.prep-delta.down { color: var(--muted); }
+.prep-delta .tri { width: 8px; height: 8px; flex: 0 0 auto; }
+.recap-val .tri { width: .5em; height: .5em; vertical-align: baseline; }
+.prep-tiles { display: flex; gap: 8px; }
+.prep-tile { flex: 1; background: var(--bg); border-radius: 14px; padding: 11px 6px; text-align: center; }
+.prep-tile b { display: block; font-family: var(--font-serif); font-size: 18px; font-weight: 500; }
+.prep-tile small { display: block; font-size: 9.5px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+
+/* Jauges segmentées sur les tuiles Découvrir & suivre */
+.nc-gauge { display: flex; gap: 3px; margin-top: 8px; }
+.nc-gauge span { flex: 1; height: 4px; border-radius: 2px; background: var(--track); }
+.nc-gauge span.on { background: currentColor; }
+.mode-tile small.tile-prog { margin-top: 5px; }
+
+/* Flèches SVG (CTA examen + lignes réviser) */
+.exam-cta-arrow svg { width: 18px; height: 18px; }
+.mode-row .chev svg { width: 16px; height: 16px; display: block; }
 
 /* Traduction optionnelle des questions */
 .qtr-btn { display: inline-block; background: none; border: none; color: var(--red); font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 2px 0 6px; }
@@ -519,7 +539,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .legal-link { text-align: left; background: var(--card); border-radius: 12px; padding: 12px 14px; font-family: inherit; font-size: 14px; color: var(--red); font-weight: 600; cursor: pointer; box-shadow: var(--shadow-sm); }
 /* Freemium : bannière accueil, verrou révision, écran premium */
 .premium-banner { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; cursor: pointer;
-  background: var(--card); border: 1.5px solid var(--gold); border-radius: 16px; padding: 12px 15px; margin-bottom: 16px; box-shadow: var(--shadow-sm); font-family: inherit; }
+  background: var(--pill-gold); border: none; border-radius: 16px; padding: 13px 15px; margin-bottom: 16px; box-shadow: var(--shadow-row); font-family: inherit; }
 .pb-ico { flex: 0 0 auto; display: grid; place-items: center; color: var(--gold); }
 .pb-ico svg { width: 20px; height: 20px; }
 .pb-txt { flex: 1; display: flex; flex-direction: column; }
