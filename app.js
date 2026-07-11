@@ -888,7 +888,7 @@
     $("studyChip").textContent = trScope(cur.ref.scope) + " · " + trTheme(cur.ref.theme);
     $("studyCount").textContent = (study.i + 1) + "/" + study.items.length;
     $("studyQuestion").textContent = cur.ref.q;
-    renderStudyQTrans(cur.ref.q);
+    renderStudyQTrans(cur);
     wireTts($("studyTtsBtn"), () => speechText(cur.ref.q, cur.options));
     $("studyProgressFill").style.width = ((study.i + 1) / study.items.length) * 100 + "%";
 
@@ -2158,18 +2158,28 @@
     txt.innerHTML = `<p>${tr.q || ""}</p>${opts}`;
     btn.onclick = () => { txt.hidden = !txt.hidden; };
   }
-  function renderQTrans(frQ) {
+  /* Réordonne les propositions traduites pour suivre l'ordre AFFICHÉ (mélangé)
+     des boutons de réponse : on apparie chaque proposition française affichée à
+     sa position d'origine. Sinon la traduction ne correspond pas aux réponses. */
+  function trInDisplayOrder(tr, displayOpts, origOpts) {
+    if (!tr || !tr.options || !tr.options.length || !displayOpts || !origOpts) return tr;
+    const opts = displayOpts.map((s) => { const i = origOpts.indexOf(s); return (i >= 0 && tr.options[i] != null) ? tr.options[i] : ""; });
+    return { q: tr.q, options: opts };
+  }
+  function renderQTrans(item) {
     const btn = $("qtrBtn"), txt = $("qtrText");
     if (!btn || !txt) return;
     // Jamais de traduction dans la vraie simulation d'examen.
     if (quiz && quiz.mode === "exam") { btn.hidden = true; txt.hidden = true; return; }
-    fillQtr(btn, txt, state.lang !== "fr" ? qTrans(frQ) : null);
+    const tr = state.lang !== "fr" ? qTrans(item.ref.q) : null;
+    fillQtr(btn, txt, trInDisplayOrder(tr, item.options, item.ref.options));
   }
   /* Traduction de la question en RÉVISION (écran study). */
-  function renderStudyQTrans(frQ) {
+  function renderStudyQTrans(item) {
     const btn = $("studyQtrBtn"), txt = $("studyQtrText");
     if (!btn || !txt) return;
-    fillQtr(btn, txt, state.lang !== "fr" ? qTrans(frQ) : null);
+    const tr = state.lang !== "fr" ? qTrans(item.ref.q) : null;
+    fillQtr(btn, txt, trInDisplayOrder(tr, item.options, item.ref.options));
   }
 
   function renderQuestion() {
@@ -2179,7 +2189,7 @@
     $("quizCount").textContent = (quiz.i + 1) + "/" + quiz.items.length;
     $("quizProgressFill").style.width = ((quiz.i) / quiz.items.length) * 100 + "%";
     $("questionText").textContent = cur.ref.q;
-    renderQTrans(cur.ref.q);
+    renderQTrans(cur);
     wireTts($("ttsBtn"), () => speechText(cur.ref.q, cur.options));
     $("explainBox").hidden = true;
     $("btnNext").hidden = true;
