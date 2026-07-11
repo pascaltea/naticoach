@@ -766,6 +766,7 @@
     $("studyChip").textContent = trScope(cur.ref.scope) + " · " + trTheme(cur.ref.theme);
     $("studyCount").textContent = (study.i + 1) + "/" + study.items.length;
     $("studyQuestion").textContent = cur.ref.q;
+    renderStudyQTrans(cur.ref.q);
     $("studyProgressFill").style.width = ((study.i + 1) / study.items.length) * 100 + "%";
 
     const revealed = !study.interactive || answered;
@@ -799,7 +800,7 @@
         head.className = "explain-head savais-head";
       }
       const exp = (cur.ref.explanation && cur.ref.explanation.trim())
-        ? cur.ref.explanation
+        ? trExplain(cur.ref.q, cur.ref.explanation)
         : t("study.correctAnswer", "Réponse correcte : ") + cur.options[cur.answer];
       $("studyExplainText").textContent = exp;
       const ik = cur.ref.illustration;
@@ -1988,17 +1989,34 @@
   function clearExamTimer() { if (examTimerId) { clearInterval(examTimerId); examTimerId = null; } $("examTimer").hidden = true; $("examTimer").classList.remove("warn"); }
 
   /* Affiche (si disponible) un bouton « Voir la traduction » sous la question française. */
-  function renderQTrans(frQ) {
-    const btn = $("qtrBtn"), txt = $("qtrText");
-    if (!btn || !txt) return;
-    const tr = state.lang !== "fr" ? qTrans(frQ) : null;
+  /* Explication de révision traduite (repli FR). Ne concerne pas l'examen. */
+  function trExplain(frQ, frE) {
+    if (state.lang === "fr") return frE;
+    const d = (typeof window.EXPLANATIONS_TR !== "undefined") && window.EXPLANATIONS_TR[state.lang];
+    return (d && d[frQ]) || frE;
+  }
+  /* Remplit un bouton « Voir la traduction » + son contenu (question + options). */
+  function fillQtr(btn, txt, tr) {
     txt.hidden = true; txt.innerHTML = "";
     if (!tr) { btn.hidden = true; return; }
     btn.hidden = false;
-    btn.textContent = "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M3 12h18'/><path d='M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z'/></svg> " + t("qtr.show", "Voir la traduction");
+    btn.innerHTML = "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M3 12h18'/><path d='M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z'/></svg> " + t("qtr.show", "Voir la traduction");
     const opts = (tr.options && tr.options.length) ? `<ul>${tr.options.map((o) => `<li>${o}</li>`).join("")}</ul>` : "";
     txt.innerHTML = `<p>${tr.q || ""}</p>${opts}`;
     btn.onclick = () => { txt.hidden = !txt.hidden; };
+  }
+  function renderQTrans(frQ) {
+    const btn = $("qtrBtn"), txt = $("qtrText");
+    if (!btn || !txt) return;
+    // Jamais de traduction dans la vraie simulation d'examen.
+    if (quiz && quiz.mode === "exam") { btn.hidden = true; txt.hidden = true; return; }
+    fillQtr(btn, txt, state.lang !== "fr" ? qTrans(frQ) : null);
+  }
+  /* Traduction de la question en RÉVISION (écran study). */
+  function renderStudyQTrans(frQ) {
+    const btn = $("studyQtrBtn"), txt = $("studyQtrText");
+    if (!btn || !txt) return;
+    fillQtr(btn, txt, state.lang !== "fr" ? qTrans(frQ) : null);
   }
 
   function renderQuestion() {
@@ -2047,7 +2065,7 @@
       head.textContent = correct ? t("quiz.correct", "Bonne réponse") : t("study.remember", "À retenir");
       head.className = "explain-head " + (correct ? "ok" : "bad");
       const exp = (cur.ref.explanation && cur.ref.explanation.trim())
-        ? cur.ref.explanation
+        ? trExplain(cur.ref.q, cur.ref.explanation)
         : t("study.correctAnswer", "Réponse correcte : ") + cur.options[cur.answer];
       $("explainText").textContent = exp;
       const ik = cur.ref.illustration;

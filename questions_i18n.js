@@ -19,4 +19,8 @@ window.QUESTION_TR = {
   fr: {},
   en: {},
   pt: {},
+  es: {},
+  it: {},
+  de: {},
+  sq: {},
 };
