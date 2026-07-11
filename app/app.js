@@ -221,6 +221,10 @@
     else if (amount && DONATE.amounts[amount]) url = DONATE.amounts[amount];
     else url = DONATE.card || DONATE.twint;
     if (!url) { toast("", t("support.todo", "Lien de don à configurer.")); return; }
+    // App native (Android) : ouvrir dans le navigateur système (hors app) — don réel,
+    // ne débloque rien, conforme à la politique Google Play. Web : nouvel onglet.
+    const B = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser;
+    if (PLATFORM !== "web" && B) { B.open({ url: url }); return; }
     window.open(url, "_blank", "noopener");
   }
 

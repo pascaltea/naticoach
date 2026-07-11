@@ -94,11 +94,11 @@ Dans Android Studio :
 4. Sur **Play Console** : crée l'app, remplis la fiche (description, captures, icône), la
    **politique de confidentialité** (§5), le questionnaire *Data safety*, la classification de
    contenu → **test interne** d'abord, puis production.
-5. **Dons Android** : ⚠️ point de vigilance — Google Play impose en principe **Play Billing**
-   pour les achats numériques « in-app ». Un lien **Stripe externe** (comme dans l'app web)
-   peut être refusé selon la nature. À trancher avant soumission : soit Play Billing (via
-   RevenueCat aussi), soit retirer le don sur la build Android, soit cadrer en « don caritatif ».
-   Le code utilise déjà Stripe pour non-iOS ; à revoir pour Android store.
+5. **Dons Android** : ✅ tranché — **don Stripe ouvert dans le navigateur système**
+   (plugin `@capacitor/browser`, `donateOpen` dans app.js). Conforme à Google Play car
+   c'est un **don réel qui ne débloque aucune fonctionnalité** (app 100 % gratuite),
+   traité hors de l'app. Garder le vocabulaire « don / soutenir » (jamais « premium » /
+   « débloquer »). Ne PAS passer par Play Billing (réservé au contenu numérique).
 
 ---
 
