@@ -125,7 +125,7 @@
   /* ---------------- i18n (français source, anglais en surcouche) ---------------- */
   // Langues disponibles (fr = source). On n'ajoute une langue que lorsque son
   // interface est traduite dans i18n.js. Noms affichés = noms natifs.
-  const LANGS = ["fr", "en", "pt", "es", "it"];
+  const LANGS = ["fr", "en", "pt", "es", "it", "de"];
   const LANG_NAMES = { fr: "Français", en: "English", pt: "Português", es: "Español", it: "Italiano", de: "Deutsch", sq: "Shqip" };
   const DICT = () => (window.I18N && window.I18N[state.lang]) || {};
   /* t("clé", "repli fr") : renvoie la traduction de la langue courante si la clé existe, sinon le français. */
