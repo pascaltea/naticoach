@@ -28,10 +28,18 @@
   const CANTON_NAME_L = {
     en: { VD: "Vaud", GE: "Geneva", NE: "Neuchâtel", VS: "Valais" },
     pt: { VD: "Vaud", GE: "Genebra", NE: "Neuchâtel", VS: "Valais" },
+    es: { VD: "Vaud", GE: "Ginebra", NE: "Neuchâtel", VS: "Valais" },
+    it: { VD: "Vaud", GE: "Ginevra", NE: "Neuchâtel", VS: "Vallese" },
+    de: { VD: "Waadt", GE: "Genf", NE: "Neuenburg", VS: "Wallis" },
+    sq: { VD: "Vaud", GE: "Gjenevë", NE: "Neuchâtel", VS: "Valais" },
   };
   const CANTON_SCOPE_L = {
     en: { VD: "Canton of Vaud", GE: "Canton of Geneva", NE: "Canton of Neuchâtel", VS: "Canton of Valais" },
     pt: { VD: "Cantão de Vaud", GE: "Cantão de Genebra", NE: "Cantão de Neuchâtel", VS: "Cantão do Valais" },
+    es: { VD: "Cantón de Vaud", GE: "Cantón de Ginebra", NE: "Cantón de Neuchâtel", VS: "Cantón del Valais" },
+    it: { VD: "Cantone di Vaud", GE: "Cantone di Ginevra", NE: "Cantone di Neuchâtel", VS: "Cantone del Vallese" },
+    de: { VD: "Kanton Waadt", GE: "Kanton Genf", NE: "Kanton Neuenburg", VS: "Kanton Wallis" },
+    sq: { VD: "Kantoni i Vaud", GE: "Kantoni i Gjenevës", NE: "Kantoni i Neuchâtel", VS: "Kantoni i Valais" },
   };
   const cnName = (cn) => { cn = cn || cantonOf(); const m = CANTON_NAME_L[state.lang]; return (m && m[cn]) || CANTON_NAME[cn]; };
   const cScope = (cn) => { cn = cn || cantonOf(); const m = CANTON_SCOPE_L[state.lang]; return (m && m[cn]) || CANTON_SCOPE[cn]; };
@@ -47,11 +55,19 @@
   const THEME_L = {
     en: { "Géographie": "Geography", "Histoire": "History", "Politique": "Politics", "Social": "Society" },
     pt: { "Géographie": "Geografia", "Histoire": "História", "Politique": "Política", "Social": "Sociedade" },
+    es: { "Géographie": "Geografía", "Histoire": "Historia", "Politique": "Política", "Social": "Sociedad" },
+    it: { "Géographie": "Geografia", "Histoire": "Storia", "Politique": "Politica", "Social": "Società" },
+    de: { "Géographie": "Geografie", "Histoire": "Geschichte", "Politique": "Politik", "Social": "Gesellschaft" },
+    sq: { "Géographie": "Gjeografi", "Histoire": "Histori", "Politique": "Politikë", "Social": "Shoqëri" },
   };
   const trTheme = (th) => { const m = THEME_L[state.lang]; return (m && m[th]) || th; };
   const SCOPE_L = {
     en: { "Suisse": "Switzerland", "Canton de Vaud": "Canton of Vaud", "Canton de Genève": "Canton of Geneva", "Canton de Neuchâtel": "Canton of Neuchâtel", "Canton du Valais": "Canton of Valais", commune: "Municipality of " },
     pt: { "Suisse": "Suíça", "Canton de Vaud": "Cantão de Vaud", "Canton de Genève": "Cantão de Genebra", "Canton de Neuchâtel": "Cantão de Neuchâtel", "Canton du Valais": "Cantão do Valais", commune: "Município de " },
+    es: { "Suisse": "Suiza", "Canton de Vaud": "Cantón de Vaud", "Canton de Genève": "Cantón de Ginebra", "Canton de Neuchâtel": "Cantón de Neuchâtel", "Canton du Valais": "Cantón del Valais", commune: "Municipio de " },
+    it: { "Suisse": "Svizzera", "Canton de Vaud": "Cantone di Vaud", "Canton de Genève": "Cantone di Ginevra", "Canton de Neuchâtel": "Cantone di Neuchâtel", "Canton du Valais": "Cantone del Vallese", commune: "Comune di " },
+    de: { "Suisse": "Schweiz", "Canton de Vaud": "Kanton Waadt", "Canton de Genève": "Kanton Genf", "Canton de Neuchâtel": "Kanton Neuenburg", "Canton du Valais": "Kanton Wallis", commune: "Gemeinde " },
+    sq: { "Suisse": "Zvicër", "Canton de Vaud": "Kantoni i Vaud", "Canton de Genève": "Kantoni i Gjenevës", "Canton de Neuchâtel": "Kantoni i Neuchâtel", "Canton du Valais": "Kantoni i Valais", commune: "Komuna e " },
   };
   function trScope(s) {
     const m = SCOPE_L[state.lang];
@@ -812,11 +828,19 @@
   const REGION_LONG_L = {
     en: { de: "German-speaking Switzerland", fr: "French-speaking Switzerland", it: "Italian-speaking Switzerland", multi: "Multilingual canton" },
     pt: { de: "Suíça alemã", fr: "Suíça francófona", it: "Suíça italiana", multi: "Cantão multilingue" },
+    es: { de: "Suiza alemana", fr: "Suiza francófona", it: "Suiza italiana", multi: "Cantón plurilingüe" },
+    it: { de: "Svizzera tedesca", fr: "Svizzera francese", it: "Svizzera italiana", multi: "Cantone plurilingue" },
+    de: { de: "Deutschschweiz", fr: "Westschweiz", it: "italienische Schweiz", multi: "Mehrsprachiger Kanton" },
+    sq: { de: "Zvicra gjermanishtfolëse", fr: "Zvicra frëngjishtfolëse", it: "Zvicra italishtfolëse", multi: "Kanton shumëgjuhësh" },
   };
   const regionLong = (r) => { const m = REGION_LONG_L[state.lang]; return (m && m[r]) || REGION_LONG[r]; };
   const REGION_LABEL_L = {
     en: (typeof REGION_LABEL_EN !== "undefined") ? REGION_LABEL_EN : null,
     pt: { de: "Alemão", fr: "Francês", it: "Italiano", multi: "Multilíngue" },
+    es: { de: "Alemán", fr: "Francés", it: "Italiano", multi: "Plurilingüe" },
+    it: { de: "Tedesco", fr: "Francese", it: "Italiano", multi: "Plurilingue" },
+    de: { de: "Deutsch", fr: "Französisch", it: "Italienisch", multi: "Mehrsprachig" },
+    sq: { de: "Gjermanisht", fr: "Frëngjisht", it: "Italisht", multi: "Shumëgjuhësh" },
   };
   const regionLabelMap = () => (REGION_LABEL_L[state.lang]) || (typeof REGION_LABEL !== "undefined" ? REGION_LABEL : {});
 
@@ -951,6 +975,10 @@
     fr: { Suisse: "Suisse", Vaud: "Canton de Vaud", "Genève": "Canton de Genève", Commune: "Ma commune" },
     en: { Suisse: "Switzerland", Vaud: "Canton of Vaud", "Genève": "Canton of Geneva", Commune: "My municipality" },
     pt: { Suisse: "Suíça", Vaud: "Cantão de Vaud", "Genève": "Cantão de Genebra", Commune: "Meu município" },
+    es: { Suisse: "Suiza", Vaud: "Cantón de Vaud", "Genève": "Cantón de Ginebra", Commune: "Mi municipio" },
+    it: { Suisse: "Svizzera", Vaud: "Cantone di Vaud", "Genève": "Cantone di Ginevra", Commune: "Il mio comune" },
+    de: { Suisse: "Schweiz", Vaud: "Kanton Waadt", "Genève": "Kanton Genf", Commune: "Meine Gemeinde" },
+    sq: { Suisse: "Zvicër", Vaud: "Kantoni i Vaud", "Genève": "Kantoni i Gjenevës", Commune: "Komuna ime" },
   };
   const levelLabel = (l) => (LEVEL_L[state.lang] || LEVEL_L.fr)[l] || (LEVEL_L.fr[l] || l);
 
@@ -1146,9 +1174,9 @@
 
   /* ---------------- Carte des districts (Vaud / Valais) ---------------- */
   const VS_REGION = {
-    bas:  { color: "#3E7A4E", label: "Bas-Valais", labelEn: "Lower Valais", labelPt: "Baixo Valais" },
-    cen:  { color: "#C8442E", label: "Valais central", labelEn: "Central Valais", labelPt: "Valais central" },
-    haut: { color: "#5B7DB1", label: "Haut-Valais", labelEn: "Upper Valais", labelPt: "Alto Valais" },
+    bas:  { color: "#3E7A4E", label: "Bas-Valais", labelEn: "Lower Valais", labelPt: "Baixo Valais", labelEs: "Bajo Valais", labelIt: "Basso Vallese", labelDe: "Unterwallis", labelSq: "Valais i poshtëm" },
+    cen:  { color: "#C8442E", label: "Valais central", labelEn: "Central Valais", labelPt: "Valais central", labelEs: "Valais central", labelIt: "Vallese centrale", labelDe: "Mittelwallis", labelSq: "Valais qendror" },
+    haut: { color: "#5B7DB1", label: "Haut-Valais", labelEn: "Upper Valais", labelPt: "Alto Valais", labelEs: "Alto Valais", labelIt: "Alto Vallese", labelDe: "Oberwallis", labelSq: "Valais i sipërm" },
   };
   const regionLabel = (k) => pf(VS_REGION[k], "label");
   function districtMap() { return (typeof DISTRICTS_MAPS !== "undefined") ? DISTRICTS_MAPS[cantonOf()] : null; }
