@@ -37,7 +37,7 @@
   const cScope = (cn) => { cn = cn || cantonOf(); const m = CANTON_SCOPE_L[state.lang]; return (m && m[cn]) || CANTON_SCOPE[cn]; };
   const fmt = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => (o[k] != null ? o[k] : ""));
   /* Accès à un champ traduit suffixé par langue : pf(obj,"title") → obj.titlePt / obj.titleEn / obj.title. */
-  const LSUF = { en: "En", pt: "Pt" };
+  const LSUF = { en: "En", pt: "Pt", es: "Es", it: "It", de: "De", sq: "Sq" };
   function pf(obj, base) {
     if (!obj) return "";
     const suf = LSUF[state.lang];
@@ -123,7 +123,10 @@
   }
 
   /* ---------------- i18n (français source, anglais en surcouche) ---------------- */
-  const LANGS = ["fr", "en", "pt"];   // langues disponibles (fr = source)
+  // Langues disponibles (fr = source). On n'ajoute une langue que lorsque son
+  // interface est traduite dans i18n.js. Noms affichés = noms natifs.
+  const LANGS = ["fr", "en", "pt", "es"];
+  const LANG_NAMES = { fr: "Français", en: "English", pt: "Português", es: "Español", it: "Italiano", de: "Deutsch", sq: "Shqip" };
   const DICT = () => (window.I18N && window.I18N[state.lang]) || {};
   /* t("clé", "repli fr") : renvoie la traduction de la langue courante si la clé existe, sinon le français. */
   function t(key, fr) {
@@ -178,8 +181,7 @@
       el.setAttribute("placeholder", (tr && d[k] != null) ? d[k] : _frSnap[k]);
     });
     document.documentElement.lang = state.lang;
-    document.querySelectorAll(".lang-btn").forEach((b) =>
-      b.classList.toggle("on", b.dataset.lang === state.lang));
+    document.querySelectorAll(".lang-select").forEach((s) => { s.value = state.lang; });
   }
   function setLang(lang) {
     if (LANGS.indexOf(lang) < 0) return;
@@ -2177,8 +2179,11 @@
     window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
   }
 
-  document.querySelectorAll(".lang-btn").forEach((b) =>
-    b.addEventListener("click", () => setLang(b.dataset.lang)));
+  document.querySelectorAll(".lang-select").forEach((sel) => {
+    sel.innerHTML = LANGS.map((l) => `<option value="${l}">${LANG_NAMES[l]}</option>`).join("");
+    sel.value = state.lang;
+    sel.addEventListener("change", () => setLang(sel.value));
+  });
 
   /* ---------------- Démarrage ---------------- */
   applyStaticI18n();
