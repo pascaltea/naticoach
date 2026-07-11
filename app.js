@@ -1665,8 +1665,7 @@
        </div>
        <div class="sup-amts">${amt("5")}${amt("10")}${amt("20")}${amt("x")}</div>
        <div class="sup-cta-wrap">
-         <button class="btn btn-primary big" id="btnDonTwint">${t("support.twint", "Faire un don avec TWINT")}</button>
-         <button class="btn btn-outline" id="btnDonCard">${t("support.card", "Payer par carte")}</button>
+         <button class="btn btn-primary big" id="btnDon">${t("support.give", "Faire un don")}</button>
          <p class="pr-note">${t("support.note", "Le don est libre et ne débloque rien — tout est déjà gratuit.")}</p>
        </div>`;
     $("supportBody").querySelectorAll(".sup-amt").forEach((b) => b.addEventListener("click", () => {
@@ -1674,8 +1673,7 @@
       $("supportBody").querySelectorAll(".sup-amt").forEach((x) => x.classList.toggle("on", x === b));
     }));
     const at = () => (supportAmount === "x" ? null : supportAmount);
-    $("btnDonTwint").addEventListener("click", () => donateOpen("twint", at()));
-    $("btnDonCard").addEventListener("click", () => donateOpen("card", at()));
+    $("btnDon").addEventListener("click", () => donateOpen("card", at()));
     showScreen("screen-support");
   }
   /* Petite relance de don (placée aux bons moments : réussite, bon score). */
@@ -1702,8 +1700,7 @@
        </div>
        <div class="sup-amts">${amt("5")}${amt("10")}${amt("20")}${amt("x")}</div>
        <div class="sup-cta-wrap">
-         <button class="btn btn-primary big" id="donSheetTwint">${t("support.twint", "Faire un don avec TWINT")}</button>
-         <button class="btn btn-outline" id="donSheetCard">${t("support.card", "Payer par carte")}</button>
+         <button class="btn btn-primary big" id="donSheetDon">${t("support.give", "Faire un don")}</button>
          <button class="btn btn-ghost" id="donSheetLater">${t("don.later", "Plus tard")}</button>
          <button class="don-off" id="donSheetOff">${t("don.never", "Ne plus proposer")}</button>
        </div>`;
@@ -1712,8 +1709,7 @@
       box.querySelectorAll(".sup-amt").forEach((x) => x.classList.toggle("on", x === b));
     }));
     const at = () => (supportAmount === "x" ? null : supportAmount);
-    $("donSheetTwint").addEventListener("click", () => donateOpen("twint", at()));
-    $("donSheetCard").addEventListener("click", () => donateOpen("card", at()));
+    $("donSheetDon").addEventListener("click", () => donateOpen("card", at()));
     $("donSheetLater").addEventListener("click", closeDonSheet);
     $("donSheetOff").addEventListener("click", () => { state.donPromptOff = true; save(); closeDonSheet(); });
     const sheet = $("donSheet");
