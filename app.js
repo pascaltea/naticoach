@@ -96,6 +96,7 @@
     canton: null,   // "VD" | "GE"
     commune: null,  // (Vaud uniquement)
     mistakes: [],   // [{q, options, answer, theme, scope}]
+    srs: {},        // répétition espacée : { qFr: {q,options,answer,theme,scope,box,due} }
     stats: {},      // { "Niveau|Thème": {a, c} }
     badges: {},     // { badgeId: true }
     seenCantons: [], // codes de cantons ouverts dans « Explorer »
@@ -127,6 +128,7 @@
   // Mémoire de défilement par écran : le retour restaure la position quittée.
   const scrollMem = {};
   function showScreen(id, restore) {
+    stopTts();
     const cur = document.querySelector(".screen.active");
     if (cur) scrollMem[cur.id] = window.scrollY || window.pageYOffset || 0;
     document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
@@ -136,6 +138,40 @@
   function setRing(el, pct) {
     el.style.strokeDasharray = RING_LEN;
     el.style.strokeDashoffset = RING_LEN * (1 - Math.max(0, Math.min(100, pct)) / 100);
+  }
+
+  /* ---------------- Lecture audio (synthèse vocale française) ----------------
+     Lit la question (et ses propositions) en français : aide la compréhension
+     orale pour qui révise dans sa langue mais passera l'examen en français. */
+  const TTS_OK = (typeof window !== "undefined") && ("speechSynthesis" in window) && (typeof SpeechSynthesisUtterance !== "undefined");
+  const SPK_ICON = "<svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M11 5L6 9H3v6h3l5 4z'/><path d='M15.5 8.5a5 5 0 0 1 0 7'/><path d='M18.5 5.5a9 9 0 0 1 0 13'/></svg>";
+  function stopTts() { if (TTS_OK) { try { window.speechSynthesis.cancel(); } catch (e) {} } }
+  function speakFr(text) {
+    if (!TTS_OK || !text) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(String(text));
+      u.lang = "fr-FR"; u.rate = 0.95; u.pitch = 1;
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  /* Texte lu : question + propositions, toujours en français (conditions d'examen). */
+  function speechText(frQ, options) {
+    let s = frQ || "";
+    if (options && options.length) s += ". " + options.join(". ");
+    return s;
+  }
+  /* Branche un bouton « Écouter en français ». getText() renvoie le texte à lire. */
+  function wireTts(btn, getText) {
+    if (!btn) return;
+    if (!TTS_OK) { btn.hidden = true; return; }
+    btn.hidden = false;
+    const label = state.lang === "fr" ? "Écouter" : t("tts.listen", "Écouter en français");
+    btn.innerHTML = SPK_ICON + " " + label;
+    btn.onclick = () => {
+      if (window.speechSynthesis.speaking) { stopTts(); return; }
+      speakFr(getText());
+    };
   }
 
   /* ---------------- i18n (français source, anglais en surcouche) ---------------- */
@@ -315,6 +351,7 @@
     } else if (!state.mistakes.some((m) => m.q === ref.q)) {
       state.mistakes.push({ q: ref.q, options: ref.options, answer: ref.answer, theme: ref.theme, scope: ref.scope });
     }
+    srsUpdate(ref, correct);
     save();
   }
 
@@ -322,6 +359,50 @@
   function buildQuestion(q) {
     const order = shuffle(q.options.map((_, i) => i));
     return { ref: q, options: order.map((i) => q.options[i]), answer: order.indexOf(q.answer) };
+  }
+
+  /* ---------------- Répétition espacée (système Leitner) ----------------
+     Chaque question répondue est planifiée dans une « boîte » (1→5). Bonne
+     réponse : la boîte monte et l'échéance s'éloigne ; erreur : retour boîte 1.
+     « À réviser aujourd'hui » = questions dont l'échéance est atteinte. */
+  const SRS_DAYS = { 1: 1, 2: 2, 3: 4, 4: 8, 5: 16 };
+  function addDaysISO(iso, n) { const d = new Date(iso + "T00:00:00"); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+  function srsUpdate(ref, correct) {
+    if (!ref || !ref.q || !ref.options) return;
+    if (!state.srs) state.srs = {};
+    const prev = state.srs[ref.q];
+    let box = prev ? prev.box : 1;
+    box = correct ? Math.min(5, box + 1) : 1;
+    state.srs[ref.q] = { q: ref.q, options: ref.options, answer: ref.answer, theme: ref.theme, scope: ref.scope, box: box, due: addDaysISO(todayISO(), SRS_DAYS[box]) };
+  }
+  function srsDueList() {
+    if (!state.srs) return [];
+    const today = todayISO();
+    return Object.keys(state.srs).map((k) => state.srs[k]).filter((e) => e && e.due <= today);
+  }
+
+  /* ---------------- Estimation « prêt·e pour l'examen » ----------------
+     Combine la moyenne des sessions récentes (60 %) et le thème le plus faible
+     (40 %, goulet d'étranglement), tempérée tant qu'il y a peu de sessions. */
+  function computeReadiness() {
+    const recent = state.history.slice(-5);
+    if (!recent.length) return 0;
+    const avg = recent.reduce((s, h) => s + h.pct, 0) / recent.length;
+    const themePcts = THEMES.map((th) => {
+      let a = 0, c = 0;
+      Object.keys(state.stats).forEach((k) => { if (k.split("|")[1] === th) { a += state.stats[k].a; c += state.stats[k].c; } });
+      return a ? (c / a * 100) : null;
+    }).filter((v) => v !== null);
+    let r = themePcts.length ? (avg * 0.6 + Math.min.apply(null, themePcts) * 0.4) : avg;
+    if (state.sessions < 3) r = r * (0.6 + 0.15 * state.sessions); // 1 session → ×0,75 · 2 → ×0,90
+    return Math.max(0, Math.min(100, Math.round(r)));
+  }
+  /* Libellé + couleur selon le niveau de préparation (seuil examen 70 %). */
+  function readinessBand(r) {
+    if (r >= 85) return { key: "ready.s4", fr: "Prêt·e pour l'examen", color: "var(--ok)" };
+    if (r >= 70) return { key: "ready.s3", fr: "Presque prêt·e", color: "var(--ok)" };
+    if (r >= 50) return { key: "ready.s2", fr: "En bonne voie", color: "#C08A2E" };
+    return { key: "ready.s1", fr: "Encore à travailler", color: "var(--red)" };
   }
 
   /* ---------------- Decks (depuis VD_DATA) ---------------- */
@@ -537,8 +618,8 @@
       ? t("home.footerGE", "Questions d'entraînement · Suisse & Canton de Genève · hors-ligne")
       : t("home.footerVD", "Questions d'entraînement · Canton de Vaud · hors-ligne");
 
-    const recent = state.history.slice(-5);
-    const readiness = recent.length ? Math.round(recent.reduce((s, h) => s + h.pct, 0) / recent.length) : 0;
+    const readiness = computeReadiness();
+    const band = readinessBand(readiness);
     $("readinessPct").textContent = readiness + "%";
     $("statBest").textContent = state.best + "%";
     $("statSessions").textContent = state.sessions;
@@ -546,7 +627,25 @@
     $("statsTileSub").textContent = readiness > 0
       ? fmt(t("home.statsGlobal", "{n}% global · par thème"), { n: readiness })
       : t("home.statsSub", "par thème");
-    setTimeout(() => setRing($("readinessRing"), readiness), 60);
+    const psEl = $("prepStatus");
+    if (psEl) {
+      if (state.history.length) {
+        psEl.textContent = state.lang === "fr" ? band.fr : t(band.key, band.fr);
+        psEl.style.color = band.color;
+        psEl.hidden = false;
+      } else { psEl.hidden = true; }
+    }
+    setTimeout(() => { setRing($("readinessRing"), readiness); const rr = $("readinessRing"); if (rr) rr.style.stroke = band.color; }, 60);
+
+    // Répétition espacée : questions dont l'échéance est atteinte aujourd'hui.
+    const dueN = srsDueList().length;
+    const sb = $("btnSrs");
+    if (sb) {
+      sb.hidden = dueN === 0;
+      $("srsCount").textContent = dueN;
+      const sbg = $("srsBadge"); if (sbg) sbg.textContent = dueN;
+      $("srsLabel").textContent = t("srs.sub", "carte(s) pour aujourd'hui");
+    }
 
     const mc = state.mistakes.length;
     $("btnMistakes").hidden = mc === 0;
@@ -698,6 +797,7 @@
     const cur = study.items[study.i];
     $("studyChip").textContent = trScope(cur.scope) + " · " + trTheme(cur.theme);
     $("studyCount").textContent = (study.i + 1) + "/" + study.items.length;
+    wireTts($("studyTtsBtn"), () => cur.type === "mcq" ? speechText(cur.q, cur.options) : (cur.q || ""));
     $("studyProgressFill").style.width = ((study.i + 1) / study.items.length) * 100 + "%";
     $("studyIllus").innerHTML = "";
     const box = $("studyOptions"); box.innerHTML = "";
@@ -767,6 +867,7 @@
     $("studyCount").textContent = (study.i + 1) + "/" + study.items.length;
     $("studyQuestion").textContent = cur.ref.q;
     renderStudyQTrans(cur.ref.q);
+    wireTts($("studyTtsBtn"), () => speechText(cur.ref.q, cur.options));
     $("studyProgressFill").style.width = ((study.i + 1) / study.items.length) * 100 + "%";
 
     const revealed = !study.interactive || answered;
@@ -1062,7 +1163,7 @@
     if (hc) hc.addEventListener("click", () => startThemeReview(hc.dataset.theme));
     $("btnResetStats").addEventListener("click", () => {
       if (confirm(t("stats.resetConfirm", "Réinitialiser toutes tes statistiques et ta liste d'erreurs ?"))) {
-        state.stats = {}; state.mistakes = []; save(); openStats();
+        state.stats = {}; state.mistakes = []; state.srs = {}; save(); openStats();
       }
     });
     showScreen("screen-stats");
@@ -1944,6 +2045,17 @@
     showScreen("screen-quiz"); renderQuestion();
   }
 
+  /* Session de répétition espacée : les questions dues aujourd'hui (max 20),
+     correction immédiate ; répondre les replanifie automatiquement. */
+  function startSrs() {
+    const due = srsDueList();
+    if (!due.length) return;
+    const items = shuffle(due.slice()).slice(0, 20).map((m) =>
+      buildQuestion(enrich({ q: m.q, options: m.options, answer: m.answer, theme: m.theme }, m.scope)));
+    quiz = { mode: "practice", items: items, i: 0, correct: 0, answered: false, isSrs: true };
+    showScreen("screen-quiz"); renderQuestion();
+  }
+
   function startExam() {
     if (!isPremium()) { startTrialExam(); return; }   // gratuit → examen d'essai
     const cfg = EXAM_CFG[cantonOf()];
@@ -2027,6 +2139,7 @@
     $("quizProgressFill").style.width = ((quiz.i) / quiz.items.length) * 100 + "%";
     $("questionText").textContent = cur.ref.q;
     renderQTrans(cur.ref.q);
+    wireTts($("ttsBtn"), () => speechText(cur.ref.q, cur.options));
     $("explainBox").hidden = true;
     $("btnNext").hidden = true;
     const box = $("optionsList"); box.innerHTML = "";
@@ -2395,6 +2508,7 @@
   $("btnQuitCgu").addEventListener("click", () => showScreen("screen-about", true));
   $("btnQuitPrivacy").addEventListener("click", () => showScreen("screen-about", true));
   $("btnMistakes").addEventListener("click", startMistakes);
+  { const _sb = $("btnSrs"); if (_sb) _sb.addEventListener("click", () => frenchNotice(startSrs)); }
   $("btnStats").addEventListener("click", openStats);
   $("btnQuitStats").addEventListener("click", () => showScreen("screen-home", true));
   $("btnBadges").addEventListener("click", openBadges);

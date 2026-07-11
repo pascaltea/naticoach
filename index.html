@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=101" />
+  <link rel="stylesheet" href="styles.css?v=102" />
 </head>
 <body>
   <div id="app">
@@ -112,6 +112,7 @@
             <div class="prep-graph-meta"><span id="sparkSessions">0 sessions</span><span class="prep-delta" id="sparkDelta"></span></div>
           </div>
         </div>
+        <div class="prep-status" id="prepStatus" hidden></div>
         <div class="prep-tiles">
           <div class="prep-tile"><b id="statBest">0%</b><small data-i18n="exam.best">meilleur</small></div>
           <div class="prep-tile"><b id="statSessions">0</b><small data-i18n="exam.sessions">sessions</small></div>
@@ -139,6 +140,11 @@
           <button class="mode-row" id="btnStudy">
             <span class="mode-ico mi-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6C10 4.6 7.6 4 5 4v13c2.6 0 5 .6 7 2 2-1.4 4.4-2 7-2V4c-2.6 0-5 .6-7 2z"/><path d="M12 6v13"/></svg></span>
             <span class="mode-row-txt"><b data-i18n="home.study">Réviser les réponses</b><small data-i18n="home.studySub">découverte ou quiz</small></span>
+            <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+          </button>
+          <button class="mode-row" id="btnSrs" hidden>
+            <span class="mode-ico mi-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg><span class="ico-badge" id="srsBadge">0</span></span>
+            <span class="mode-row-txt"><b data-i18n="srs.title">À réviser aujourd'hui</b><small class="hot"><span id="srsCount">0</span> <span id="srsLabel">carte(s) pour aujourd'hui</span></small></span>
             <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
           </button>
           <button class="mode-row" id="btnMistakes" hidden>
@@ -200,6 +206,7 @@
       <div class="quiz-body">
         <span class="chip" id="studyChip"></span>
         <h2 class="question" id="studyQuestion"></h2>
+        <button class="qtr-btn tts-btn" id="studyTtsBtn" hidden></button>
         <button class="qtr-btn" id="studyQtrBtn" hidden></button>
         <div class="qtr-text" id="studyQtrText" hidden></div>
         <div class="options" id="studyOptions"></div>
@@ -236,6 +243,7 @@
       <div class="quiz-body">
         <span class="chip" id="quizCat"></span>
         <h2 class="question" id="questionText"></h2>
+        <button class="qtr-btn tts-btn" id="ttsBtn" hidden></button>
         <button class="qtr-btn" id="qtrBtn" hidden></button>
         <div class="qtr-text" id="qtrText" hidden></div>
         <div class="options" id="optionsList"></div>
@@ -552,8 +560,8 @@
   <script src="ge_official.js"></script>
   <script src="ne_official.js?v=56"></script>
   <script src="vs_official.js?v=56"></script>
-  <script src="i18n.js?v=100"></script>
+  <script src="i18n.js?v=101"></script>
   <script src="questions_i18n.js?v=121"></script>
-  <script src="app.js?v=107"></script>
+  <script src="app.js?v=108"></script>
 </body>
 </html>

@@ -516,6 +516,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 .prep-delta.down { color: var(--muted); }
 .prep-delta .tri { width: 8px; height: 8px; flex: 0 0 auto; }
 .recap-val .tri { width: .5em; height: .5em; vertical-align: baseline; }
+.prep-status { text-align: center; font-size: 12px; font-weight: 700; letter-spacing: .3px; margin: 2px 0 14px; }
 .prep-tiles { display: flex; gap: 8px; }
 .prep-tile { flex: 1; background: var(--bg); border-radius: 14px; padding: 11px 6px; text-align: center; }
 .prep-tile b { display: block; font-family: var(--font-serif); font-size: 18px; font-weight: 500; }
@@ -533,6 +534,8 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
 
 /* Traduction optionnelle des questions */
 .qtr-btn { display: inline-block; background: none; border: none; color: var(--red); font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 2px 0 6px; }
+.tts-btn { color: var(--ink-soft); margin-right: 16px; }
+.tts-btn .ic { color: var(--red); margin-right: 3px; }
 .qtr-text { background: var(--bg); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
 .qtr-text p { margin: 0; }
 .qtr-text ul { list-style: none; margin: 6px 0 0; padding: 0; }
