@@ -224,6 +224,42 @@
     window.open(url, "_blank", "noopener");
   }
 
+  /* ---------------- Don multi-plateforme ----------------
+     Web + Android : liens Stripe (donateOpen). iOS : App Store impose l'achat
+     intégré → « pourboires » via IAP consommables (RevenueCat). Capacitor injecte
+     window.Capacitor dans l'app native ; sur le web, PLATFORM = "web". */
+  const PLATFORM = (window.Capacitor && typeof window.Capacitor.getPlatform === "function")
+    ? window.Capacitor.getPlatform() : "web";   // "ios" | "android" | "web"
+  const IS_IOS = PLATFORM === "ios";
+  /* Palier CHF → identifiant du produit IAP consommable (à créer dans App Store
+     Connect ET RevenueCat). Voir IAP-SETUP.md. Pas de montant libre en IAP. */
+  const IAP_TIPS = { "5": "support_5", "10": "support_10", "20": "support_20" };
+
+  /* Point d'entrée unique du don : route selon la plateforme. */
+  function startDonation(amount) {
+    if (IS_IOS) { iosTip(amount); return; }
+    donateOpen("card", amount);           // Android + Web → Stripe
+  }
+  /* Pourboire iOS via IAP (RevenueCat). Sans le plugin (ex. build web), on
+     dégrade proprement. Le SDK est configuré au démarrage natif (cf. IAP-SETUP.md). */
+  function iosTip(amount) {
+    const productId = IAP_TIPS[amount] || IAP_TIPS["10"];  // défaut 10 si « Autre »
+    const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
+    if (!P) { toast("", t("don.iosSoon", "Le soutien intégré arrive bientôt sur iOS.")); return; }
+    // ► POINT D'INTÉGRATION RevenueCat (à finaliser lors du build iOS) :
+    //   const { storeProduct } = await P.getProducts({ productIdentifiers: [productId] });
+    //   await P.purchaseStoreProduct({ product: storeProduct[0] });
+    Promise.resolve()
+      .then(() => P.getProducts({ productIdentifiers: [productId] }))
+      .then((r) => P.purchaseStoreProduct({ product: (r.products || r.storeProduct || [])[0] }))
+      .then(() => {
+        toast("<img src='logo-edelweiss-red.svg' width='18' height='18' alt=''>", t("don.thanks", "Merci pour ton soutien !"));
+        if (state) { state.donated = true; save(); }
+        closeDonSheet();
+      })
+      .catch(() => { /* achat annulé ou erreur : rien */ });
+  }
+
   /* Avertit (dans la langue de l'interface) que les questions restent en français, puis exécute proceed. */
   let _noticeCb = null;
   function frenchNotice(proceed) {
@@ -1667,17 +1703,18 @@
          <h3>${t("support.title", "Soutenir NatiCoach")}</h3>
          <p>${t("support.sub", "NatiCoach est <b>100 % gratuit</b>, sans publicité. Si l'app t'aide, un <b>don libre</b> soutient son développement et les mises à jour. Merci&nbsp;!")}</p>
        </div>
-       <div class="sup-amts">${amt("5")}${amt("10")}${amt("20")}${amt("x")}</div>
+       <div class="sup-amts">${amt("5")}${amt("10")}${amt("20")}${IS_IOS ? "" : amt("x")}</div>
        <div class="sup-cta-wrap">
          <button class="btn btn-primary big" id="btnDon">${t("support.give", "Faire un don")}</button>
          <p class="pr-note">${t("support.note", "Le don est libre et ne débloque rien — tout est déjà gratuit.")}</p>
        </div>`;
+    if (IS_IOS && supportAmount === "x") supportAmount = "10";  // pas de montant libre en IAP
     $("supportBody").querySelectorAll(".sup-amt").forEach((b) => b.addEventListener("click", () => {
       supportAmount = b.dataset.amt;
       $("supportBody").querySelectorAll(".sup-amt").forEach((x) => x.classList.toggle("on", x === b));
     }));
     const at = () => (supportAmount === "x" ? null : supportAmount);
-    $("btnDon").addEventListener("click", () => donateOpen("card", at()));
+    $("btnDon").addEventListener("click", () => startDonation(at()));
     showScreen("screen-support");
   }
   /* Petite relance de don (placée aux bons moments : réussite, bon score). */
@@ -1690,6 +1727,7 @@
   let donPromptedThisSession = false;
   /* Vrai seulement si au moins un lien de don est configuré (sinon on reste dormant). */
   function donateConfigured() {
+    if (IS_IOS) return true;   // iOS : pourboires IAP toujours disponibles
     return !!(DONATE.twint || DONATE.card || (DONATE.amounts && Object.keys(DONATE.amounts).some((k) => DONATE.amounts[k])));
   }
   function closeDonSheet() { const s = $("donSheet"); if (s) s.hidden = true; }
@@ -1702,7 +1740,7 @@
          <h3>${t("don.promptTitle", "Bravo pour ta progression !")}</h3>
          <p>${t("don.promptSub", "NatiCoach t'aide dans ta préparation&nbsp;? L'app est <b>100 % gratuite</b>, sans publicité — un <b>petit don libre</b> soutient le projet. Merci&nbsp;!")}</p>
        </div>
-       <div class="sup-amts">${amt("5")}${amt("10")}${amt("20")}${amt("x")}</div>
+       <div class="sup-amts">${amt("5")}${amt("10")}${amt("20")}${IS_IOS ? "" : amt("x")}</div>
        <div class="sup-cta-wrap">
          <button class="btn btn-primary big" id="donSheetDon">${t("support.give", "Faire un don")}</button>
          <button class="btn btn-ghost" id="donSheetLater">${t("don.later", "Plus tard")}</button>
@@ -1712,8 +1750,9 @@
       supportAmount = b.dataset.amt;
       box.querySelectorAll(".sup-amt").forEach((x) => x.classList.toggle("on", x === b));
     }));
+    if (IS_IOS && supportAmount === "x") supportAmount = "10";
     const at = () => (supportAmount === "x" ? null : supportAmount);
-    $("donSheetDon").addEventListener("click", () => donateOpen("card", at()));
+    $("donSheetDon").addEventListener("click", () => startDonation(at()));
     $("donSheetLater").addEventListener("click", closeDonSheet);
     $("donSheetOff").addEventListener("click", () => { state.donPromptOff = true; save(); closeDonSheet(); });
     const sheet = $("donSheet");
