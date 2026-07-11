@@ -1683,13 +1683,32 @@
       `<div class="cs-card src-list">${order.map(srcRow).join("")}</div>` +
       csCard("", t("about.answersH", "Réponses & propositions"), t("about.answers", "Seule la <b>bonne réponse</b> provient du questionnaire de référence. Pour Neuchâtel et le Valais, les <b>fausses propositions</b> des QCM sont générées par l'app pour aider à mémoriser — elles ne proviennent pas de ce questionnaire.")) +
       `<p class="cs-note">${t("about.offline", "NatiCoach fonctionne hors-ligne ; aucune donnée ne quitte ton téléphone.")}</p>` +
+      `<div class="cs-card cs-highlight fb-card">
+         <div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z'/></svg> ${t("fb.cardH", "Ton avis compte")}</div>
+         <p>${t("fb.intro", "Une idée, un souci, une remarque ? Aide-nous à améliorer NatiCoach — ça prend 30 secondes.")}</p>
+         <button class="btn btn-primary" style="margin-top:14px" id="btnFeedback"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'><path d='M4 4h16v12H7l-3 3z'/><path d='M8 9h8'/><path d='M8 12h5'/></svg> ${t("fb.give", "Donne ton avis")}</button>
+       </div>` +
       `<div class="legal-links">
          <button class="legal-link" id="btnCgu">${t("about.cgu", "Conditions générales")} ›</button>
          <button class="legal-link" id="btnPrivacy">${t("about.privacy", "Politique de confidentialité")} ›</button>
        </div>`;
     const bc = $("btnCgu"); if (bc) bc.addEventListener("click", openCgu);
     const bp = $("btnPrivacy"); if (bp) bp.addEventListener("click", openPrivacy);
+    const bf = $("btnFeedback"); if (bf) bf.addEventListener("click", openFeedback);
     showScreen("screen-about");
+  }
+
+  /* ---------------- Retour utilisateur (e-mail pré-rempli, sans traceur) ---------------- */
+  function openFeedback() {
+    const addr = "contact" + "@" + "naticoach.ch"; // assemblé en JS (limite le spam des robots)
+    const subject = t("fb.subject", "Mon avis sur NatiCoach");
+    const body = t("fb.body", "Ce que j'aime :\n\n\nCe qui me bloque :\n\n\nMes idées :\n\n\n")
+      + "\n—\n"
+      + fmt(t("fb.ctx", "Canton : {c} · Langue : {l} · Plateforme : {p}"),
+            { c: cnName(cantonOf()), l: (state.lang || "fr").toUpperCase(), p: PLATFORM });
+    window.location.href = "mailto:" + addr +
+      "?subject=" + encodeURIComponent(subject) +
+      "&body=" + encodeURIComponent(body);
   }
 
   /* ---------------- Soutenir le projet (dons) ---------------- */
