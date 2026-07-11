@@ -686,6 +686,7 @@ h2 { font-size: 19px; font-family: var(--font-serif); font-weight: 500; letter-s
   padding: 20px 20px calc(var(--safe-bot) + 20px); box-shadow: 0 -8px 30px rgba(0,0,0,.2); animation: sheetUp .28s cubic-bezier(.2,.8,.2,1); }
 @keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
 .sheet-title { font-family: var(--font-serif); font-size: 16px; font-weight: 500; margin-bottom: 12px; text-align: center; }
+.don-off { display: block; margin: 4px auto 0; background: none; border: none; color: var(--muted); font-family: inherit; font-size: 12.5px; padding: 6px; cursor: pointer; text-decoration: underline; }
 .sheet-options { display: flex; flex-direction: column; gap: 8px; }
 .sheet-options button { display: flex; justify-content: space-between; align-items: center; background: var(--card);
   border: 1.5px solid transparent; box-shadow: var(--shadow-sm); border-radius: 14px; padding: 14px 16px; font-family: inherit; font-size: 15px; color: var(--ink); cursor: pointer; }

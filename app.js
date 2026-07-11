@@ -110,6 +110,8 @@
     badges: {},     // { badgeId: true }
     seenCantons: [], // codes de cantons ouverts dans « Explorer »
     seenDates: [],   // années/repères de frise déjà consultés
+    lastDonPrompt: null, // date du dernier « pop » de don (cooldown)
+    donPromptOff: false, // l'utilisateur a choisi « Ne plus proposer »
   });
   function load() {
     try {
@@ -1679,6 +1681,58 @@
     return `<button class="sup-nudge" id="resultSupport"><img src="logo-edelweiss-red.svg" width="18" height="18" alt="" /> ${t("support.nudge", "NatiCoach t'aide ? Soutiens le projet")}</button>`;
   }
 
+  /* ---------- « Pop » de don, dosé (feuille discrète aux pics positifs) ---------- */
+  const DON_COOLDOWN_DAYS = 14;   // délai minimal entre deux pops
+  let donPromptedThisSession = false;
+  /* Vrai seulement si au moins un lien de don est configuré (sinon on reste dormant). */
+  function donateConfigured() {
+    return !!(DONATE.twint || DONATE.card || (DONATE.amounts && Object.keys(DONATE.amounts).some((k) => DONATE.amounts[k])));
+  }
+  function closeDonSheet() { const s = $("donSheet"); if (s) s.hidden = true; }
+  function openDonSheet() {
+    const box = $("donSheetBody"); if (!box) return;
+    const amt = (v) => `<button class="sup-amt${v === supportAmount ? " on" : ""}" data-amt="${v}">${v === "x" ? t("support.other", "Autre") : "CHF " + v}</button>`;
+    box.innerHTML =
+      `<div class="sup-hero">
+         <img class="pr-flower" src="logo-edelweiss-red.svg" alt="" width="40" height="40" />
+         <h3>${t("don.promptTitle", "Bravo pour ta progression !")}</h3>
+         <p>${t("don.promptSub", "NatiCoach t'aide dans ta préparation&nbsp;? L'app est <b>100 % gratuite</b>, sans publicité — un <b>petit don libre</b> soutient le projet. Merci&nbsp;!")}</p>
+       </div>
+       <div class="sup-amts">${amt("5")}${amt("10")}${amt("20")}${amt("x")}</div>
+       <div class="sup-cta-wrap">
+         <button class="btn btn-primary big" id="donSheetTwint">${t("support.twint", "Faire un don avec TWINT")}</button>
+         <button class="btn btn-outline" id="donSheetCard">${t("support.card", "Payer par carte")}</button>
+         <button class="btn btn-ghost" id="donSheetLater">${t("don.later", "Plus tard")}</button>
+         <button class="don-off" id="donSheetOff">${t("don.never", "Ne plus proposer")}</button>
+       </div>`;
+    box.querySelectorAll(".sup-amt").forEach((b) => b.addEventListener("click", () => {
+      supportAmount = b.dataset.amt;
+      box.querySelectorAll(".sup-amt").forEach((x) => x.classList.toggle("on", x === b));
+    }));
+    const at = () => (supportAmount === "x" ? null : supportAmount);
+    $("donSheetTwint").addEventListener("click", () => donateOpen("twint", at()));
+    $("donSheetCard").addEventListener("click", () => donateOpen("card", at()));
+    $("donSheetLater").addEventListener("click", closeDonSheet);
+    $("donSheetOff").addEventListener("click", () => { state.donPromptOff = true; save(); closeDonSheet(); });
+    const sheet = $("donSheet");
+    sheet.onclick = (e) => { if (e.target === sheet) closeDonSheet(); };  // clic sur le fond = fermer
+    sheet.hidden = false;
+  }
+  /* Décide si l'on montre le pop maintenant (aux bons moments seulement). */
+  function maybeDonPrompt() {
+    if (state.donPromptOff) return;               // opt-out définitif
+    if (!donateConfigured()) return;              // dormant tant qu'aucun lien n'existe
+    if (donPromptedThisSession) return;           // au plus 1× par ouverture de l'app
+    if (state.sessions < 2) return;               // jamais dès la 1re session
+    if (state.lastDonPrompt) {
+      const days = (Date.parse(todayISO()) - Date.parse(state.lastDonPrompt)) / 864e5;
+      if (days < DON_COOLDOWN_DAYS) return;       // cooldown
+    }
+    donPromptedThisSession = true;
+    state.lastDonPrompt = todayISO(); save();
+    setTimeout(openDonSheet, 900);                // après l'animation de résultat
+  }
+
   /* ---------------- Mentions légales (CGU + confidentialité) ---------------- */
   const legalSec = (n, title, body) => `<div class="legal-sec"><h3>${n}. ${title}</h3><p>${body}</p></div>`;
 
@@ -2392,6 +2446,9 @@
 
     showScreen("screen-result");
     const rpc = $("resultSupport"); if (rpc) rpc.addEventListener("click", openSupport);
+
+    // « Pop » de don, dosé : uniquement aux pics positifs (examen réussi ou erreurs vidées).
+    if ((quiz.mode === "exam" && pass) || clearedAll) maybeDonPrompt();
   }
 
   function shareResult() {
