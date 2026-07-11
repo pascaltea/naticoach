@@ -1431,11 +1431,21 @@
 
   /* Sources officielles des banques de questions, par canton (+ dates connues). */
   const SOURCES = {
-    VD: { auth: "État de Vaud", srcFr: "Outil d'entraînement au test de connaissances", srcEn: "Knowledge-test practice tool", url: "https://www.vd.ch/prestations/naturalisation", host: "vd.ch", dateFr: "consulté en juillet 2026", dateEn: "accessed July 2026" },
-    GE: { auth: "République et canton de Genève", srcFr: "E-learning « Connaître la Suisse et Genève »", srcEn: "E-learning « Getting to know Switzerland and Geneva »", url: "https://outils.ge.ch/e-learning/connaitre-suisse/", host: "outils.ge.ch", dateFr: "consulté en juillet 2026", dateEn: "accessed July 2026" },
-    NE: { auth: "République et canton de Neuchâtel", srcFr: "Questionnaire avec réponses", srcEn: "Questionnaire with answers", url: "https://www.ne.ch", host: "ne.ch", dateFr: "édition janvier 2026", dateEn: "January 2026 edition" },
-    VS: { auth: "Canton du Valais", srcFr: "Questionnaire (questions et réponses)", srcEn: "Questionnaire (questions and answers)", url: "https://www.vs.ch", host: "vs.ch", dateFr: "questions : novembre 2021 · réponses : août 2022", dateEn: "questions: November 2021 · answers: August 2022" },
+    VD: { auth: "État de Vaud", url: "https://www.vd.ch/prestations/naturalisation", host: "vd.ch",
+      srcFr: "Outil d'entraînement au test de connaissances", srcEn: "Knowledge-test practice tool", srcPt: "Ferramenta de treino para o teste de conhecimentos", srcEs: "Herramienta de práctica para el test de conocimientos", srcIt: "Strumento di pratica per il test di conoscenze", srcDe: "Übungswerkzeug für den Wissenstest", srcSq: "Mjet ushtrimi për testin e njohurive",
+      dateFr: "consulté en juillet 2026", dateEn: "accessed July 2026", datePt: "consultado em julho de 2026", dateEs: "consultado en julio de 2026", dateIt: "consultato a luglio 2026", dateDe: "abgerufen im Juli 2026", dateSq: "konsultuar në korrik 2026" },
+    GE: { auth: "République et canton de Genève", url: "https://outils.ge.ch/e-learning/connaitre-suisse/", host: "outils.ge.ch",
+      srcFr: "E-learning « Connaître la Suisse et Genève »", srcEn: "E-learning « Getting to know Switzerland and Geneva »", srcPt: "E-learning « Conhecer a Suíça e Genebra »", srcEs: "E-learning « Conocer Suiza y Ginebra »", srcIt: "E-learning « Conoscere la Svizzera e Ginevra »", srcDe: "E-Learning « Die Schweiz und Genf kennenlernen »", srcSq: "E-learning « Njihni Zvicrën dhe Gjenevën »",
+      dateFr: "consulté en juillet 2026", dateEn: "accessed July 2026", datePt: "consultado em julho de 2026", dateEs: "consultado en julio de 2026", dateIt: "consultato a luglio 2026", dateDe: "abgerufen im Juli 2026", dateSq: "konsultuar në korrik 2026" },
+    NE: { auth: "République et canton de Neuchâtel", url: "https://www.ne.ch", host: "ne.ch",
+      srcFr: "Questionnaire avec réponses", srcEn: "Questionnaire with answers", srcPt: "Questionário com respostas", srcEs: "Cuestionario con respuestas", srcIt: "Questionario con risposte", srcDe: "Fragebogen mit Antworten", srcSq: "Pyetësor me përgjigje",
+      dateFr: "édition janvier 2026", dateEn: "January 2026 edition", datePt: "edição de janeiro de 2026", dateEs: "edición de enero de 2026", dateIt: "edizione gennaio 2026", dateDe: "Ausgabe Januar 2026", dateSq: "botimi janar 2026" },
+    VS: { auth: "Canton du Valais", url: "https://www.vs.ch", host: "vs.ch",
+      srcFr: "Questionnaire (questions et réponses)", srcEn: "Questionnaire (questions and answers)", srcPt: "Questionário (perguntas e respostas)", srcEs: "Cuestionario (preguntas y respuestas)", srcIt: "Questionario (domande e risposte)", srcDe: "Fragebogen (Fragen und Antworten)", srcSq: "Pyetësor (pyetje dhe përgjigje)",
+      dateFr: "questions : novembre 2021 · réponses : août 2022", dateEn: "questions: November 2021 · answers: August 2022", datePt: "perguntas: novembro de 2021 · respostas: agosto de 2022", dateEs: "preguntas: noviembre de 2021 · respuestas: agosto de 2022", dateIt: "domande: novembre 2021 · risposte: agosto 2022", dateDe: "Fragen: November 2021 · Antworten: August 2022", dateSq: "pyetjet: nëntor 2021 · përgjigjet: gusht 2022" },
   };
+  /* Sélecteur de champ localisé pour SOURCES : base + suffixe langue (repli FR). */
+  const srcPick = (s, base) => s[base + (LSUF[state.lang] || "Fr")] || s[base + "Fr"];
 
   function openAbout() {
     const cn = cantonOf();
@@ -1446,8 +1456,8 @@
           <span class="src-canton">${cnName(k)}</span>
           <div class="src-detail">
             <b>${s.auth}</b>
-            <span>${en ? s.srcEn : s.srcFr}</span>
-            <span class="src-date"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16'/><path d='M8 3v4'/><path d='M16 3v4'/></svg> ${en ? s.dateEn : s.dateFr}</span>
+            <span>${srcPick(s, "src")}</span>
+            <span class="src-date"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16'/><path d='M8 3v4'/><path d='M16 3v4'/></svg> ${srcPick(s, "date")}</span>
             <a href="${s.url}" target="_blank" rel="noopener">${s.host} ↗</a>
           </div>
         </div>`;
@@ -1505,33 +1515,180 @@
   /* ---------------- Mentions légales (CGU + confidentialité) ---------------- */
   const legalSec = (n, title, body) => `<div class="legal-sec"><h3>${n}. ${title}</h3><p>${body}</p></div>`;
 
+  /* Contenu légal multilingue (CGU + confidentialité). Repli FR. */
+  const LEGAL = {
+    cgu: {
+      fr: [
+        ["Éditeur", "L'application <b>NatiCoach</b> (« l'Application ») est éditée par l'équipe <b>NatiCoach</b> (« l'Éditeur »). Contact : <b>contact@naticoach.ch</b>."],
+        ["Objet", "Les présentes conditions régissent l'accès et l'utilisation de l'Application, un <b>outil d'entraînement pédagogique</b> à la préparation du test de connaissances de la naturalisation suisse. En utilisant l'Application, l'utilisateur·rice les accepte."],
+        ["Absence de caractère officiel", "NatiCoach est un outil <b>indépendant</b>, <b>non affilié</b> et non approuvé par les autorités (Confédération, cantons, communes). Les questions s'inspirent de questionnaires <b>rendus publics</b> par les cantons ; l'Éditeur ne garantit ni leur exactitude ni leur mise à jour. Seule fait foi l'information de l'autorité compétente."],
+        ["Absence de garantie de résultat", "L'Application est fournie « en l'état » et <b>ne garantit pas la réussite</b> au test ni l'obtention de la nationalité. Les explications et propositions de réponses sont à visée pédagogique."],
+        ["Gratuité", "L'Application est <b>entièrement gratuite</b> et sans publicité. L'ensemble des fonctionnalités est accessible <b>sans achat</b>."],
+        ["Dons", "Un <b>don libre et facultatif</b> peut être proposé pour soutenir le développement. Il est <b>sans contrepartie</b> et <b>ne débloque aucune fonctionnalité</b> (tout est déjà gratuit). Les dons sont traités par des <b>prestataires de paiement tiers</b> (p. ex. TWINT, Stripe) selon leurs propres conditions."],
+        ["Propriété intellectuelle", "L'Application, son code, son design, la marque « NatiCoach », les textes explicatifs et illustrations sont protégés et demeurent la propriété de l'Éditeur. L'utilisateur·rice bénéficie d'un droit d'usage <b>personnel</b>. Toute revente, extraction ou rediffusion non autorisée est interdite."],
+        ["Données personnelles", "L'Application fonctionne <b>hors-ligne</b> ; la progression est stockée <b>localement</b> sur l'appareil. Voir la <b>Politique de confidentialité</b>."],
+        ["Responsabilité", "Dans les limites de la loi, l'Éditeur décline toute responsabilité pour les dommages indirects, les décisions prises sur la base du contenu, ou l'inexactitude des questions."],
+        ["Modifications", "L'Éditeur peut modifier l'Application et les présentes conditions ; la version applicable est celle en vigueur lors de l'utilisation."],
+        ["Droit applicable et for", "Droit <b>suisse</b>. For : canton de <b>Vaud</b>, sous réserve des dispositions impératives protégeant les consommateurs."],
+      ],
+      en: [
+        ["Publisher", "The <b>NatiCoach</b> app (« the App ») is published by the <b>NatiCoach</b> team (« the Publisher »). Contact: <b>contact@naticoach.ch</b>."],
+        ["Purpose", "These terms govern access to and use of the App, an <b>educational practice tool</b> for preparing the Swiss naturalisation knowledge test. By using the App, you accept them."],
+        ["No official status", "NatiCoach is an <b>independent</b> tool, <b>not affiliated with</b> or approved by the authorities (Confederation, cantons, municipalities). The questions draw on questionnaires <b>made public</b> by the cantons; the Publisher guarantees neither their accuracy nor that they are up to date. Only the information from the competent authority is binding."],
+        ["No guarantee of results", "The App is provided « as is » and <b>does not guarantee</b> passing the test or obtaining citizenship. Explanations and answer options are for educational purposes."],
+        ["Free of charge", "The App is <b>entirely free</b> and ad-free. All features are available <b>without any purchase</b>."],
+        ["Donations", "A <b>free, optional donation</b> may be offered to support development. It is <b>without any consideration</b> and <b>unlocks no feature</b> (everything is already free). Donations are processed by <b>third-party payment providers</b> (e.g. TWINT, Stripe) under their own terms."],
+        ["Intellectual property", "The App, its code, design, the « NatiCoach » brand, explanatory texts and illustrations are protected and remain the property of the Publisher. You are granted a <b>personal</b> right of use. Any unauthorised resale, extraction or redistribution is prohibited."],
+        ["Personal data", "The App works <b>offline</b>; your progress is stored <b>locally</b> on the device. See the <b>Privacy Policy</b>."],
+        ["Liability", "Within the limits of the law, the Publisher accepts no liability for indirect damages, decisions made on the basis of the content, or the inaccuracy of the questions."],
+        ["Changes", "The Publisher may modify the App and these terms; the applicable version is the one in force at the time of use."],
+        ["Governing law and jurisdiction", "<b>Swiss</b> law. Jurisdiction: canton of <b>Vaud</b>, subject to mandatory consumer-protection provisions."],
+      ],
+      pt: [
+        ["Editor", "A aplicação <b>NatiCoach</b> (« a Aplicação ») é editada pela equipa <b>NatiCoach</b> (« o Editor »). Contacto: <b>contact@naticoach.ch</b>."],
+        ["Objeto", "Estas condições regem o acesso e a utilização da Aplicação, uma <b>ferramenta pedagógica de treino</b> para a preparação do teste de conhecimentos da naturalização suíça. Ao utilizar a Aplicação, aceita-as."],
+        ["Ausência de caráter oficial", "NatiCoach é uma ferramenta <b>independente</b>, <b>não afiliada</b> nem aprovada pelas autoridades (Confederação, cantões, municípios). As perguntas inspiram-se em questionários <b>tornados públicos</b> pelos cantões; o Editor não garante a sua exatidão nem a sua atualização. Só a informação da autoridade competente é vinculativa."],
+        ["Sem garantia de resultado", "A Aplicação é fornecida « tal como está » e <b>não garante</b> a aprovação no teste nem a obtenção da nacionalidade. As explicações e propostas de resposta têm fins pedagógicos."],
+        ["Gratuidade", "A Aplicação é <b>totalmente gratuita</b> e sem publicidade. Todas as funcionalidades estão acessíveis <b>sem qualquer compra</b>."],
+        ["Doações", "Pode ser proposta uma <b>doação livre e facultativa</b> para apoiar o desenvolvimento. É <b>sem contrapartida</b> e <b>não desbloqueia qualquer funcionalidade</b> (tudo já é gratuito). As doações são processadas por <b>prestadores de pagamento terceiros</b> (p. ex. TWINT, Stripe) segundo as suas próprias condições."],
+        ["Propriedade intelectual", "A Aplicação, o seu código, o seu design, a marca « NatiCoach », os textos explicativos e as ilustrações estão protegidos e continuam propriedade do Editor. Beneficia de um direito de uso <b>pessoal</b>. Qualquer revenda, extração ou redistribuição não autorizada é proibida."],
+        ["Dados pessoais", "A Aplicação funciona <b>offline</b>; o teu progresso é armazenado <b>localmente</b> no dispositivo. Ver a <b>Política de privacidade</b>."],
+        ["Responsabilidade", "Nos limites da lei, o Editor declina qualquer responsabilidade por danos indiretos, decisões tomadas com base no conteúdo ou inexatidão das perguntas."],
+        ["Alterações", "O Editor pode alterar a Aplicação e as presentes condições; a versão aplicável é a que está em vigor no momento da utilização."],
+        ["Direito aplicável e foro", "Direito <b>suíço</b>. Foro: cantão de <b>Vaud</b>, sob reserva das disposições imperativas de proteção dos consumidores."],
+      ],
+      es: [
+        ["Editor", "La aplicación <b>NatiCoach</b> (« la Aplicación ») es editada por el equipo <b>NatiCoach</b> (« el Editor »). Contacto: <b>contact@naticoach.ch</b>."],
+        ["Objeto", "Estas condiciones rigen el acceso y el uso de la Aplicación, una <b>herramienta pedagógica de práctica</b> para preparar el test de conocimientos de la naturalización suiza. Al usar la Aplicación, las aceptas."],
+        ["Ausencia de carácter oficial", "NatiCoach es una herramienta <b>independiente</b>, <b>no afiliada</b> ni aprobada por las autoridades (Confederación, cantones, municipios). Las preguntas se inspiran en cuestionarios <b>hechos públicos</b> por los cantones; el Editor no garantiza ni su exactitud ni su actualización. Solo la información de la autoridad competente es vinculante."],
+        ["Sin garantía de resultado", "La Aplicación se ofrece « tal cual » y <b>no garantiza</b> aprobar el test ni obtener la nacionalidad. Las explicaciones y propuestas de respuesta tienen fines pedagógicos."],
+        ["Gratuidad", "La Aplicación es <b>totalmente gratuita</b> y sin publicidad. Todas las funciones están disponibles <b>sin ninguna compra</b>."],
+        ["Donaciones", "Puede proponerse una <b>donación libre y opcional</b> para apoyar el desarrollo. Es <b>sin contrapartida</b> y <b>no desbloquea ninguna función</b> (todo ya es gratis). Las donaciones las procesan <b>proveedores de pago externos</b> (p. ej. TWINT, Stripe) según sus propias condiciones."],
+        ["Propiedad intelectual", "La Aplicación, su código, su diseño, la marca « NatiCoach », los textos explicativos y las ilustraciones están protegidos y siguen siendo propiedad del Editor. Dispones de un derecho de uso <b>personal</b>. Queda prohibida cualquier reventa, extracción o redifusión no autorizada."],
+        ["Datos personales", "La Aplicación funciona <b>sin conexión</b>; tu progreso se almacena <b>localmente</b> en el dispositivo. Consulta la <b>Política de privacidad</b>."],
+        ["Responsabilidad", "Dentro de los límites de la ley, el Editor declina toda responsabilidad por daños indirectos, decisiones tomadas con base en el contenido o inexactitud de las preguntas."],
+        ["Modificaciones", "El Editor puede modificar la Aplicación y estas condiciones; la versión aplicable es la vigente en el momento del uso."],
+        ["Ley aplicable y jurisdicción", "Derecho <b>suizo</b>. Jurisdicción: cantón de <b>Vaud</b>, sin perjuicio de las disposiciones imperativas de protección de los consumidores."],
+      ],
+      it: [
+        ["Editore", "L'applicazione <b>NatiCoach</b> (« l'Applicazione ») è edita dal team <b>NatiCoach</b> (« l'Editore »). Contatto: <b>contact@naticoach.ch</b>."],
+        ["Oggetto", "Le presenti condizioni regolano l'accesso e l'uso dell'Applicazione, uno <b>strumento pedagogico di pratica</b> per la preparazione al test di conoscenze della naturalizzazione svizzera. Usando l'Applicazione, le accetti."],
+        ["Assenza di carattere ufficiale", "NatiCoach è uno strumento <b>indipendente</b>, <b>non affiliato</b> né approvato dalle autorità (Confederazione, cantoni, comuni). Le domande si ispirano a questionari <b>resi pubblici</b> dai cantoni; l'Editore non garantisce né la loro esattezza né il loro aggiornamento. Fa fede solo l'informazione dell'autorità competente."],
+        ["Nessuna garanzia di risultato", "L'Applicazione è fornita « così com'è » e <b>non garantisce</b> il superamento del test né l'ottenimento della cittadinanza. Le spiegazioni e le proposte di risposta hanno scopo pedagogico."],
+        ["Gratuità", "L'Applicazione è <b>interamente gratuita</b> e senza pubblicità. Tutte le funzionalità sono accessibili <b>senza alcun acquisto</b>."],
+        ["Donazioni", "Può essere proposta una <b>donazione libera e facoltativa</b> per sostenere lo sviluppo. È <b>senza contropartita</b> e <b>non sblocca alcuna funzionalità</b> (tutto è già gratis). Le donazioni sono gestite da <b>fornitori di pagamento terzi</b> (es. TWINT, Stripe) secondo le loro condizioni."],
+        ["Proprietà intellettuale", "L'Applicazione, il suo codice, il suo design, il marchio « NatiCoach », i testi esplicativi e le illustrazioni sono protetti e restano proprietà dell'Editore. Beneficii di un diritto d'uso <b>personale</b>. È vietata ogni rivendita, estrazione o ridiffusione non autorizzata."],
+        ["Dati personali", "L'Applicazione funziona <b>offline</b>; i tuoi progressi sono memorizzati <b>localmente</b> sul dispositivo. Vedi l'<b>Informativa sulla privacy</b>."],
+        ["Responsabilità", "Nei limiti di legge, l'Editore declina ogni responsabilità per danni indiretti, decisioni prese sulla base del contenuto o inesattezza delle domande."],
+        ["Modifiche", "L'Editore può modificare l'Applicazione e le presenti condizioni; la versione applicabile è quella in vigore al momento dell'uso."],
+        ["Diritto applicabile e foro", "Diritto <b>svizzero</b>. Foro: cantone di <b>Vaud</b>, fatte salve le disposizioni imperative a tutela dei consumatori."],
+      ],
+      de: [
+        ["Herausgeber", "Die App <b>NatiCoach</b> (« die App ») wird vom <b>NatiCoach</b>-Team herausgegeben (« der Herausgeber »). Kontakt: <b>contact@naticoach.ch</b>."],
+        ["Zweck", "Diese Bedingungen regeln den Zugang zur und die Nutzung der App, einem <b>pädagogischen Übungswerkzeug</b> zur Vorbereitung auf den Schweizer Einbürgerungs-Wissenstest. Mit der Nutzung der App akzeptierst du sie."],
+        ["Kein offizieller Charakter", "NatiCoach ist ein <b>unabhängiges</b> Werkzeug, <b>nicht verbunden mit</b> und nicht von den Behörden (Bund, Kantone, Gemeinden) genehmigt. Die Fragen lehnen sich an von den Kantonen <b>veröffentlichte</b> Fragebögen an; der Herausgeber garantiert weder deren Richtigkeit noch deren Aktualität. Massgebend ist allein die Information der zuständigen Behörde."],
+        ["Keine Erfolgsgarantie", "Die App wird « wie besehen » bereitgestellt und <b>garantiert nicht</b> das Bestehen des Tests oder den Erwerb der Staatsbürgerschaft. Erklärungen und Antwortvorschläge dienen pädagogischen Zwecken."],
+        ["Kostenlos", "Die App ist <b>vollständig kostenlos</b> und werbefrei. Alle Funktionen sind <b>ohne Kauf</b> zugänglich."],
+        ["Spenden", "Eine <b>freiwillige, freie Spende</b> kann angeboten werden, um die Entwicklung zu unterstützen. Sie erfolgt <b>ohne Gegenleistung</b> und <b>schaltet keine Funktion frei</b> (alles ist bereits kostenlos). Spenden werden von <b>Drittanbietern für Zahlungen</b> (z. B. TWINT, Stripe) nach deren Bedingungen abgewickelt."],
+        ["Geistiges Eigentum", "Die App, ihr Code, ihr Design, die Marke « NatiCoach », die Erklärtexte und Illustrationen sind geschützt und bleiben Eigentum des Herausgebers. Du erhältst ein <b>persönliches</b> Nutzungsrecht. Jeder unbefugte Weiterverkauf, jede Extraktion oder Weiterverbreitung ist untersagt."],
+        ["Personendaten", "Die App funktioniert <b>offline</b>; dein Fortschritt wird <b>lokal</b> auf dem Gerät gespeichert. Siehe die <b>Datenschutzerklärung</b>."],
+        ["Haftung", "Im Rahmen des Gesetzes lehnt der Herausgeber jede Haftung für indirekte Schäden, auf Basis des Inhalts getroffene Entscheidungen oder die Unrichtigkeit der Fragen ab."],
+        ["Änderungen", "Der Herausgeber kann die App und diese Bedingungen ändern; massgebend ist die zum Zeitpunkt der Nutzung geltende Fassung."],
+        ["Anwendbares Recht und Gerichtsstand", "<b>Schweizer</b> Recht. Gerichtsstand: Kanton <b>Waadt</b>, unter Vorbehalt zwingender Konsumentenschutzbestimmungen."],
+      ],
+      sq: [
+        ["Botuesi", "Aplikacioni <b>NatiCoach</b> (« Aplikacioni ») botohet nga ekipi <b>NatiCoach</b> (« Botuesi »). Kontakt: <b>contact@naticoach.ch</b>."],
+        ["Qëllimi", "Këto kushte rregullojnë qasjen dhe përdorimin e Aplikacionit, një <b>mjet pedagogjik ushtrimi</b> për përgatitjen e testit të njohurive të natyralizimit zviceran. Duke përdorur Aplikacionin, i pranon ato."],
+        ["Mungesë e karakterit zyrtar", "NatiCoach është një mjet <b>i pavarur</b>, <b>i palidhur</b> dhe i pamiratuar nga autoritetet (Konfederata, kantonet, komunat). Pyetjet frymëzohen nga pyetësorë <b>të bërë publikë</b> nga kantonet; Botuesi nuk garanton as saktësinë as përditësimin e tyre. Vlen vetëm informacioni i autoritetit kompetent."],
+        ["Pa garanci rezultati", "Aplikacioni ofrohet « ashtu siç është » dhe <b>nuk garanton</b> kalimin e testit as marrjen e shtetësisë. Shpjegimet dhe propozimet e përgjigjeve kanë qëllim pedagogjik."],
+        ["Falas", "Aplikacioni është <b>tërësisht falas</b> dhe pa reklama. Të gjitha funksionet janë të aksesueshme <b>pa asnjë blerje</b>."],
+        ["Dhurime", "Mund të propozohet një <b>dhurim i lirë dhe fakultativ</b> për të mbështetur zhvillimin. Është <b>pa kundërshpërblim</b> dhe <b>nuk zhbllokon asnjë funksion</b> (gjithçka është tashmë falas). Dhurimet përpunohen nga <b>ofrues pagesash të palëve të treta</b> (p.sh. TWINT, Stripe) sipas kushteve të tyre."],
+        ["Pronësia intelektuale", "Aplikacioni, kodi, dizajni i tij, marka « NatiCoach », tekstet shpjeguese dhe ilustrimet janë të mbrojtura dhe mbeten pronë e Botuesit. Përfiton një të drejtë përdorimi <b>personale</b>. Ndalohet çdo rishitje, nxjerrje ose rishpërndarje e paautorizuar."],
+        ["Të dhënat personale", "Aplikacioni funksionon <b>pa internet</b>; përparimi yt ruhet <b>lokalisht</b> në pajisje. Shih <b>Politikën e privatësisë</b>."],
+        ["Përgjegjësia", "Brenda kufijve të ligjit, Botuesi nuk mban asnjë përgjegjësi për dëme të tërthorta, vendime të marra mbi bazën e përmbajtjes, ose pasaktësinë e pyetjeve."],
+        ["Ndryshimet", "Botuesi mund të ndryshojë Aplikacionin dhe këto kushte; vlen versioni në fuqi në momentin e përdorimit."],
+        ["Ligji i zbatueshëm dhe juridiksioni", "E drejta <b>zvicerane</b>. Juridiksioni: kantoni i <b>Vaud</b>, me rezervë të dispozitave detyruese për mbrojtjen e konsumatorëve."],
+      ],
+    },
+    priv: {
+      fr: [
+        ["Responsable", "<b>NatiCoach</b>. Contact : <b>contact@naticoach.ch</b>."],
+        ["Principe : hors-ligne", "NatiCoach est conçue pour fonctionner <b>hors-ligne</b>. Ta progression (scores, statistiques, réglages) est enregistrée <b>uniquement sur ton appareil</b> et <b>n'est pas transmise</b> à l'Éditeur ni à des tiers."],
+        ["Aucun compte, aucun traceur", "L'Application ne demande <b>aucun compte</b>, n'utilise <b>ni cookie ni outil d'analyse tiers</b>, et ne collecte aucune donnée de localisation."],
+        ["Dons", "Si tu fais un <b>don</b>, il est traité <b>hors de l'Application</b> par un prestataire de paiement tiers (TWINT, Stripe…). NatiCoach ne reçoit ni ne stocke tes <b>coordonnées bancaires</b>."],
+        ["Tes droits (nLPD)", "Conformément à la loi suisse sur la protection des données, tu disposes de droits d'accès, de rectification et d'effacement. Tes données étant <b>locales</b>, tu peux les effacer à tout moment en réinitialisant ou désinstallant l'Application."],
+        ["Conservation", "Les données restent sur ton appareil tant que l'Application est installée."],
+        ["Contact & modifications", "Pour toute question : <b>contact@naticoach.ch</b>. La présente politique peut être mise à jour ; la version applicable est celle en vigueur dans l'Application. Droit applicable : <b>suisse</b>."],
+      ],
+      en: [
+        ["Controller", "<b>NatiCoach</b>. Contact: <b>contact@naticoach.ch</b>."],
+        ["Principle: offline", "NatiCoach is designed to work <b>offline</b>. Your progress (scores, statistics, settings) is stored <b>only on your device</b> and is <b>not transmitted</b> to the Publisher or any third party."],
+        ["No account, no tracker", "The App requires <b>no account</b>, uses <b>no cookies or third-party analytics</b>, and collects no location data."],
+        ["Donations", "If you make a <b>donation</b>, it is handled <b>outside the App</b> by a third-party payment provider (TWINT, Stripe…). NatiCoach neither receives nor stores your <b>banking details</b>."],
+        ["Your rights (Swiss FADP)", "Under the Swiss Data Protection Act, you have rights of access, rectification and erasure. As your data is <b>local</b>, you can erase it at any time by resetting or uninstalling the App."],
+        ["Retention", "Data stays on your device for as long as the App is installed."],
+        ["Contact & changes", "For any question: <b>contact@naticoach.ch</b>. This policy may be updated; the applicable version is the one in force in the App. Governing law: <b>Swiss</b>."],
+      ],
+      pt: [
+        ["Responsável", "<b>NatiCoach</b>. Contacto: <b>contact@naticoach.ch</b>."],
+        ["Princípio: offline", "NatiCoach foi concebida para funcionar <b>offline</b>. O teu progresso (pontuações, estatísticas, definições) é guardado <b>apenas no teu dispositivo</b> e <b>não é transmitido</b> ao Editor nem a terceiros."],
+        ["Sem conta, sem rastreador", "A Aplicação não pede <b>qualquer conta</b>, não usa <b>cookies nem ferramentas de análise de terceiros</b> e não recolhe dados de localização."],
+        ["Doações", "Se fizeres um <b>donativo</b>, é processado <b>fora da Aplicação</b> por um prestador de pagamento terceiro (TWINT, Stripe…). NatiCoach não recebe nem armazena os teus <b>dados bancários</b>."],
+        ["Os teus direitos (nLPD)", "Nos termos da lei suíça de proteção de dados, tens direitos de acesso, retificação e eliminação. Como os teus dados são <b>locais</b>, podes eliminá-los a qualquer momento repondo ou desinstalando a Aplicação."],
+        ["Conservação", "Os dados permanecem no teu dispositivo enquanto a Aplicação estiver instalada."],
+        ["Contacto e alterações", "Para qualquer questão: <b>contact@naticoach.ch</b>. Esta política pode ser atualizada; a versão aplicável é a que está em vigor na Aplicação. Direito aplicável: <b>suíço</b>."],
+      ],
+      es: [
+        ["Responsable", "<b>NatiCoach</b>. Contacto: <b>contact@naticoach.ch</b>."],
+        ["Principio: sin conexión", "NatiCoach está diseñada para funcionar <b>sin conexión</b>. Tu progreso (puntuaciones, estadísticas, ajustes) se guarda <b>solo en tu dispositivo</b> y <b>no se transmite</b> al Editor ni a terceros."],
+        ["Sin cuenta, sin rastreador", "La Aplicación no pide <b>ninguna cuenta</b>, no usa <b>cookies ni herramientas de análisis de terceros</b> y no recopila datos de ubicación."],
+        ["Donaciones", "Si haces una <b>donación</b>, se gestiona <b>fuera de la Aplicación</b> por un proveedor de pago externo (TWINT, Stripe…). NatiCoach no recibe ni almacena tus <b>datos bancarios</b>."],
+        ["Tus derechos (nLPD)", "Conforme a la ley suiza de protección de datos, tienes derechos de acceso, rectificación y supresión. Como tus datos son <b>locales</b>, puedes borrarlos en cualquier momento reiniciando o desinstalando la Aplicación."],
+        ["Conservación", "Los datos permanecen en tu dispositivo mientras la Aplicación esté instalada."],
+        ["Contacto y modificaciones", "Para cualquier pregunta: <b>contact@naticoach.ch</b>. Esta política puede actualizarse; la versión aplicable es la vigente en la Aplicación. Derecho aplicable: <b>suizo</b>."],
+      ],
+      it: [
+        ["Titolare", "<b>NatiCoach</b>. Contatto: <b>contact@naticoach.ch</b>."],
+        ["Principio: offline", "NatiCoach è concepita per funzionare <b>offline</b>. I tuoi progressi (punteggi, statistiche, impostazioni) sono memorizzati <b>solo sul tuo dispositivo</b> e <b>non vengono trasmessi</b> all'Editore né a terzi."],
+        ["Nessun account, nessun tracciatore", "L'Applicazione non richiede <b>alcun account</b>, non usa <b>cookie né strumenti di analisi di terzi</b> e non raccoglie dati di localizzazione."],
+        ["Donazioni", "Se fai una <b>donazione</b>, è gestita <b>fuori dall'Applicazione</b> da un fornitore di pagamento terzo (TWINT, Stripe…). NatiCoach non riceve né conserva i tuoi <b>dati bancari</b>."],
+        ["I tuoi diritti (nLPD)", "Ai sensi della legge svizzera sulla protezione dei dati, hai diritti di accesso, rettifica e cancellazione. Poiché i tuoi dati sono <b>locali</b>, puoi cancellarli in qualsiasi momento ripristinando o disinstallando l'Applicazione."],
+        ["Conservazione", "I dati restano sul tuo dispositivo finché l'Applicazione è installata."],
+        ["Contatto e modifiche", "Per qualsiasi domanda: <b>contact@naticoach.ch</b>. La presente politica può essere aggiornata; la versione applicabile è quella in vigore nell'Applicazione. Diritto applicabile: <b>svizzero</b>."],
+      ],
+      de: [
+        ["Verantwortlicher", "<b>NatiCoach</b>. Kontakt: <b>contact@naticoach.ch</b>."],
+        ["Grundsatz: offline", "NatiCoach ist so konzipiert, dass sie <b>offline</b> funktioniert. Dein Fortschritt (Ergebnisse, Statistiken, Einstellungen) wird <b>nur auf deinem Gerät</b> gespeichert und <b>nicht</b> an den Herausgeber oder Dritte übermittelt."],
+        ["Kein Konto, kein Tracker", "Die App verlangt <b>kein Konto</b>, verwendet <b>keine Cookies oder Analysetools von Dritten</b> und erfasst keine Standortdaten."],
+        ["Spenden", "Wenn du eine <b>Spende</b> machst, wird sie <b>ausserhalb der App</b> von einem Drittanbieter für Zahlungen (TWINT, Stripe…) abgewickelt. NatiCoach erhält und speichert deine <b>Bankdaten</b> nicht."],
+        ["Deine Rechte (revDSG)", "Nach dem Schweizer Datenschutzgesetz hast du Rechte auf Auskunft, Berichtigung und Löschung. Da deine Daten <b>lokal</b> sind, kannst du sie jederzeit löschen, indem du die App zurücksetzt oder deinstallierst."],
+        ["Aufbewahrung", "Die Daten bleiben auf deinem Gerät, solange die App installiert ist."],
+        ["Kontakt & Änderungen", "Bei Fragen: <b>contact@naticoach.ch</b>. Diese Erklärung kann aktualisiert werden; massgebend ist die in der App geltende Fassung. Anwendbares Recht: <b>schweizerisch</b>."],
+      ],
+      sq: [
+        ["Përgjegjësi", "<b>NatiCoach</b>. Kontakt: <b>contact@naticoach.ch</b>."],
+        ["Parimi: pa internet", "NatiCoach është konceptuar të funksionojë <b>pa internet</b>. Përparimi yt (rezultatet, statistikat, cilësimet) ruhet <b>vetëm në pajisjen tënde</b> dhe <b>nuk i transmetohet</b> Botuesit as palëve të treta."],
+        ["Pa llogari, pa gjurmues", "Aplikacioni nuk kërkon <b>asnjë llogari</b>, nuk përdor <b>as cookie as mjete analize të palëve të treta</b> dhe nuk mbledh të dhëna vendndodhjeje."],
+        ["Dhurime", "Nëse bën një <b>dhurim</b>, ai përpunohet <b>jashtë Aplikacionit</b> nga një ofrues pagese i palës së tretë (TWINT, Stripe…). NatiCoach as nuk merr as nuk ruan <b>të dhënat e tua bankare</b>."],
+        ["Të drejtat e tua (nLPD)", "Sipas ligjit zviceran për mbrojtjen e të dhënave, ke të drejta qasjeje, korrigjimi dhe fshirjeje. Meqë të dhënat e tua janë <b>lokale</b>, mund t'i fshish në çdo moment duke rivendosur ose çinstaluar Aplikacionin."],
+        ["Ruajtja", "Të dhënat qëndrojnë në pajisjen tënde për sa kohë Aplikacioni është i instaluar."],
+        ["Kontakti dhe ndryshimet", "Për çdo pyetje: <b>contact@naticoach.ch</b>. Kjo politikë mund të përditësohet; vlen versioni në fuqi në Aplikacion. Ligji i zbatueshëm: <b>zviceran</b>."],
+      ],
+    },
+  };
+  const legalRender = (arr) => arr.map((s, i) => legalSec(i + 1, s[0], s[1])).join("");
+
   function openCgu() {
     $("cguBody").innerHTML =
       `<p class="legal-meta">${t("legal.cguIntro", "Conditions Générales d'Utilisation — NatiCoach · Version 1.0")}</p>` +
-      legalSec(1, "Éditeur", "L'application <b>NatiCoach</b> (« l'Application ») est éditée par l'équipe <b>NatiCoach</b> (« l'Éditeur »). Contact : <b>contact@naticoach.ch</b>.") +
-      legalSec(2, "Objet", "Les présentes conditions régissent l'accès et l'utilisation de l'Application, un <b>outil d'entraînement pédagogique</b> à la préparation du test de connaissances de la naturalisation suisse. En utilisant l'Application, l'utilisateur·rice les accepte.") +
-      legalSec(3, "Absence de caractère officiel", "NatiCoach est un outil <b>indépendant</b>, <b>non affilié</b> et non approuvé par les autorités (Confédération, cantons, communes). Les questions s'inspirent de questionnaires <b>rendus publics</b> par les cantons ; l'Éditeur ne garantit ni leur exactitude ni leur mise à jour. Seule fait foi l'information de l'autorité compétente.") +
-      legalSec(4, "Absence de garantie de résultat", "L'Application est fournie « en l'état » et <b>ne garantit pas la réussite</b> au test ni l'obtention de la nationalité. Les explications et propositions de réponses sont à visée pédagogique.") +
-      legalSec(5, "Gratuité", "L'Application est <b>entièrement gratuite</b> et sans publicité. L'ensemble des fonctionnalités est accessible <b>sans achat</b>.") +
-      legalSec(6, "Dons", "Un <b>don libre et facultatif</b> peut être proposé pour soutenir le développement. Il est <b>sans contrepartie</b> et <b>ne débloque aucune fonctionnalité</b> (tout est déjà gratuit). Les dons sont traités par des <b>prestataires de paiement tiers</b> (p. ex. TWINT, Stripe) selon leurs propres conditions.") +
-      legalSec(7, "Propriété intellectuelle", "L'Application, son code, son design, la marque « NatiCoach », les textes explicatifs et illustrations sont protégés et demeurent la propriété de l'Éditeur. L'utilisateur·rice bénéficie d'un droit d'usage <b>personnel</b>. Toute revente, extraction ou rediffusion non autorisée est interdite.") +
-      legalSec(8, "Données personnelles", "L'Application fonctionne <b>hors-ligne</b> ; la progression est stockée <b>localement</b> sur l'appareil. Voir la <b>Politique de confidentialité</b>.") +
-      legalSec(9, "Responsabilité", "Dans les limites de la loi, l'Éditeur décline toute responsabilité pour les dommages indirects, les décisions prises sur la base du contenu, ou l'inexactitude des questions.") +
-      legalSec(10, "Modifications", "L'Éditeur peut modifier l'Application et les présentes conditions ; la version applicable est celle en vigueur lors de l'utilisation.") +
-      legalSec(11, "Droit applicable et for", "Droit <b>suisse</b>. For : canton de <b>Vaud</b>, sous réserve des dispositions impératives protégeant les consommateurs.");
+      legalRender(LEGAL.cgu[state.lang] || LEGAL.cgu.fr);
     showScreen("screen-cgu");
   }
 
   function openPrivacy() {
     $("privacyBody").innerHTML =
       `<p class="legal-meta">${t("legal.privIntro", "Politique de confidentialité — NatiCoach · Version 1.0")}</p>` +
-      legalSec(1, "Responsable", "<b>NatiCoach</b>. Contact : <b>contact@naticoach.ch</b>.") +
-      legalSec(2, "Principe : hors-ligne", "NatiCoach est conçue pour fonctionner <b>hors-ligne</b>. Ta progression (scores, statistiques, réglages) est enregistrée <b>uniquement sur ton appareil</b> et <b>n'est pas transmise</b> à l'Éditeur ni à des tiers.") +
-      legalSec(3, "Aucun compte, aucun traceur", "L'Application ne demande <b>aucun compte</b>, n'utilise <b>ni cookie ni outil d'analyse tiers</b>, et ne collecte aucune donnée de localisation.") +
-      legalSec(4, "Dons", "Si tu fais un <b>don</b>, il est traité <b>hors de l'Application</b> par un prestataire de paiement tiers (TWINT, Stripe…). NatiCoach ne reçoit ni ne stocke tes <b>coordonnées bancaires</b>.") +
-      legalSec(5, "Tes droits (nLPD)", "Conformément à la loi suisse sur la protection des données, tu disposes de droits d'accès, de rectification et d'effacement. Tes données étant <b>locales</b>, tu peux les effacer à tout moment en réinitialisant ou désinstallant l'Application.") +
-      legalSec(6, "Conservation", "Les données restent sur ton appareil tant que l'Application est installée.") +
-      legalSec(7, "Contact & modifications", "Pour toute question : <b>contact@naticoach.ch</b>. La présente politique peut être mise à jour ; la version applicable est celle en vigueur dans l'Application. Droit applicable : <b>suisse</b>.");
+      legalRender(LEGAL.priv[state.lang] || LEGAL.priv.fr);
     showScreen("screen-privacy");
   }
 
