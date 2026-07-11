@@ -39,6 +39,10 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+/* Pas de zoom au double-tap (feeling app natif) — conserve défilement & pinch.
+   Appliqué aussi aux éléments interactifs pour couvrir iOS Safari. */
+html, body { touch-action: manipulation; }
+button, a, .mode-tile, .mode-row, .exam-cta, .option, .lang-select, .sup-amt, .canton-card, .commune-row { touch-action: manipulation; }
 /* Reset global : aucun <button> n'a de bordure par défaut du navigateur.
    Les bordures voulues (réponse correcte, sélection, verrou, outline, chips)
    restent portées par leurs classes, qui l'emportent en spécificité. */
