@@ -201,11 +201,13 @@
   const isPremium = () => true;
   const FREE_STUDY = 20, FREE_EXAM = 12; // héritage (non utilisés en accès gratuit)
 
-  /* Liens de don — À REMPLACER par tes vrais liens. Le don est libre et ne
-     débloque RIEN (tout est déjà gratuit) — condition des stores respectée. */
+  /* Liens de don. Le don est libre et ne débloque RIEN (tout est déjà gratuit)
+     — condition des stores respectée. Un seul lien Stripe (montant libre, CHF)
+     couvre carte + Apple Pay… et TWINT dès qu'il sera activé côté Stripe. */
+  const STRIPE_DON = "https://buy.stripe.com/3cIfZj7Lh5mO0DcbgQbbG00";
   const DONATE = {
-    twint:   "",   // lien / QR TWINT (public suisse) — ex. "https://…"
-    card:    "",   // lien carte (Ko-fi / page Stripe) — ex. "https://ko-fi.com/…"
+    twint:   STRIPE_DON,   // même page Stripe (proposera TWINT une fois activé dans les réglages)
+    card:    STRIPE_DON,   // page Stripe (montant libre, défaut 10 CHF)
     amounts: { "5": "", "10": "", "20": "" }, // liens Stripe par montant (facultatif)
   };
   /* Ouvre le meilleur lien disponible pour un montant donné (ou le lien générique). */
