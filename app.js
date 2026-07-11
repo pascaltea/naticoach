@@ -6,6 +6,12 @@
 (function () {
   "use strict";
 
+  /* Rendu « application » : bloque le zoom natif iOS Safari (pinch à deux doigts
+     + double-tap), là où le viewport user-scalable=no est ignoré (onglet Safari).
+     La carte des cantons a ses propres boutons de zoom, non affectés. */
+  ["gesturestart", "gesturechange", "gestureend"].forEach((ev) =>
+    document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
+
   const RING_LEN = 2 * Math.PI * 52;
   const STORE_KEY = "swisscitoyen.v1";
   const THEMES = ["Géographie", "Histoire", "Politique", "Social"];
