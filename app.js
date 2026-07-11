@@ -204,11 +204,15 @@
   /* Liens de don. Le don est libre et ne débloque RIEN (tout est déjà gratuit)
      — condition des stores respectée. Un seul lien Stripe (montant libre, CHF)
      couvre carte + Apple Pay… et TWINT dès qu'il sera activé côté Stripe. */
-  const STRIPE_DON = "https://buy.stripe.com/3cIfZj7Lh5mO0DcbgQbbG00";
+  const STRIPE_DON = "https://buy.stripe.com/3cIfZj7Lh5mO0DcbgQbbG00"; // montant libre (« Autre »)
   const DONATE = {
     twint:   STRIPE_DON,   // même page Stripe (proposera TWINT une fois activé dans les réglages)
-    card:    STRIPE_DON,   // page Stripe (montant libre, défaut 10 CHF)
-    amounts: { "5": "", "10": "", "20": "" }, // liens Stripe par montant (facultatif)
+    card:    STRIPE_DON,   // montant libre (utilisé pour « Autre »)
+    amounts: {             // liens Stripe à montant fixe (le palier choisi ouvre le bon montant)
+      "5":  "https://buy.stripe.com/cNicN7c1xaH8bhQdoYbbG01",
+      "10": "https://buy.stripe.com/28EcN76Hd6qSgCa3OobbG02",
+      "20": "https://buy.stripe.com/8x200l4z5cPgfy6gBabbG03",
+    },
   };
   /* Ouvre le meilleur lien disponible pour un montant donné (ou le lien générique). */
   function donateOpen(kind, amount) {
