@@ -20,30 +20,31 @@
     GE: { total: 45, passCorrect: 40, minutes: 45, passLabel: "40 bonnes réponses sur 45 (5 fautes maximum)", passLabelEn: "40 correct answers out of 45 (5 mistakes max)", passLabelPt: "40 respostas corretas em 45 (máx. 5 erros)" },
     JU: { total: 40, passCorrect: 28, minutes: 45, passLabel: "70 % de bonnes réponses", passLabelEn: "70% correct answers", passLabelPt: "70% de respostas corretas" },
     FR: { total: 40, passCorrect: 28, minutes: 45, passLabel: "70 % de bonnes réponses", passLabelEn: "70% correct answers", passLabelPt: "70% de respostas corretas" },
+    BE: { total: 48, passCorrect: 29, minutes: 90, passLabel: "29 bonnes réponses sur 48 (60 %)", passLabelEn: "29 correct answers out of 48 (60%)", passLabelPt: "29 respostas corretas em 48 (60%)" },
   };
-  const cantonOf = () => (["VD", "GE", "NE", "VS", "JU", "FR"].indexOf(state.canton) >= 0 ? state.canton : "VD");
-  /* Format d'un canton : "mcq" (QCM Vaud/Genève/Jura/Fribourg) ou "cards" (fiches Q→R : Neuchâtel/Valais). */
-  const CANTON_FORMAT = { VD: "mcq", GE: "mcq", NE: "cards", VS: "cards", JU: "mcq", FR: "mcq" };
+  const cantonOf = () => (["VD", "GE", "NE", "VS", "JU", "FR", "BE"].indexOf(state.canton) >= 0 ? state.canton : "VD");
+  /* Format d'un canton : "mcq" (QCM Vaud/Genève/Jura/Fribourg/Berne) ou "cards" (fiches Q→R : Neuchâtel/Valais). */
+  const CANTON_FORMAT = { VD: "mcq", GE: "mcq", NE: "cards", VS: "cards", JU: "mcq", FR: "mcq", BE: "mcq" };
   const isCards = () => CANTON_FORMAT[cantonOf()] === "cards";
-  /* Cantons bilingues (français / allemand) — affichés « plurilingues ». */
-  const BILINGUAL = { VS: 1, FR: 1 };
-  const CANTON_NAME = { VD: "Vaud", GE: "Genève", NE: "Neuchâtel", VS: "Valais", JU: "Jura", FR: "Fribourg" };
-  const CANTON_SCOPE = { VD: "Canton de Vaud", GE: "Canton de Genève", NE: "Canton de Neuchâtel", VS: "Canton du Valais", JU: "Canton du Jura", FR: "Canton de Fribourg" };
+  /* Cantons bilingues / plurilingues (langues officielles multiples). */
+  const BILINGUAL = { VS: 1, FR: 1, BE: 1 };
+  const CANTON_NAME = { VD: "Vaud", GE: "Genève", NE: "Neuchâtel", VS: "Valais", JU: "Jura", FR: "Fribourg", BE: "Berne" };
+  const CANTON_SCOPE = { VD: "Canton de Vaud", GE: "Canton de Genève", NE: "Canton de Neuchâtel", VS: "Canton du Valais", JU: "Canton du Jura", FR: "Canton de Fribourg", BE: "Canton de Berne" };
   const CANTON_NAME_L = {
-    en: { VD: "Vaud", GE: "Geneva", NE: "Neuchâtel", VS: "Valais", JU: "Jura", FR: "Fribourg" },
-    pt: { VD: "Vaud", GE: "Genebra", NE: "Neuchâtel", VS: "Valais", JU: "Jura", FR: "Friburgo" },
-    es: { VD: "Vaud", GE: "Ginebra", NE: "Neuchâtel", VS: "Valais", JU: "Jura", FR: "Friburgo" },
-    it: { VD: "Vaud", GE: "Ginevra", NE: "Neuchâtel", VS: "Vallese", JU: "Giura", FR: "Friburgo" },
-    de: { VD: "Waadt", GE: "Genf", NE: "Neuenburg", VS: "Wallis", JU: "Jura", FR: "Freiburg" },
-    sq: { VD: "Vaud", GE: "Gjenevë", NE: "Neuchâtel", VS: "Valais", JU: "Jura", FR: "Friburg" },
+    en: { VD: "Vaud", GE: "Geneva", NE: "Neuchâtel", VS: "Valais", JU: "Jura", FR: "Fribourg", BE: "Bern" },
+    pt: { VD: "Vaud", GE: "Genebra", NE: "Neuchâtel", VS: "Valais", JU: "Jura", FR: "Friburgo", BE: "Berna" },
+    es: { VD: "Vaud", GE: "Ginebra", NE: "Neuchâtel", VS: "Valais", JU: "Jura", FR: "Friburgo", BE: "Berna" },
+    it: { VD: "Vaud", GE: "Ginevra", NE: "Neuchâtel", VS: "Vallese", JU: "Giura", FR: "Friburgo", BE: "Berna" },
+    de: { VD: "Waadt", GE: "Genf", NE: "Neuenburg", VS: "Wallis", JU: "Jura", FR: "Freiburg", BE: "Bern" },
+    sq: { VD: "Vaud", GE: "Gjenevë", NE: "Neuchâtel", VS: "Valais", JU: "Jura", FR: "Friburg", BE: "Berna" },
   };
   const CANTON_SCOPE_L = {
-    en: { VD: "Canton of Vaud", GE: "Canton of Geneva", NE: "Canton of Neuchâtel", VS: "Canton of Valais", JU: "Canton of Jura", FR: "Canton of Fribourg" },
-    pt: { VD: "Cantão de Vaud", GE: "Cantão de Genebra", NE: "Cantão de Neuchâtel", VS: "Cantão do Valais", JU: "Cantão do Jura", FR: "Cantão de Friburgo" },
-    es: { VD: "Cantón de Vaud", GE: "Cantón de Ginebra", NE: "Cantón de Neuchâtel", VS: "Cantón del Valais", JU: "Cantón del Jura", FR: "Cantón de Friburgo" },
-    it: { VD: "Cantone di Vaud", GE: "Cantone di Ginevra", NE: "Cantone di Neuchâtel", VS: "Cantone del Vallese", JU: "Cantone del Giura", FR: "Cantone di Friburgo" },
-    de: { VD: "Kanton Waadt", GE: "Kanton Genf", NE: "Kanton Neuenburg", VS: "Kanton Wallis", JU: "Kanton Jura", FR: "Kanton Freiburg" },
-    sq: { VD: "Kantoni i Vaud", GE: "Kantoni i Gjenevës", NE: "Kantoni i Neuchâtel", VS: "Kantoni i Valais", JU: "Kantoni i Jurës", FR: "Kantoni i Friburgut" },
+    en: { VD: "Canton of Vaud", GE: "Canton of Geneva", NE: "Canton of Neuchâtel", VS: "Canton of Valais", JU: "Canton of Jura", FR: "Canton of Fribourg", BE: "Canton of Bern" },
+    pt: { VD: "Cantão de Vaud", GE: "Cantão de Genebra", NE: "Cantão de Neuchâtel", VS: "Cantão do Valais", JU: "Cantão do Jura", FR: "Cantão de Friburgo", BE: "Cantão de Berna" },
+    es: { VD: "Cantón de Vaud", GE: "Cantón de Ginebra", NE: "Cantón de Neuchâtel", VS: "Cantón del Valais", JU: "Cantón del Jura", FR: "Cantón de Friburgo", BE: "Cantón de Berna" },
+    it: { VD: "Cantone di Vaud", GE: "Cantone di Ginevra", NE: "Cantone di Neuchâtel", VS: "Cantone del Vallese", JU: "Cantone del Giura", FR: "Cantone di Friburgo", BE: "Cantone di Berna" },
+    de: { VD: "Kanton Waadt", GE: "Kanton Genf", NE: "Kanton Neuenburg", VS: "Kanton Wallis", JU: "Kanton Jura", FR: "Kanton Freiburg", BE: "Kanton Bern" },
+    sq: { VD: "Kantoni i Vaud", GE: "Kantoni i Gjenevës", NE: "Kantoni i Neuchâtel", VS: "Kantoni i Valais", JU: "Kantoni i Jurës", FR: "Kantoni i Friburgut", BE: "Kantoni i Bernës" },
   };
   const cnName = (cn) => { cn = cn || cantonOf(); const m = CANTON_NAME_L[state.lang]; return (m && m[cn]) || CANTON_NAME[cn]; };
   const cScope = (cn) => { cn = cn || cantonOf(); const m = CANTON_SCOPE_L[state.lang]; return (m && m[cn]) || CANTON_SCOPE[cn]; };
@@ -66,12 +67,12 @@
   };
   const trTheme = (th) => { const m = THEME_L[state.lang]; return (m && m[th]) || th; };
   const SCOPE_L = {
-    en: { "Suisse": "Switzerland", "Canton de Vaud": "Canton of Vaud", "Canton de Genève": "Canton of Geneva", "Canton de Neuchâtel": "Canton of Neuchâtel", "Canton du Valais": "Canton of Valais", "Canton du Jura": "Canton of Jura", "Canton de Fribourg": "Canton of Fribourg", commune: "Municipality of " },
-    pt: { "Suisse": "Suíça", "Canton de Vaud": "Cantão de Vaud", "Canton de Genève": "Cantão de Genebra", "Canton de Neuchâtel": "Cantão de Neuchâtel", "Canton du Valais": "Cantão do Valais", "Canton du Jura": "Cantão do Jura", "Canton de Fribourg": "Cantão de Friburgo", commune: "Município de " },
-    es: { "Suisse": "Suiza", "Canton de Vaud": "Cantón de Vaud", "Canton de Genève": "Cantón de Ginebra", "Canton de Neuchâtel": "Cantón de Neuchâtel", "Canton du Valais": "Cantón del Valais", "Canton du Jura": "Cantón del Jura", "Canton de Fribourg": "Cantón de Friburgo", commune: "Municipio de " },
-    it: { "Suisse": "Svizzera", "Canton de Vaud": "Cantone di Vaud", "Canton de Genève": "Cantone di Ginevra", "Canton de Neuchâtel": "Cantone di Neuchâtel", "Canton du Valais": "Cantone del Vallese", "Canton du Jura": "Cantone del Giura", "Canton de Fribourg": "Cantone di Friburgo", commune: "Comune di " },
-    de: { "Suisse": "Schweiz", "Canton de Vaud": "Kanton Waadt", "Canton de Genève": "Kanton Genf", "Canton de Neuchâtel": "Kanton Neuenburg", "Canton du Valais": "Kanton Wallis", "Canton du Jura": "Kanton Jura", "Canton de Fribourg": "Kanton Freiburg", commune: "Gemeinde " },
-    sq: { "Suisse": "Zvicër", "Canton de Vaud": "Kantoni i Vaud", "Canton de Genève": "Kantoni i Gjenevës", "Canton de Neuchâtel": "Kantoni i Neuchâtel", "Canton du Valais": "Kantoni i Valais", "Canton du Jura": "Kantoni i Jurës", "Canton de Fribourg": "Kantoni i Friburgut", commune: "Komuna e " },
+    en: { "Suisse": "Switzerland", "Canton de Vaud": "Canton of Vaud", "Canton de Genève": "Canton of Geneva", "Canton de Neuchâtel": "Canton of Neuchâtel", "Canton du Valais": "Canton of Valais", "Canton du Jura": "Canton of Jura", "Canton de Fribourg": "Canton of Fribourg", "Canton de Berne": "Canton of Bern", commune: "Municipality of " },
+    pt: { "Suisse": "Suíça", "Canton de Vaud": "Cantão de Vaud", "Canton de Genève": "Cantão de Genebra", "Canton de Neuchâtel": "Cantão de Neuchâtel", "Canton du Valais": "Cantão do Valais", "Canton du Jura": "Cantão do Jura", "Canton de Fribourg": "Cantão de Friburgo", "Canton de Berne": "Cantão de Berna", commune: "Município de " },
+    es: { "Suisse": "Suiza", "Canton de Vaud": "Cantón de Vaud", "Canton de Genève": "Cantón de Ginebra", "Canton de Neuchâtel": "Cantón de Neuchâtel", "Canton du Valais": "Cantón del Valais", "Canton du Jura": "Cantón del Jura", "Canton de Fribourg": "Cantón de Friburgo", "Canton de Berne": "Cantón de Berna", commune: "Municipio de " },
+    it: { "Suisse": "Svizzera", "Canton de Vaud": "Cantone di Vaud", "Canton de Genève": "Cantone di Ginevra", "Canton de Neuchâtel": "Cantone di Neuchâtel", "Canton du Valais": "Cantone del Vallese", "Canton du Jura": "Cantone del Giura", "Canton de Fribourg": "Cantone di Friburgo", "Canton de Berne": "Cantone di Berna", commune: "Comune di " },
+    de: { "Suisse": "Schweiz", "Canton de Vaud": "Kanton Waadt", "Canton de Genève": "Kanton Genf", "Canton de Neuchâtel": "Kanton Neuenburg", "Canton du Valais": "Kanton Wallis", "Canton du Jura": "Kanton Jura", "Canton de Fribourg": "Kanton Freiburg", "Canton de Berne": "Kanton Bern", commune: "Gemeinde " },
+    sq: { "Suisse": "Zvicër", "Canton de Vaud": "Kantoni i Vaud", "Canton de Genève": "Kantoni i Gjenevës", "Canton de Neuchâtel": "Kantoni i Neuchâtel", "Canton du Valais": "Kantoni i Valais", "Canton du Jura": "Kantoni i Jurës", "Canton de Fribourg": "Kantoni i Friburgut", "Canton de Berne": "Kantoni i Bernës", commune: "Komuna e " },
   };
   function trScope(s) {
     const m = SCOPE_L[state.lang];
@@ -342,6 +343,7 @@
     if (scope && scope.indexOf("Canton du Valais") >= 0 || scope && scope.indexOf("Canton de Valais") >= 0) return "Valais";
     if (scope && scope.indexOf("Canton du Jura") >= 0) return "Jura";
     if (scope && scope.indexOf("Canton de Fribourg") >= 0) return "Fribourg";
+    if (scope && scope.indexOf("Canton de Berne") >= 0) return "Berne";
     if (scope && scope.indexOf("Commune") >= 0) return "Commune";
     return "Suisse";
   }
@@ -372,7 +374,7 @@
      réponse : la boîte monte et l'échéance s'éloigne ; erreur : retour boîte 1.
      « À réviser aujourd'hui » = questions dont l'échéance est atteinte. */
   const SRS_DAYS = { 1: 1, 2: 2, 3: 4, 4: 8, 5: 16 };
-  function addDaysISO(iso, n) { const d = new Date(iso + "T00:00:00"); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+  function addDaysISO(iso, n) { const d = new Date(iso + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
   function srsUpdate(ref, correct) {
     if (!ref || !ref.q || !ref.options) return;
     if (!state.srs) state.srs = {};
@@ -447,6 +449,7 @@
     if (cn === "GE" && typeof GE_DATA !== "undefined") return GE_DATA;
     if (cn === "JU" && typeof JU_DATA !== "undefined") return JU_DATA;
     if (cn === "FR" && typeof FR_DATA !== "undefined") return FR_DATA;
+    if (cn === "BE" && typeof BE_DATA !== "undefined") return BE_DATA;
     return { questions: [] };
   }
   /* Deck QCM générique (Genève / Jura / Fribourg) : questions scindées Suisse / canton.
@@ -634,7 +637,9 @@
     $("examTitle").textContent = t("exam.simulate", "Simuler l'examen");
     $("examSub").textContent = cn === "GE"
       ? fmt(t("exam.subGE", "{n} questions · max 5 fautes"), { n: cfg.total })
-      : fmt(t("exam.subVD", "{n} questions · {m} min · réussite 70 %"), { n: cfg.total, m: cfg.minutes });
+      : cn === "VD"
+        ? fmt(t("exam.subVD", "{n} questions · {m} min · réussite 70 %"), { n: cfg.total, m: cfg.minutes })
+        : fmt(t("exam.subGeneric", "{n} questions · {m} min · réussite {p} %"), { n: cfg.total, m: cfg.minutes, p: Math.round(cfg.passCorrect / cfg.total * 100) });
     $("homeFooter").textContent = cn === "GE"
       ? t("home.footerGE", "Questions d'entraînement · Suisse & Canton de Genève · hors-ligne")
       : cn === "VD"
@@ -1434,6 +1439,7 @@
     VS: { legis: "Conseil général (ou Assemblée primaire)", exec: "Conseil municipal", head: "président·e de commune" },
     JU: { legis: "Conseil général (ou Assemblée communale)", exec: "Conseil communal", head: "maire" },
     FR: { legis: "Conseil général (ou Assemblée communale)", exec: "Conseil communal", head: "syndic" },
+    BE: { legis: "Conseil de ville (ou Assemblée communale)", exec: "Conseil municipal", head: "maire / président·e de commune" },
   };
 
   /* Données d'élection par canton (composition + durée du mandat, en années). */
@@ -1444,6 +1450,7 @@
     VS: { gc: 130, ce: 5, tCant: 4, tCom: 4 },
     JU: { gc: 60, ce: 5, tCant: 5, tCom: 5 },
     FR: { gc: 110, ce: 7, tCant: 5, tCom: 5 },
+    BE: { gc: 160, ce: 7, tCant: 4, tCom: 4 },
   };
   const termLabel = (yrs) => state.lang === "en" ? (yrs + "-year term") : (state.lang === "pt" ? ("mandato de " + yrs + " anos") : ("mandat " + yrs + " ans"));
 
@@ -1610,6 +1617,9 @@
     FR: { auth: "État de Fribourg / Staat Freiburg", url: "https://www.fr.ch", host: "fr.ch",
       srcFr: "Questions d'entraînement (sources publiques cantonales)", srcEn: "Practice questions (public cantonal sources)", srcPt: "Perguntas de treino (fontes públicas cantonais)", srcEs: "Preguntas de práctica (fuentes públicas cantonales)", srcIt: "Domande di allenamento (fonti pubbliche cantonali)", srcDe: "Übungsfragen (öffentliche kantonale Quellen)", srcSq: "Pyetje ushtrimore (burime publike kantonale)",
       dateFr: "compilation juillet 2026", dateEn: "compiled July 2026", datePt: "compilação de julho de 2026", dateEs: "compilación de julio de 2026", dateIt: "compilazione luglio 2026", dateDe: "Zusammenstellung Juli 2026", dateSq: "përmbledhje korrik 2026" },
+    BE: { auth: "Canton de Berne · bzi Interlaken", url: "https://www.bzi.ch", host: "bzi.ch",
+      srcFr: "Test de naturalisation officiel (séries 36 & 37 / 2025)", srcEn: "Official naturalisation test (series 36 & 37 / 2025)", srcPt: "Teste de naturalização oficial (séries 36 e 37 / 2025)", srcEs: "Test de naturalización oficial (series 36 y 37 / 2025)", srcIt: "Test di naturalizzazione ufficiale (serie 36 e 37 / 2025)", srcDe: "Offizieller Einbürgerungstest (Serien 36 & 37 / 2025)", srcSq: "Test zyrtar natyralizimi (seritë 36 & 37 / 2025)",
+      dateFr: "édition 2025", dateEn: "2025 edition", datePt: "edição de 2025", dateEs: "edición de 2025", dateIt: "edizione 2025", dateDe: "Ausgabe 2025", dateSq: "botimi 2025" },
   };
   /* Sélecteur de champ localisé pour SOURCES : base + suffixe langue (repli FR). */
   const srcPick = (s, base) => s[base + (LSUF[state.lang] || "Fr")] || s[base + "Fr"];
@@ -1629,7 +1639,7 @@
           </div>
         </div>`;
     };
-    const order = [cn].concat(["VD", "GE", "NE", "VS", "JU", "FR"].filter((x) => x !== cn));
+    const order = [cn].concat(["VD", "GE", "NE", "VS", "JU", "FR", "BE"].filter((x) => x !== cn));
     $("aboutBody").innerHTML =
       `<div class="cs-card cs-highlight about-disclaimer">
          <div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l9 16H3z'/><path d='M12 10v4'/><path d='M12 17h.01'/></svg> ${t("about.discH", "Application non officielle")}</div>
@@ -1984,6 +1994,20 @@
         facts: ["Zweisprachiger Kanton Französisch / Deutsch (Sprachgrenze an der Saane)", "Gruyère-AOP-Käse, Moitié-moitié-Fondue und Broc-Schokolade", "1481 dank Niklaus von Flüe der Eidgenossenschaft beigetreten"] },
       sq: { langs: "Frëngjisht dhe Gjermanisht (kanton dygjuhësh)",
         facts: ["Kanton dygjuhësh frëngjisht / gjermanisht (kufiri gjuhësor përgjatë Sarine-s)", "Djathi Gruyère AOP, fondue moitié-moitié dhe çokollata e Broc-ut", "Hyri në Konfederatë në 1481 falë Nikolla së Flüe-së"] } },
+    BE: { capital: "Berne", joined: "1353", langs: "Allemand et Français (canton bilingue)", communes: "~335", districts: "10 arrondissements", pop: "~1 040 000", gc: 160, ce: 7, motto: "",
+      facts: ["Berne est aussi la ville fédérale (siège du gouvernement suisse)", "2e canton le plus peuplé ; officiellement bilingue allemand / français", "Vieille ville de Berne et région Jungfrau-Aletsch inscrites à l'UNESCO"],
+      en: { langs: "German and French (bilingual canton)", districts: "10 administrative districts",
+        facts: ["Bern is also the federal city (seat of the Swiss government)", "2nd most populous canton; officially bilingual German / French", "Bern's Old Town and the Jungfrau-Aletsch region are UNESCO sites"] },
+      pt: { langs: "Alemão e Francês (cantão bilingue)", districts: "10 distritos administrativos",
+        facts: ["Berna é também a cidade federal (sede do governo suíço)", "2.º cantão mais populoso; oficialmente bilingue alemão / francês", "A Cidade Velha de Berna e a região Jungfrau-Aletsch são património da UNESCO"] },
+      es: { langs: "Alemán y Francés (cantón bilingüe)", districts: "10 distritos administrativos",
+        facts: ["Berna es también la ciudad federal (sede del gobierno suizo)", "2.º cantón más poblado; oficialmente bilingüe alemán / francés", "El casco antiguo de Berna y la región Jungfrau-Aletsch son patrimonio de la UNESCO"] },
+      it: { langs: "Tedesco e Francese (cantone bilingue)", districts: "10 circondari amministrativi",
+        facts: ["Berna è anche la città federale (sede del governo svizzero)", "2º cantone più popoloso; ufficialmente bilingue tedesco / francese", "Il centro storico di Berna e la regione Jungfrau-Aletsch sono patrimonio UNESCO"] },
+      de: { langs: "Deutsch und Französisch (zweisprachiger Kanton)", districts: "10 Verwaltungskreise",
+        facts: ["Bern ist auch die Bundesstadt (Sitz der Schweizer Regierung)", "Zweitbevölkerungsreichster Kanton; offiziell zweisprachig Deutsch / Französisch", "Berner Altstadt und Region Jungfrau-Aletsch gehören zum UNESCO-Welterbe"] },
+      sq: { langs: "Gjermanisht dhe Frëngjisht (kanton dygjuhësh)", districts: "10 rrethe administrative",
+        facts: ["Berna është edhe qyteti federal (selia e qeverisë zvicerane)", "Kantoni i dytë më i populluar; zyrtarisht dygjuhësh gjermanisht / frëngjisht", "Qyteti i Vjetër i Bernës dhe rajoni Jungfrau-Aletsch janë në UNESCO"] } },
   };
   function openMonCanton() {
     const cn = cantonOf();
@@ -2012,7 +2036,7 @@
          <div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 21V10'/><path d='M9 21V10'/><path d='M15 21V10'/><path d='M19 21V10'/><path d='M12 3l8 5H4z'/></svg> ${t("mc.instT", "Institutions cantonales")}</div>
          ${row(cn === "JU" ? t("mc.parlement", "Parlement (législatif)") : t("mc.gc", "Grand Conseil (législatif)"), p.gc + " " + t("mc.gcUnit", "sièges"))}
          ${row(t("mc.ce", "Conseil d'État (exécutif)"), p.ce + " " + t("mc.ceUnit", "membres"))}
-         ${row(t("mc.legislature", "Législature"), t("mc.years5", "5 ans"))}
+         ${row(t("mc.legislature", "Législature"), fmt(t("mc.yearsN", "{n} ans"), { n: (ELECT[cn] ? ELECT[cn].tCant : 5) }))}
        </div>` +
       (pv("motto") ? `<div class="cs-card"><div class="cs-card-h"><svg class='ic' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z'/></svg> ${t("mc.mottoT", "Devise")}</div><p><i>${pv("motto")}</i></p></div>` : "") +
       `<div class="cs-card cs-highlight">
@@ -2602,7 +2626,7 @@
   /* ---------------- Démarrage ---------------- */
   applyStaticI18n();
   checkBadges();
-  const ready = ["GE", "NE", "VS", "JU", "FR"].indexOf(state.canton) >= 0
+  const ready = ["GE", "NE", "VS", "JU", "FR", "BE"].indexOf(state.canton) >= 0
     || (state.canton === "VD" && state.commune && VD_DATA.communes[state.commune]);
   if (ready) { renderHome(); showScreen("screen-home"); }
   else { openSetup(false); }

@@ -18,6 +18,7 @@ window.I18N = {
     "setup.desc.VS": "Switzerland · canton · Q&A cards",
     "setup.desc.JU": "Switzerland · canton",
     "setup.desc.FR": "Switzerland · canton · bilingual",
+    "setup.desc.BE": "Switzerland · canton · official test",
     "setup.noteTop": "You can change canton at any time.",
     "setup.communeTitle": "Where do you live?",
     "setup.communeSub": "Your municipality personalises your questions. You can change it any time.",
@@ -97,7 +98,7 @@ window.I18N = {
     "home.statsGlobal": "{n}% overall · by theme",
     "home.sessionsCount": "{n} sessions",
     "exam.subGE": "{n} questions · max 5 wrong",
-    "exam.subVD": "{n} questions · {m} min · pass 70%",
+    "exam.subGeneric": "{n} questions · {m} min · pass {p}%",
     "exam.subCards": "{n} questions · MCQ & cards",
 
     /* ---------- Titres d'écrans ---------- */
@@ -411,7 +412,7 @@ window.I18N = {
     "mc.capital": "Capital", "mc.joined": "Joined the Confederation", "mc.langs": "Language(s)",
     "mc.communes": "Municipalities", "mc.districts": "Districts", "mc.pop": "Population", "mc.popUnit": "inhab.",
     "mc.instT": "Cantonal institutions", "mc.gc": "Grand Council (legislative)", "mc.parlement": "Parliament (legislative)", "mc.ce": "Council of State (executive)",
-    "mc.gcUnit": "seats", "mc.ceUnit": "members", "mc.legislature": "Term of office", "mc.years5": "5 years",
+    "mc.gcUnit": "seats", "mc.ceUnit": "members", "mc.legislature": "Term of office", "mc.years5": "5 years", "mc.yearsN": "{n} years",
     "mc.mottoT": "Motto", "mc.knowT": "Good to know",
     "mc.note": "Indicative figures (population and number of municipalities change with mergers).",
 
@@ -467,6 +468,7 @@ window.I18N = {
     "setup.desc.VS": "Suiza · cantón · fichas P/R",
     "setup.desc.JU": "Suiza · cantón",
     "setup.desc.FR": "Suiza · cantón · bilingüe",
+    "setup.desc.BE": "Suiza · cantón · test oficial",
     "setup.noteTop": "Puedes cambiar de cantón en cualquier momento.",
     "setup.communeTitle": "¿Dónde vives?",
     "setup.communeSub": "Tu municipio personaliza tus preguntas. Puedes cambiarlo cuando quieras.",
@@ -546,7 +548,7 @@ window.I18N = {
     "home.statsGlobal": "{n}% global · por tema",
     "home.sessionsCount": "{n} sesiones",
     "exam.subGE": "{n} preguntas · máx. 5 errores",
-    "exam.subVD": "{n} preguntas · {m} min · aprobado 70%",
+    "exam.subGeneric": "{n} preguntas · {m} min · aprobado {p}%",
     "exam.subCards": "{n} preguntas · test y fichas",
 
     /* ---------- Títulos de pantalla ---------- */
@@ -860,7 +862,7 @@ window.I18N = {
     "mc.capital": "Capital", "mc.joined": "Ingreso en la Confederación", "mc.langs": "Lengua(s)",
     "mc.communes": "Municipios", "mc.districts": "Distritos", "mc.pop": "Población", "mc.popUnit": "hab.",
     "mc.instT": "Instituciones cantonales", "mc.gc": "Gran Consejo (legislativo)", "mc.parlement": "Parlamento (legislativo)", "mc.ce": "Consejo de Estado (ejecutivo)",
-    "mc.gcUnit": "escaños", "mc.ceUnit": "miembros", "mc.legislature": "Mandato", "mc.years5": "5 años",
+    "mc.gcUnit": "escaños", "mc.ceUnit": "miembros", "mc.legislature": "Mandato", "mc.years5": "5 años", "mc.yearsN": "{n} años",
     "mc.mottoT": "Lema", "mc.knowT": "Bueno saber",
     "mc.note": "Cifras indicativas (la población y el número de municipios cambian con las fusiones).",
 
@@ -916,6 +918,7 @@ window.I18N = {
     "setup.desc.VS": "Svizzera · cantone · schede D/R",
     "setup.desc.JU": "Svizzera · cantone",
     "setup.desc.FR": "Svizzera · cantone · bilingue",
+    "setup.desc.BE": "Svizzera · cantone · test ufficiale",
     "setup.noteTop": "Puoi cambiare cantone in qualsiasi momento.",
     "setup.communeTitle": "Dove abiti?",
     "setup.communeSub": "Il tuo comune personalizza le domande. Puoi cambiarlo quando vuoi.",
@@ -995,7 +998,7 @@ window.I18N = {
     "home.statsGlobal": "{n}% globale · per tema",
     "home.sessionsCount": "{n} sessioni",
     "exam.subGE": "{n} domande · max 5 errori",
-    "exam.subVD": "{n} domande · {m} min · superato 70%",
+    "exam.subGeneric": "{n} domande · {m} min · superato {p}%",
     "exam.subCards": "{n} domande · quiz e schede",
 
     /* ---------- Titoli schermate ---------- */
@@ -1309,7 +1312,7 @@ window.I18N = {
     "mc.capital": "Capoluogo", "mc.joined": "Ingresso nella Confederazione", "mc.langs": "Lingua/e",
     "mc.communes": "Comuni", "mc.districts": "Distretti", "mc.pop": "Popolazione", "mc.popUnit": "ab.",
     "mc.instT": "Istituzioni cantonali", "mc.gc": "Gran Consiglio (legislativo)", "mc.parlement": "Parlamento (legislativo)", "mc.ce": "Consiglio di Stato (esecutivo)",
-    "mc.gcUnit": "seggi", "mc.ceUnit": "membri", "mc.legislature": "Mandato", "mc.years5": "5 anni",
+    "mc.gcUnit": "seggi", "mc.ceUnit": "membri", "mc.legislature": "Mandato", "mc.years5": "5 anni", "mc.yearsN": "{n} anni",
     "mc.mottoT": "Motto", "mc.knowT": "Da sapere",
     "mc.note": "Cifre indicative (la popolazione e il numero di comuni cambiano con le fusioni).",
 
@@ -1365,6 +1368,7 @@ window.I18N = {
     "setup.desc.VS": "Schweiz · Kanton · F&A-Karten",
     "setup.desc.JU": "Schweiz · Kanton",
     "setup.desc.FR": "Schweiz · Kanton · zweisprachig",
+    "setup.desc.BE": "Schweiz · Kanton · offizieller Test",
     "setup.noteTop": "Du kannst den Kanton jederzeit wechseln.",
     "setup.communeTitle": "Wo wohnst du?",
     "setup.communeSub": "Deine Gemeinde personalisiert deine Fragen. Du kannst sie jederzeit ändern.",
@@ -1444,7 +1448,7 @@ window.I18N = {
     "home.statsGlobal": "{n}% gesamt · nach Thema",
     "home.sessionsCount": "{n} Sitzungen",
     "exam.subGE": "{n} Fragen · max. 5 Fehler",
-    "exam.subVD": "{n} Fragen · {m} Min. · bestanden 70%",
+    "exam.subGeneric": "{n} Fragen · {m} Min. · bestanden {p}%",
     "exam.subCards": "{n} Fragen · Quiz & Karten",
 
     /* ---------- Bildschirmtitel ---------- */
@@ -1758,7 +1762,7 @@ window.I18N = {
     "mc.capital": "Hauptort", "mc.joined": "Beitritt zur Eidgenossenschaft", "mc.langs": "Sprache(n)",
     "mc.communes": "Gemeinden", "mc.districts": "Bezirke", "mc.pop": "Bevölkerung", "mc.popUnit": "Einw.",
     "mc.instT": "Kantonale Institutionen", "mc.gc": "Grosser Rat (Legislative)", "mc.parlement": "Parlament (Legislative)", "mc.ce": "Staatsrat (Exekutive)",
-    "mc.gcUnit": "Sitze", "mc.ceUnit": "Mitglieder", "mc.legislature": "Amtszeit", "mc.years5": "5 Jahre",
+    "mc.gcUnit": "Sitze", "mc.ceUnit": "Mitglieder", "mc.legislature": "Amtszeit", "mc.years5": "5 Jahre", "mc.yearsN": "{n} Jahre",
     "mc.mottoT": "Wahlspruch", "mc.knowT": "Gut zu wissen",
     "mc.note": "Richtwerte (Bevölkerung und Gemeindezahl ändern sich durch Fusionen).",
 
@@ -1814,6 +1818,7 @@ window.I18N = {
     "setup.desc.VS": "Zvicër · kanton · fisha P/P",
     "setup.desc.JU": "Zvicër · kanton",
     "setup.desc.FR": "Zvicër · kanton · dygjuhësh",
+    "setup.desc.BE": "Zvicër · kanton · test zyrtar",
     "setup.noteTop": "Mund ta ndryshosh kantonin në çdo moment.",
     "setup.communeTitle": "Ku banon?",
     "setup.communeSub": "Komuna jote personalizon pyetjet e tua. Mund ta ndryshosh kur të duash.",
@@ -1893,7 +1898,7 @@ window.I18N = {
     "home.statsGlobal": "{n}% gjithsej · sipas temës",
     "home.sessionsCount": "{n} seanca",
     "exam.subGE": "{n} pyetje · maks. 5 gabime",
-    "exam.subVD": "{n} pyetje · {m} min · kalueshmëri 70%",
+    "exam.subGeneric": "{n} pyetje · {m} min · kalueshmëri {p}%",
     "exam.subCards": "{n} pyetje · kuiz dhe fisha",
 
     /* ---------- Titujt e ekraneve ---------- */
@@ -2207,7 +2212,7 @@ window.I18N = {
     "mc.capital": "Kryeqendra", "mc.joined": "Anëtarësimi në Konfederatë", "mc.langs": "Gjuha/ët",
     "mc.communes": "Komuna", "mc.districts": "Rrethe", "mc.pop": "Popullsia", "mc.popUnit": "ban.",
     "mc.instT": "Institucionet kantonale", "mc.gc": "Këshilli i Madh (legjislativ)", "mc.parlement": "Parlamenti (legjislativ)", "mc.ce": "Këshilli i Shtetit (ekzekutiv)",
-    "mc.gcUnit": "vende", "mc.ceUnit": "anëtarë", "mc.legislature": "Mandati", "mc.years5": "5 vjet",
+    "mc.gcUnit": "vende", "mc.ceUnit": "anëtarë", "mc.legislature": "Mandati", "mc.years5": "5 vjet", "mc.yearsN": "{n} vjet",
     "mc.mottoT": "Motoja", "mc.knowT": "Mirë të dihet",
     "mc.note": "Shifra treguese (popullsia dhe numri i komunave ndryshojnë me bashkimet).",
 
@@ -2263,6 +2268,7 @@ window.I18N = {
     "setup.desc.VS": "Suíça · cantão · fichas P&R",
     "setup.desc.JU": "Suíça · cantão",
     "setup.desc.FR": "Suíça · cantão · bilingue",
+    "setup.desc.BE": "Suíça · cantão · teste oficial",
     "setup.noteTop": "Pode mudar de cantão a qualquer momento.",
     "setup.communeTitle": "Onde moras?",
     "setup.communeSub": "O teu município personaliza as tuas perguntas. Podes alterá-lo a qualquer momento.",
@@ -2343,7 +2349,7 @@ window.I18N = {
     "home.statsGlobal": "{n}% global · por tema",
     "home.sessionsCount": "{n} sessões",
     "exam.subGE": "{n} perguntas · máx. 5 erros",
-    "exam.subVD": "{n} perguntas · {m} min · aprovação 70%",
+    "exam.subGeneric": "{n} perguntas · {m} min · aprovação {p}%",
     "exam.subCards": "{n} perguntas oficiais · escolha múltipla e fichas",
 
     /* ---------- Titres d'écrans ---------- */
@@ -2657,7 +2663,7 @@ window.I18N = {
     "mc.capital": "Capital", "mc.joined": "Adesão à Confederação", "mc.langs": "Língua(s)",
     "mc.communes": "Municípios", "mc.districts": "Distritos", "mc.pop": "População", "mc.popUnit": "hab.",
     "mc.instT": "Instituições cantonais", "mc.gc": "Grande Conselho (legislativo)", "mc.parlement": "Parlamento (legislativo)", "mc.ce": "Conselho de Estado (executivo)",
-    "mc.gcUnit": "lugares", "mc.ceUnit": "membros", "mc.legislature": "Legislatura", "mc.years5": "5 anos",
+    "mc.gcUnit": "lugares", "mc.ceUnit": "membros", "mc.legislature": "Legislatura", "mc.years5": "5 anos", "mc.yearsN": "{n} anos",
     "mc.mottoT": "Divisa", "mc.knowT": "A saber",
     "mc.note": "Números indicativos (a população e o número de municípios variam com as fusões).",
 
