@@ -11,4 +11,8 @@ android/app/build/
 android/build/
 android/local.properties
 android/app/src/main/assets/public/
+# Signature Android — NE JAMAIS versionner (secrets)
+android/keystore.properties
+*.jks
+*.keystore
 .DS_Store
