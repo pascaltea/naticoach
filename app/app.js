@@ -244,24 +244,39 @@
     if (IS_IOS) { iosTip(amount); return; }
     donateOpen("card", amount);           // Android + Web → Stripe
   }
-  /* Pourboire iOS via IAP (RevenueCat). Sans le plugin (ex. build web), on
-     dégrade proprement. Le SDK est configuré au démarrage natif (cf. IAP-SETUP.md). */
-  function iosTip(amount) {
-    const productId = IAP_TIPS[amount] || IAP_TIPS["10"];  // défaut 10 si « Autre »
-    const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
-    if (!P) { toast("", t("don.iosSoon", "Le soutien intégré arrive bientôt sur iOS.")); return; }
-    // ► POINT D'INTÉGRATION RevenueCat (à finaliser lors du build iOS) :
-    //   const { storeProduct } = await P.getProducts({ productIdentifiers: [productId] });
-    //   await P.purchaseStoreProduct({ product: storeProduct[0] });
-    Promise.resolve()
-      .then(() => P.getProducts({ productIdentifiers: [productId] }))
-      .then((r) => P.purchaseStoreProduct({ product: (r.products || r.storeProduct || [])[0] }))
-      .then(() => {
+  /* Pourboire iOS via achat intégré (StoreKit, plugin cordova-plugin-purchase).
+     Produits CONSOMMABLES support_5/10/20 créés dans App Store Connect.
+     Initialisé une seule fois au démarrage natif (initIAP, sur deviceready). */
+  let _iapReady = false;
+  function initIAP() {
+    if (!IS_IOS || _iapReady) return;
+    const CdvPurchase = window.CdvPurchase;
+    if (!CdvPurchase) return;                 // plugin absent (web/Android) → non concerné
+    _iapReady = true;
+    const { store, ProductType, Platform } = CdvPurchase;
+    store.register(Object.keys(IAP_TIPS).map((k) => ({
+      id: IAP_TIPS[k], type: ProductType.CONSUMABLE, platform: Platform.APPLE_APPSTORE,
+    })));
+    store.when()
+      .approved((tr) => tr.verify())
+      .verified((receipt) => {
+        receipt.finish();
         toast("<img src='logo-edelweiss-red.svg' width='18' height='18' alt=''>", t("don.thanks", "Merci pour ton soutien !"));
         if (state) { state.donated = true; save(); }
         closeDonSheet();
-      })
-      .catch(() => { /* achat annulé ou erreur : rien */ });
+      });
+    store.error(() => { /* annulation ou erreur : silencieux */ });
+    store.initialize([Platform.APPLE_APPSTORE]).catch(() => {});
+  }
+  function iosTip(amount) {
+    const productId = IAP_TIPS[amount] || IAP_TIPS["10"];  // défaut 10 si « Autre »
+    const CdvPurchase = window.CdvPurchase;
+    const store = CdvPurchase && CdvPurchase.store;
+    if (!store) { toast("", t("don.iosSoon", "Le soutien intégré arrive bientôt sur iOS.")); return; }
+    const product = store.get(productId, CdvPurchase.Platform.APPLE_APPSTORE);
+    const offer = product && product.getOffer();
+    if (offer) { offer.order().catch(() => {}); }
+    else { toast("", t("don.iosSoon", "Le soutien intégré arrive bientôt sur iOS.")); }
   }
 
   /* Avertit (dans la langue de l'interface) que les questions restent en français, puis exécute proceed. */
@@ -2708,6 +2723,12 @@
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  }
+
+  // iOS natif : initialise les achats intégrés (pourboires) quand les plugins sont prêts.
+  if (IS_IOS) {
+    if (window.CdvPurchase) initIAP();
+    else document.addEventListener("deviceready", initIAP, { once: true });
   }
 
   document.querySelectorAll(".lang-select").forEach((sel) => {
