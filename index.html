@@ -92,6 +92,10 @@
   .hero p.lede{ font-size:17px; line-height:1.65; color:var(--ink-soft); max-width:470px; margin:0 0 28px; }
   .badges{ display:flex; align-items:center; gap:10px; margin:18px 0 22px; flex-wrap:wrap; }
   .store-badge{ display:inline-flex; align-items:center; gap:9px; border:1px solid var(--line); border-radius:12px; padding:9px 16px; opacity:.55; cursor:default; }
+  .store-badge.live{ opacity:1; cursor:pointer; border-color:var(--ink); background:var(--card); transition:transform .12s ease, box-shadow .12s ease; }
+  .store-badge.live:hover{ transform:translateY(-1px); box-shadow:0 6px 18px rgba(43,38,32,.12); }
+  .store-badge.live .bt small{ color:var(--terra); }
+  .store-badge.live .bt b{ color:var(--ink); }
   .store-badge .bt{ display:flex; flex-direction:column; line-height:1.15; text-align:left; }
   .store-badge .bt small{ font-size:9px; font-weight:600; letter-spacing:.5px; color:var(--muted); }
   .store-badge .bt b{ font-size:13px; font-weight:700; }
@@ -314,10 +318,10 @@
         </a>
       </div>
       <div class="badges">
-        <span class="store-badge">
+        <a class="store-badge live" href="https://apps.apple.com/app/id6790120006" target="_blank" rel="noopener" aria-label="Télécharger NatiCoach sur l'App Store">
           <svg viewBox="0 0 24 24" style="width:18px;height:18px" fill="none" stroke="#2B2620" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 7.5c-.9 1.1-2.3 1-2.3 1s-.2-1.4.7-2.5c.9-1.1 2.3-1 2.3-1s.2 1.4-.7 2.5z"></path><path d="M16.8 12.1c0-2.3 1.9-3.1 1.9-3.1s-1-1.6-2.9-1.6c-1.1 0-2 .6-2.6.6-.6 0-1.6-.6-2.7-.6-2 0-4 1.7-4 5 0 3.2 2.4 6.6 3.7 6.6.7 0 1.5-.6 2.5-.6s1.6.6 2.5.6c1.3 0 2.8-2.6 3.3-4.1 0 0-1.7-.8-1.7-2.8z"></path></svg>
-          <span class="bt"><small>BIENTÔT SUR</small><b>App Store</b></span>
-        </span>
+          <span class="bt"><small>TÉLÉCHARGER SUR</small><b>App Store</b></span>
+        </a>
         <span class="store-badge">
           <svg viewBox="0 0 24 24" style="width:17px;height:17px" fill="none" stroke="#2B2620" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4l12 8-12 8V4z"></path><path d="M5 4l9.5 9.5"></path><path d="M5 20l9.5-9.5"></path></svg>
           <span class="bt"><small>BIENTÔT SUR</small><b>Google Play</b></span>
